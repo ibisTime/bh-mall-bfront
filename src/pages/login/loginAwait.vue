@@ -57,8 +57,12 @@ export default {
         });
       } else {
         usergo1(this.code).then(info => {
+<<<<<<< HEAD
           // alert(info.status + '专爱');
           alert('hahaha'+JSON.stringify(info));
+=======
+          alert(info.status + "专爱");
+>>>>>>> 1c23b1237469e1335a50c9e6d6e11d0a14c49823
           this.info = info;
           // setCookie("token", info.token);
           setUser(info);
@@ -69,8 +73,8 @@ export default {
       }
     },
     goLogin(userId, status) {
-      alert(status + '999状态');
       setCookie("status", status);
+      alert(status + "状态");
       //1,2禁止登陆
       if (status == 1 || status == 2) {
         alert("对不起，你被禁登录");
@@ -99,7 +103,11 @@ export default {
   mounted() {
     alert('999'+getCookie('userId'));
     if (!isLogin()) {
+<<<<<<< HEAD
       alert(location.href + '666地址');
+=======
+      alert(location.href + "地址");
+>>>>>>> 1c23b1237469e1335a50c9e6d6e11d0a14c49823
       if (/userReferee=([^&]+)&code=([^&]+)&state=/.exec(location.href)) {
         this.userReferee = RegExp.$1;
         this.code = RegExp.$2;
@@ -133,7 +141,6 @@ export default {
     loading
   }
 };
-
 </script>
 
 <style lang="scss" scoped>
