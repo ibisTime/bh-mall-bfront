@@ -45,49 +45,48 @@
 </template>
 <script>
 //二维码插件引入
-import {inquireConfig} from 'api/baohuo'
-import {initShare} from 'common/js/weixin'
-import {getCookie} from 'common/js/cookie.js';
-import {getUser} from 'api/user';
+import { inquireConfig } from "api/baohuo";
+import { initShare } from "common/js/weixin";
+import { getCookie } from "common/js/cookie.js";
+import { isLogin } from "common/js/util";
+import { getUser } from "api/user";
 const QRCode = require("js-qrcode");
 export default {
-  name:'Invitation',
-  data(){
-      return{
-          flag:false,
-          wxUrl:'http://front.bhxt.hichengdai.com?userReferee=',
-          info:{
-              title:'qqqqqqqqqqq',
-              desc:'qqqqqqqqqqq',
-              link:location.href,
-              imgUrl:'http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg'
-          },
-          nickname: ''
-      }
+  name: "Invitation",
+  data() {
+    return {
+      flag: false,
+      wxUrl: "http://front.bhxt.hichengdai.com?userReferee=",
+      info: {
+        title: "奇遇科技邀请链接",
+        desc: "邀请链接",
+        link: location.href.split('#')[0],
+        imgUrl: "http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg"
+      },
+      nickname: ""
+    };
   },
-  methods:{
-        changeFlag(){
-            this.flag = !this.flag
-        },
-        share(){
-            console.log(this.info)
-            initShare(this.info,this.success)
-        },
-        success(){
-            alert('点击右上角，进行分享')
-        },
-        error(e){
-            alert(e)
-        },
-        cancel(){
-            alert('cancel')
-        },
+  methods: {
+    changeFlag() {
+      this.flag = !this.flag;
+    },
+    share() {
+      initShare(this.info, this.success);
+    },
+    success() {
+      alert("点击右上角，进行分享");
+    },
+    error(e) {
+      alert(e);
+    },
+    cancel() {
+      alert("cancel");
+    }
   },
-  mounted(){
-      let userReferee = getCookie('userId')
-      console.log(userReferee);
-      this.wxUrl += userReferee
-      console.log(this.wxUrl)
+  mounted() {
+    if (isLogin()) {
+      let userReferee = getCookie("userId");
+      this.wxUrl += userReferee;
       //用插件生成二维码
       const container = document.getElementById("qrcode");
 
@@ -102,185 +101,185 @@ export default {
       });
       qr.make(this.wxUrl);
       getUser().then(res => {
-          console.log(res);
-          this.nickname = res.nickname
-      })
+        this.nickname = res.nickname;
+      });
+    }
   }
-}
+};
 </script>
 <style lang="scss" scoped>
-@import '../../common/scss/variable.scss';
-    .invitation{
-        height: 12rem;
-        background-image: url('../../assets/invitationLink/yaoqinglianjie@2x.png');
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-color: #f19a02;
+@import "../../common/scss/variable.scss";
+.invitation {
+  height: 12rem;
+  background-image: url("../../assets/invitationLink/yaoqinglianjie@2x.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-color: #f19a02;
+  position: relative;
+  .container {
+    padding: 0 0.3rem;
+    font-size: $font-size-small;
+    overflow: hidden;
+    .top {
+      height: 3.9rem;
+      margin-top: 3.16rem;
+      background-image: url("../../assets/invitationLink/juxing3.png");
+      background-repeat: no-repeat;
+      > div {
+        float: left;
+        width: 50%;
+        height: 3.9rem;
         position: relative;
-        .container{
-            padding: 0 0.3rem;
-            font-size: $font-size-small;
-            overflow: hidden;
-            .top{
-                height: 3.9rem;
-                margin-top: 3.16rem;
-                background-image: url('../../assets/invitationLink/juxing3.png');
-                background-repeat: no-repeat;
-                >div{
-                    float: left;
-                    width: 50%;
-                    height: 3.9rem;
-                    position: relative;
-                    span{
-                        width: 100%;
-                        position: absolute;
-                        text-align: center;
-                        top: 0.7rem;
-                        color: #f19a02;
-                    }
-                    i{
-                        width: 100%;
-                        position: absolute;
-                        top: 1.45rem;
-                        text-align: center;                        
-                        font-size: $font-size-large-s;
-                        color: #fe7300;
-                    }
-                    button{
-                        width: 2.5rem;
-                        height: 1rem;
-                        line-height: 1rem;
-                        background-color: #FE8729;
-                        border-radius: 0.1rem;
-                        background-size: cover;
-                        text-align: center;
-                        position: absolute;
-                        left: 50%;
-                        bottom: 0.6rem;
-                        transform: translateX(-50%);
-                        font-size: $font-size-large-ss;
-                        color: #fff;
-                    }
-                }
-            }
-            .bottom{
-                height: 3.9rem;
-                margin-top: 0.4rem;
-                background-image: url('../../assets/invitationLink/juxing3.png');
-                background-repeat: no-repeat;
-                overflow: hidden;
-                position: relative;
-                h3{
-                    text-align: center;
-                    margin-top: 0.4rem;
-                    font-size: $font-size-large;
-                    color: #b07c43;
-                    z-index: 2;
-                    position: relative;
-                }
-                span{
-                    width: 2.38rem;
-                    height: 0.24rem;
-                    background-color: #feebcc;
-                    border-radius: 0.1rem;
-                    position: absolute;
-                    top: 0.6rem;
-                    left: 50%;
-                    transform: translateX(-50%);
-                }
-                .content{
-                    padding: 0.56rem 0.5rem;
-                    position: absolute;
-                    top: 0.78rem;
-                    color: #c58c58;
-                    p{
-                        line-height: 0.5rem;
-                    }
-                }
-            }
+        span {
+          width: 100%;
+          position: absolute;
+          text-align: center;
+          top: 0.7rem;
+          color: #f19a02;
         }
-        .mask{
-            width: 100%;
-            height: 100%;
-            background-color: rgba($color: #000000, $alpha: 0.7);
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: none;
-            &.show{
-                display: block;
-            }
+        i {
+          width: 100%;
+          position: absolute;
+          top: 1.45rem;
+          text-align: center;
+          font-size: $font-size-large-s;
+          color: #fe7300;
         }
-        .line{
-            width: 0.03rem;
-            height: 2.2rem;
-            background-color: #fd8340;
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
-            &.show{
-                display: block;
-            }
+        button {
+          width: 2.5rem;
+          height: 1rem;
+          line-height: 1rem;
+          background-color: #fe8729;
+          border-radius: 0.1rem;
+          background-size: cover;
+          text-align: center;
+          position: absolute;
+          left: 50%;
+          bottom: 0.6rem;
+          transform: translateX(-50%);
+          font-size: $font-size-large-ss;
+          color: #fff;
         }
-        .erweima{
-            width: 5.7rem;
-            height: 6.7rem;
-            border-radius: 0.1rem;
-            background-image: url('../../assets/imgs/erweima@2x(1).png');
-            background-size: cover;
-            padding: 0.2rem 0;
-            position: absolute;
-            top: 2.2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9;
-            color: #fff;
-            display: none;
-            &.show{
-                display: block;
-            }
-            .erweima-top{
-                img{
-                    display: inline-block;
-                    width: 1rem;
-                    margin-left: 0.86rem;
-                    vertical-align: top;
-                }
-                .info{
-                    height: 1rem;
-                    display: inline-block;
-                    margin-left: 0.2rem;
-                    h3{
-                        font-size: $font-size-medium-xx;
-                    }
-                    p{
-                        margin-top: 0.2rem;
-                        font-size: $font-size-small;
-                    }
-                }
-            }
-            .erweima-middle{
-                font-size: $font-size-small;
-                padding-left: 0.86rem;
-                p + p {
-                    margin-top: 0.14rem;
-                }
-            }
-            .erweima-bottom{
-                margin-top: 0.24rem;
-                margin-left: 0.86rem;
-                width: 3.8rem;
-                height: 3.8rem;
-                padding: 0.26rem;
-                background-color: #fff;
-                position: relative;
-                .erweimaPic{
-                    width: 100%;
-                    height: 100%;
-                }
-            }
-        }
+      }
     }
+    .bottom {
+      height: 3.9rem;
+      margin-top: 0.4rem;
+      background-image: url("../../assets/invitationLink/juxing3.png");
+      background-repeat: no-repeat;
+      overflow: hidden;
+      position: relative;
+      h3 {
+        text-align: center;
+        margin-top: 0.4rem;
+        font-size: $font-size-large;
+        color: #b07c43;
+        z-index: 2;
+        position: relative;
+      }
+      span {
+        width: 2.38rem;
+        height: 0.24rem;
+        background-color: #feebcc;
+        border-radius: 0.1rem;
+        position: absolute;
+        top: 0.6rem;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .content {
+        padding: 0.56rem 0.5rem;
+        position: absolute;
+        top: 0.78rem;
+        color: #c58c58;
+        p {
+          line-height: 0.5rem;
+        }
+      }
+    }
+  }
+  .mask {
+    width: 100%;
+    height: 100%;
+    background-color: rgba($color: #000000, $alpha: 0.7);
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    &.show {
+      display: block;
+    }
+  }
+  .line {
+    width: 0.03rem;
+    height: 2.2rem;
+    background-color: #fd8340;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    &.show {
+      display: block;
+    }
+  }
+  .erweima {
+    width: 5.7rem;
+    height: 6.7rem;
+    border-radius: 0.1rem;
+    background-image: url("../../assets/imgs/erweima@2x(1).png");
+    background-size: cover;
+    padding: 0.2rem 0;
+    position: absolute;
+    top: 2.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9;
+    color: #fff;
+    display: none;
+    &.show {
+      display: block;
+    }
+    .erweima-top {
+      img {
+        display: inline-block;
+        width: 1rem;
+        margin-left: 0.86rem;
+        vertical-align: top;
+      }
+      .info {
+        height: 1rem;
+        display: inline-block;
+        margin-left: 0.2rem;
+        h3 {
+          font-size: $font-size-medium-xx;
+        }
+        p {
+          margin-top: 0.2rem;
+          font-size: $font-size-small;
+        }
+      }
+    }
+    .erweima-middle {
+      font-size: $font-size-small;
+      padding-left: 0.86rem;
+      p + p {
+        margin-top: 0.14rem;
+      }
+    }
+    .erweima-bottom {
+      margin-top: 0.24rem;
+      margin-left: 0.86rem;
+      width: 3.8rem;
+      height: 3.8rem;
+      padding: 0.26rem;
+      background-color: #fff;
+      position: relative;
+      .erweimaPic {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}
 </style>

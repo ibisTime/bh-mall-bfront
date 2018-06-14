@@ -7,7 +7,9 @@ function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
 
-module.exports = {
+const vuxLoader = require('vux-loader')
+
+const webpackConfig = {
   entry: {
     app: './src/main.js'
   },
@@ -19,7 +21,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.js', '.vue', '.json', '.less'],
     alias: {
       '@': resolve('src'),
       'common': resolve('src/common'),
@@ -28,7 +30,8 @@ module.exports = {
       'api': resolve('src/api'),
       'base': resolve('src/base'),
       'store': resolve('src/store'),
-      'static': resolve('static')
+      'static': resolve('static'),
+      'vue$': 'vue/dist/vue.esm.js'
     }
   },
   module: {
@@ -79,3 +82,4 @@ module.exports = {
     ]
   }
 }
+module.exports = vuxLoader.merge(webpackConfig, { plugins: ['vux-ui'] }) 

@@ -1,48 +1,40 @@
 <template>
     <div class="buycloud">
         <div class="item" v-for="item in list">
-            <img :src="item.pic">
+            <img :src="item.product.pic">
             <div class="content">
-                <p>{{item.productName}}</p>
+                <p>产品名称：{{item.productName}}</p>
                 <i>包装：{{item.productSpecsName}}</i>
-                <span>￥{{item.price / 1000}}</span>
+                <span>￥{{item.product.price / 1000}}</span>
             </div>
         </div>
     </div>
 </template>
 <script>
-import {getCloudList,productDetail} from 'api/baohuo';
-import {setCookie,getCookie} from 'common/js/cookie.js';
-import {formatDate,formatImg} from 'common/js/util';
+import { getCloudList, productDetail } from "api/baohuo";
+import { setCookie, getCookie } from "common/js/cookie.js";
+import { formatDate, formatImg } from "common/js/util";
 export default {
-    data(){
-        return{
-          list:[],
-        }
-    },
-    methods:{
+  data() {
+    return {
+      list: []
+    };
+  },
+  methods: {},
+  created() {
+    //获取用户等级
+    let level = getCookie("level");
 
-    },
-    created(){
-
-      //获取用户等级
-      let level = getCookie('level')
-
-      getCloudList().then(res => {
-
-        //遍历格式化图片
-          res.list.map(function(item){
-            
-            //查询产品详情
-            productDetail(item.productCode,level).then(info => {
-              item.pic = formatImg(info.pic)
-            })
-          })
-          this.list = res.list
-          console.log(this.list)
-      })
-    },
-}
+    getCloudList().then(res => {
+      //遍历格式化图片
+      res.list.map(function(item) {
+        //查询产品详情
+        item.product.pic = formatImg(item.product.pic);
+      });
+      this.list = res.list;
+    });
+  }
+};
 </script>
 <style lang="scss" scoped>
 @import "../../common/scss/variable.scss";

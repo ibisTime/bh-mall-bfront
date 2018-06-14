@@ -57,7 +57,6 @@ export default {
                 this.$router.push('/recharge/offine?accountNumber=' + this.accountNumber)
             }else if(this.status === 2) {
                 queryConfig(this.accountNumber,this.moneyNum * 1000).then(res => {
-                    console.log(res)
                     let wxConfig = {
                         appId: res.appId, // 公众号名称，由商户传入
                         timeStamp: res.timeStamp, // 时间戳，自1970年以来的秒数
@@ -72,7 +71,6 @@ export default {
         }
   },
   mounted(){
-      console.log(this)
       this.accountNumber = this.$route.query.accountNumber
       queryAmount(this.accountNumber).then(res => {
           this.account = res.amount

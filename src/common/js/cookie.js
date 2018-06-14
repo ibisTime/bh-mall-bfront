@@ -1,38 +1,42 @@
 export function setCookie(name, value, expires) {
-  var expr = '';
-  if (!expires) {
-    var Days = 30;
-    var exp = new Date();
-    exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-    expr = ';expires=' + exp.toGMTString();
-  }
-  document.cookie = name + '=' + escape(value) + expr + ';path=/;';
+  // var expr = '';
+  // // if (!expires) {
+  // //   var Days = 30;
+  // //   var exp = new Date();
+  // //   exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+  // //   expr = ';expires=' + exp.toGMTString();
+  // // }
+  // document.cookie = name + '=' + escape(value) + expr + ';path=/;';
+  sessionStorage.setItem(name, value);
 }
 
 export function getCookie(name) {
-  var reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)');
-  var arr = document.cookie.match(reg);
-  if (arr) {
-    return unescape(arr[2]);
-  } else {
-    return null;
-  }
+  // var reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)');
+  // var arr = document.cookie.match(reg);
+  // if (arr) {
+  //   return unescape(arr[2]);
+  // } else {
+  //   return null;
+  // }
+  return sessionStorage.getItem(name);
 }
 
 export function delCookie(name) {
-  var exp = new Date();
-  exp.setTime(exp.getTime() - 1);
-  var cval = getCookie(name);
-  if (cval != null) {
-    document.cookie = name + '=' + cval + ';expires=' + exp.toGMTString() + ';path=/;';
-  }
+  // var exp = new Date();
+  // exp.setTime(exp.getTime() - 1);
+  // var cval = getCookie(name);
+  // if (cval != null) {
+  //   document.cookie = name + '=' + cval + ';expires=' + exp.toGMTString() + ';path=/;';
+  // }
+  sessionStorage.removeItem(name);
 }
 
 
 export function clearAllCookie(){
-  var keys = document.cookie.match(/[^ =;]+(?=\=)/g);  
-  if(keys) {  
-      for(var i = keys.length; i--;)  
-          document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString()  
-  }
+  // var keys = document.cookie.match(/[^ =;]+(?=\=)/g);  
+  // if(keys) {  
+  //     for(var i = keys.length; i--;)  
+  //         document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString()  
+  // }
+  sessionStorage.clear(name);
 }

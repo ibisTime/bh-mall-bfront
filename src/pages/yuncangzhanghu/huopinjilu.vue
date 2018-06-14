@@ -3,15 +3,10 @@
         <div class="header">
             <img src="../../assets/imgs/buyimg.png" alt="">
             <div class="content">
-                <p>{{ info.productName}}</p>
-                <i>￥{{ info.price /1000}}</i>
-                <span>{{info.quantity}}瓶</span>
+                <p>{{ info[0].product.name}}</p>
+                <i>￥{{ info[0].product.adPrice /1000}}</i>
+                <span>{{info[0].quantity}}瓶</span>
             </div>
-        </div>
-        <div class="item" v-for="item in list">
-            <p class="top"><span>{{item.bizNote}}</span> <i>置换</i></p>
-            <p class="center">数量：{{item.tranNumber}}</p>
-            <p class="bottom">{{item.approveDatetime}}</p>
         </div>
     </div>
 </template>
@@ -21,8 +16,7 @@ import {formatDate} from 'common/js/util';
 export default {
   data(){
       return{
-          info:{},
-          list:[],
+          info:{}
       }
   },
   mounted(){

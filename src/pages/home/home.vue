@@ -7,7 +7,7 @@
         </div>
         <div class="userinfo">
           <p class="username">{{userinfo.realName}}</p>
-          <p class="userpost">上级：{{highuser}}</p>
+          <p class="userpost">等级：{{userinfo.level}}</p>
           <p>团队：{{userinfo.teamName}}</p>
         </div>
       </div>
@@ -105,200 +105,220 @@
   </div>
 </template>
 <script>
-
-import {setCookie,getCookie,clearAllCookie} from 'common/js/cookie.js';
-import {getUser,getUserById} from 'api/user';
-import {getBill} from 'api/baohuo';
+import { setCookie, getCookie, clearAllCookie } from "common/js/cookie.js";
+import { isLogin } from "common/js/util";
+import { getUser1, getUserById } from "api/user";
+import { getBill, checkRed, getLevel } from "api/baohuo";
 export default {
-    name: 'home',
-    data(){
-        return{
-
-          //代理管理
-          dailiManage: [{
-              text: '门槛账户',
-              src: require('../../assets/imgs/menkan@2x.png'),
-              to: '/threshold'
-            }, {
-              text: '代理轨迹',
-              src: require('../../assets/imgs/guiji@2x.png'),
-              to: '/agentTrajectory'
-
-            }, {
-              text: '代理结构图',
-              src: require('../../assets/imgs/daili2@2x.png'),
-              to: '/structure'
-            },
-            {
-              text: '授权证书',
-              src: require('../../assets/imgs/certification2@2x.png'),
-              to: '/acceptimg'
-            },
-            {
-              text: '邀请链接',
-              src: require('../../assets/imgs/yaoqinglianjie@2x.png'),
-              to: '/Invitation'
-            },
-            {
-              text: '下级代理',
-              src: require('../../assets/imgs/xiajidaili@2x.png'),
-              to: '/subAgent'
-            },
-            {
-              text: '意向代理',
-              src: require('../../assets/imgs/constructor@2x.png'),
-              to: '/IntentionalAgent'
-            },
-            {
-              text: '代理审核',
-              src: require('../../assets/imgs/shenhe@2x.png'),
-              to: '/check'
-            },
-            {
-              text: '申请退出',
-              src: require('../../assets/imgs/cancel@2x.png'),
-              to: '/logout'
-            },
-          ],
-
-          //财务管理
-          caiwuManage: [{
-              text: '业绩账户',
-              src: require('../../assets/imgs/yejizhanghu@2x.png'),
-              to: '/yejizhanghu'
-            }, {
-              text: '提现记录',
-              src: require('../../assets/imgs/tixianjilu@2x.png'),
-              to: '/tixianjilu'
-
-            }, {
-              text: '审核充值',
-              src: require('../../assets/imgs/shenhechongzhi2@2x.png'),
-              to: '/shenhechongzhi'
-            }, {
-              text: '推荐奖励',
-              src: require('../../assets/imgs/tuijianjiangli@2x.png'),
-              to: '/tuijianjiangli'
-            }, {
-              text: '出货奖励',
-              src: require('../../assets/imgs/chuhuojiangli@2x.png'),
-              to: '/chuhuojiangli'
-            }, {
-              text: '介绍奖励',
-              src: require('../../assets/imgs/jieshaojiangli@2x.png'),
-              to: '/jieshaojiangli'
-            }
-          ],
-
-          //云仓账户
-          cloudManage: [{
-              text: '云仓账户',
-              src: require('../../assets/imgs/yuncangzhanghu@2x.png'),
-              to: '/yuncangzhanghu'
-            }, {
-              text: '产品查询',
-              src: require('../../assets/imgs/chanpinchaxun@2x.png'),
-              to: '/chanpinchaxun'
-
-            }, {
-              text: '我要出货',
-              src: require('../../assets/imgs/jisongdaojia@2x.png'),
-              to: '/home'
-            }, {
-              text: '我的订单',
-              src: require('../../assets/imgs/wodedingdan@2x.png'),
-              to: '/wodedingdan'
-            }, 
-          ],
-
-          //营销推广
-          SalesManage: [{
-              text: '分享商城',
-              src: require('../../assets/imgs/fenxiangshangcheng2@2x.png'),
-              to: '/fenxiangshangcheng'
-            }, {
-              text: '产品素材',
-              src: require('../../assets/imgs/sucaichaxun@2x.png'),
-              to: '/sucaichaxun'
-
-            }, {
-              text: '待处理订单',
-              src: require('../../assets/imgs/daichulidingdan@2x.png'),
-              to: '/daichulidingdan'
-            },
-          ],
-
-          //内购商城
-          PurchaseManage: [{
-              text: '选购商品',
-              src: require('../../assets/imgs/xuangoushangpan@2x.png'),
-              to: '/xuangoushangpin'
-            }, {
-              text: '我的订单',
-              src: require('../../assets/imgs/wodedingdan@2x.png'),
-              to: '/neigoudingdan'
-
-            }, 
-          ],
-
-          //统计分析
-          StatisticsManage: [{
-              text: '我的介绍',
-              src: require('../../assets/imgs/wodejieshao@2x.png'),
-              to: '/my-templet'
-            }, {
-              text: '我的推荐',
-              src: require('../../assets/imgs/wodetuijian@2x.png'),
-              to: '/home/contact-business'
-
-            }, {
-              text: '我的出货',
-              src: require('../../assets/imgs/wodechuhuo@2x.png'),
-              to: '/home/contact-business'
-            },
-            {
-              text: '差价利润',
-              src: require('../../assets/imgs/chajialirun@2x.png'),
-              to: '/home/contact-business'
-            },
-          ],
-          userinfo:'',
-          highuser:'',
-          photo:'../../assets/imgs/head@2x.png',
-          balance:'',
+  name: "home",
+  data() {
+    return {
+      //代理管理
+      dailiManage: [
+        {
+          text: "门槛账户",
+          src: require("../../assets/imgs/menkan@2x.png"),
+          to: "/threshold"
+        },
+        {
+          text: "代理轨迹",
+          src: require("../../assets/imgs/guiji@2x.png"),
+          to: "/agentTrajectory"
+        },
+        {
+          text: "代理结构图",
+          src: require("../../assets/imgs/daili2@2x.png"),
+          to: "/structure"
+        },
+        {
+          text: "授权证书",
+          src: require("../../assets/imgs/certification2@2x.png"),
+          to: "/acceptimg"
+        },
+        {
+          text: "邀请链接",
+          src: require("../../assets/imgs/yaoqinglianjie@2x.png"),
+          to: "/Invitation"
+        },
+        {
+          text: "下级代理",
+          src: require("../../assets/imgs/xiajidaili@2x.png"),
+          to: "/subAgent"
+        },
+        {
+          text: "意向代理",
+          src: require("../../assets/imgs/constructor@2x.png"),
+          to: "/IntentionalAgent"
+        },
+        {
+          text: "代理审核",
+          src: require("../../assets/imgs/shenhe@2x.png"),
+          to: "/check"
+        },
+        {
+          text: "申请退出",
+          src: require("../../assets/imgs/cancel@2x.png"),
+          to: "/logout"
         }
-    },
-    methods:{
-        tuichu(){
-            clearAllCookie()
-            this.$router.push('/home')
-        }
-    },
-    mounted(){
-      // alert(2222222222222222)
-      // setCookie('token','TUSYS201800000000002TK201804041011485725277')
-      // let userId = this.$route.query.userId
-      // if(userId) {
-      //   setCookie('userId',userId)
-      // }
-      // setCookie('userId','U201805021553003594506')
-      getUser().then(res => {
-        console.log(res.userId);
-        this.userinfo = res
-        setCookie('level',res.level)
-        // if(res.highUserId){
-          getUserById(res.userId).then(info => {
-            this.highuser = info.realName
-          })
-        // }
-      })
+      ],
 
-      getBill().then(res => {
-        console.log(res)
-        this.balance = res[0].amount;
-      })
+      //财务管理
+      caiwuManage: [
+        {
+          text: "业绩账户",
+          src: require("../../assets/imgs/yejizhanghu@2x.png"),
+          to: "/yejizhanghu"
+        },
+        {
+          text: "提现记录",
+          src: require("../../assets/imgs/tixianjilu@2x.png"),
+          to: "/tixianjilu"
+        },
+        {
+          text: "审核充值",
+          src: require("../../assets/imgs/shenhechongzhi2@2x.png"),
+          to: "/shenhechongzhi"
+        },
+        {
+          text: "推荐奖励",
+          src: require("../../assets/imgs/tuijianjiangli@2x.png"),
+          to: "/tuijianjiangli"
+        },
+        {
+          text: "出货奖励",
+          src: require("../../assets/imgs/chuhuojiangli@2x.png"),
+          to: "/chuhuojiangli"
+        },
+        {
+          text: "介绍奖励",
+          src: require("../../assets/imgs/jieshaojiangli@2x.png"),
+          to: "/jieshaojiangli"
+        }
+      ],
+
+      //云仓账户
+      cloudManage: [
+        {
+          text: "云仓账户",
+          src: require("../../assets/imgs/yuncangzhanghu@2x.png"),
+          to: "/yuncangzhanghu"
+        },
+        {
+          text: "产品查询",
+          src: require("../../assets/imgs/chanpinchaxun@2x.png"),
+          to: "/chanpinchaxun"
+        },
+        {
+          text: "我要出货",
+          src: require("../../assets/imgs/jisongdaojia@2x.png"),
+          to: "/woyaochuhuo"
+        },
+        {
+          text: "我的订单",
+          src: require("../../assets/imgs/wodedingdan@2x.png"),
+          to: "/wodedingdan"
+        }
+      ],
+
+      //营销推广
+      SalesManage: [
+        {
+          text: "分享商城",
+          src: require("../../assets/imgs/fenxiangshangcheng2@2x.png"),
+          to: "/fenxiangshangcheng"
+        },
+        {
+          text: "产品素材",
+          src: require("../../assets/imgs/sucaichaxun@2x.png"),
+          to: "/sucaichaxun"
+        },
+        {
+          text: "待处理订单",
+          src: require("../../assets/imgs/daichulidingdan@2x.png"),
+          to: "/daichulidingdan"
+        }
+      ],
+
+      //内购商城
+      PurchaseManage: [
+        {
+          text: "选购商品",
+          src: require("../../assets/imgs/xuangoushangpan@2x.png"),
+          to: "/xuangoushangpin"
+        },
+        {
+          text: "我的订单",
+          src: require("../../assets/imgs/wodedingdan@2x.png"),
+          to: "/neigoudingdan"
+        },
+        {
+          text: "我要出货",
+          src: require("../../assets/imgs/jisongdaojia@2x.png"),
+          to: "/neigouchuhuo"
+        }
+      ],
+
+      //统计分析
+      StatisticsManage: [
+        {
+          text: "我的介绍",
+          src: require("../../assets/imgs/wodejieshao@2x.png"),
+          to: "/my-templet"
+        },
+        {
+          text: "我的推荐",
+          src: require("../../assets/imgs/wodetuijian@2x.png"),
+          to: "/home/contact-business"
+        },
+        {
+          text: "我的出货",
+          src: require("../../assets/imgs/wodechuhuo@2x.png"),
+          to: "/home/contact-business"
+        },
+        {
+          text: "差价利润",
+          src: require("../../assets/imgs/chajialirun@2x.png"),
+          to: "/home/contact-business"
+        }
+      ],
+      userinfo: "",
+      highuser: "",
+      photo: "../../assets/imgs/head@2x.png",
+      balance: ""
+    };
+  },
+  methods: {
+    tuichu() {
+      clearAllCookie();
+      this.$router.push("/home");
     }
-}
+  },
+  mounted() {
+    if (this.$route.query.userId) {
+      var userId = this.$route.query.userId;
+      setCookie("userId", userId);
+    } else {
+      var userId = getCookie("userId");
+    }
+    checkRed(userId).then(res => {
+      if (res.result == "0") {
+        this.$router.push("/login/reCharge");
+      } else if (res.result == "1") {
+        alert("您需要下授权单！");
+      }
+    });
+    getUser1(userId).then(res => {
+      this.userinfo = res;
+      setCookie("level", res.level);
+      getLevel(res.level).then(item => {
+        res.level = item[0].name;
+      });
+    });
+    getBill().then(res => {
+      this.balance = res[0].amount;
+    });
+  }
+};
 </script>
 <style lang="scss" scoped>
 @import "../../common/scss/mixin.scss";
@@ -472,7 +492,7 @@ export default {
       }
     }
   }
-  .tuichu{
+  .tuichu {
     position: fixed;
     right: 0.3rem;
     top: 0.3rem;

@@ -14,20 +14,18 @@ export default {
   data(){
       return{
           list:[],
-          name:'',
+          name:''
       }
   },
   methods:{},
   mounted(){
-        console.log(this.$route.query)
         this.name = this.$route.query.name
         let userId = this.$route.query.id
         getTrack(userId).then(res => {
             res.logList.map(item => {
                 item.approveDatetime = formatDate(item.approveDatetime)
             })
-            this.list = res.logList
-            console.log(this.list)
+            this.list = res
         })
   },
 }

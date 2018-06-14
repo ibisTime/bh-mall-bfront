@@ -10,8 +10,9 @@
       <img :src="item.pic" alt="">
       <div class="content">
         <p>{{item.name}}</p>
-        <i>包装：{{item.specsList[0].name}}</i>
-        <span @click="prodectDetail(item.code)">购买云仓</span>
+        <p>价格：{{item.price / 100}}</p>
+        <p>数量：{{item.quantity}}</p>
+        <span @click="prodectDetail(item.code)">购买</span>
       </div>
     </div>
     <div :class="['mask',flag ? 'show' : '']" @click="genghuan"></div>
@@ -26,157 +27,127 @@
           <i @click="genghuan">X</i>
         </div>
       </div>
-      <div class="packaging">
-        <p>包装</p>
-        <div class="select">
-          <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(index,$event)" :class="[num === index ? 'active' : '']">{{item.name}}</span>
-        </div>
-      </div>
-      <div class="packaging">
-        <p>规格</p>
-        <div class="select">
-          <span v-for="(item,index) in detail.specsList" :code="item.code" @click="_chooseSize(index,$event)" :class="[number === index ? 'active' : '']">{{item.weight}}g</span>
-        </div>
-      </div>
       <div class="total-money">
         <div class="left">
           <i class="text">合计：</i>
           <i class="symbol">￥</i>
-          <i class="sum">{{detail.specsList[num].price.price / 1000 * detail.specsList[num].number}}</i>
+          <i class="sum">{{detail.price / 1000 * number}}</i>
         </div>
         <div class="right">
           <span class="diamonds" @click="add">+</span>
-          <span class="num">{{detail.specsList[num].number}}</span>
+          <span class="num">{{number}}</span>
           <span class="diamonds" @click="sub">-</span>
         </div>
       </div>
-      <div class="buypart-bottom" @click="buy">
-        确认购买
+      <div class="buypart-bottom" @click="confirm(detail.code)">
+        提交订单
       </div>
     </div>
   </div>
 </template>
 <script>
-import {queryProduct,productDetail,cloudBill} from 'api/baohuo';
-import {getUser,getUserById} from 'api/user';formatImg
-import {formatImg} from 'common/js/util';
-import {setCookie,getCookie} from 'common/js/cookie.js';
+import {
+  queryProduct,
+  neigouProductDetail,
+  cloudBill,
+  palceOrder,
+  shopBill,
+  neigouProduct
+} from "api/baohuo";
+import { getUser, getUserById } from "api/user";
+formatImg;
+import { formatImg } from "common/js/util";
+import { setCookie, getCookie } from "common/js/cookie.js";
 export default {
-    data(){
-        return{
-            tipshow : false,
-            buypartFlag:false,
-            flag:false,
-            level:'',
-            list : [],
-            detail:{
-                name:'',
-                specsList:[
-                    {
-                        name:'',
-                        weight:'',
-                        price:{
-                            price:0,
-                        },
-                    },
-                ],
-            },
-            options:{},
-            i:0,
-            num:0,
-            number:0,
-        }
+  data() {
+    return {
+      tipshow: false,
+      buypartFlag: false,
+      flag: false,
+      level: "",
+      list: [],
+      detail: [],
+      options: {},
+      i: 0,
+      num: 0,
+      number: 1
+    };
+  },
+  methods: {
+    changeTipShow() {
+      this.tipshow = !this.tipshow;
     },
-    methods:{
-        changeTipShow(){
-          this.tipshow = !this.tipshow
-        },
 
-        //变换遮罩层显示与隐藏
-        changeFlag(){
-            this.flag = !this.flag;
-        },
-
-        //我的商品详情展示与隐藏
-        changebuypartFlag(){
-            this.buypartFlag = !this.buypartFlag;
-        },
-
-    
-        genghuan(){
-            this.changeFlag()
-            this.changebuypartFlag()
-            this.num = 0
-        },
-
-        //选购产品数量+1
-        add(){
-            this.detail.specsList[this.num].number++
-        },
-
-        // 选购产品数量-1
-        sub(){
-            if(this.detail.specsList[this.num].number >= 2) {
-                this.detail.specsList[this.num].number--
-            }
-        },
-
-        //选择包装
-        chooseSize(index,event) {
-          this.num = index
-        },
-
-        //选择规格
-        _chooseSize(index) {
-          this.number = index
-        },
-
-        //产品详情查询
-        prodectDetail(code){
-            this.genghuan()
-            this.options.code = code
-            //保存this
-            let self = this
-            productDetail(code,this.level).then(res => {
-                res.pic = formatImg(res.pic)
-                self.detail = res
-                self.options.name = res.name
-                console.log(self.detail)
-            })
-        },
-
-        //产品购买
-        buy(){
-            if(this.num == 0) {
-              this.options.baozhuan = this.detail.specsList[0].name
-            }
-            if(this.number == 0) {
-              this.options.guige = this.detail.specsList[0].weight
-            }
-            this.options.productSpecsCode = this.detail.specsList[this.num].code
-            this.options.quantity = this.detail.specsList[this.num].number
-            this.options.price = this.detail.specsList[this.num].price.price / 1000
-            this.options.pic = this.detail.pic
-            setCookie('options',JSON.stringify(this.options))
-            console.log(this.options)
-            this.$router.push('/xuangoushangpin/shangpingoumai')
-        },
+    //变换遮罩层显示与隐藏
+    changeFlag() {
+      this.flag = !this.flag;
     },
-    mounted(){
-        getUser().then(res => {
-            this.level = res.level
 
-            //商品列表查询
-            queryProduct(res.level).then(res => {
-                res.list.map(function(item){
-                  item.pic = formatImg(item.pic)
-                })
-                this.list = res.list
-            })
-        })
-
+    //我的商品详情展示与隐藏
+    changebuypartFlag() {
+      this.buypartFlag = !this.buypartFlag;
     },
-}
+
+    genghuan() {
+      this.changeFlag();
+      this.changebuypartFlag();
+      this.num = 0;
+    },
+
+    //选购产品数量+1
+    add() {
+      this.number++;
+    },
+
+    // 选购产品数量-1
+    sub() {
+      if (this.number >= 2) {
+        this.number--;
+      }
+    },
+
+    //选择包装
+    chooseSize(index, event) {
+      this.num = index;
+    },
+
+    //选择规格
+    _chooseSize(index) {
+      this.number = index;
+    },
+
+    //产品详情查询
+    prodectDetail(code) {
+      this.genghuan();
+      this.options.code = code;
+      //保存this
+      let self = this;
+      neigouProductDetail(code).then(res => {
+        res.pic = formatImg(res.pic);
+        self.detail = res;
+        console.log(self.detail);
+      });
+    },
+    //确认商品
+    confirm(code) {
+      this.$router.push(
+        "/xuangoushangpin/shangpingoumai?code=" +
+          code +
+          "&number=" +
+          this.number
+      );
+    }
+  },
+  mounted() {
+    //商品列表查询
+    neigouProduct().then(res => {
+      res.list.map(function(item) {
+        item.pic = formatImg(item.pic);
+      });
+      this.list = res.list;
+    });
+  }
+};
 </script>
 <style lang="scss" scoped>
 @import "../../common/scss/variable.scss";

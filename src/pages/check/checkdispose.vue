@@ -27,7 +27,6 @@
             <span class="footer-check" @click="audit">审核</span>
             <span class="footer-back" @click="$router.push('/check')">返回</span>
         </div>
-        <toast ref="mytoast" :text="text"></toast>
     </div>
 </template>
 <script>
@@ -48,11 +47,10 @@ export default {
           if(this.index == 6) {
               accredit(this.userId).then(res => {
                     if(res.isSuccess){
-                        this.text = '审核成功'
-                        this.$refs.mytoast.show()
+                       alert('审核成功');
+                       this.$router.go(-1);
                     }else{
-                        this.text = '审核失败'
-                        this.$refs.mytoast.show()
+                       alert('审核失败');
                     }
               })
           }else if(index == 12){
@@ -84,10 +82,8 @@ export default {
         this.userId = this.$route.query.id
         this.index = this.$route.query.index
         getUserById(this.userId).then(res => {
-            console.log(res)
             this.userinfo = res
             getLevel(res.applyLevel).then(info => {
-                console.log(info)
                 res.applyLevel = info[0].name
             })
         })

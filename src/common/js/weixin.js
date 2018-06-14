@@ -92,6 +92,7 @@ export function initShowImage () {
  * }
  */
 function _initShare(data, config, isInitImage) {
+  alert(config.link);
   let jsApiList = [
     'onMenuShareTimeline',
     'onMenuShareAppMessage',

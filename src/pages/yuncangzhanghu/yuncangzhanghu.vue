@@ -6,7 +6,7 @@
                 <p class="money-balance">{{account / 1000}}</p>
             </div>
             <div class="header-bottom">
-                <div class="header-bottom-left fl">
+                <div class="header-bottom-left fl" @click="$router.push('/woyaochuhuo')">
                     <img src="../../assets/threshold/chongzhi.png" alt="">
                     <span>我要出货</span>
                     <i class="line"></i>
@@ -17,59 +17,59 @@
                 </div>
             </div>
         </div>
-        <div class="item" v-for="item in list" @click="$router.push('/yuncangzhanghu/huopinjilu?code=' + item.code + '&productCode=' + item.productCode)">
-            <img :src="item.pic">
+        <div class="item" v-for="item in list" @click="$router.push('/yuncangzhanghu/huopinjilu?code=' + item.code + '&productCode=' + item.productCode)">      
+        <img :src="item.product.pic" alt="">
             <div class="content">
-                <p>{{item.productName}}</p>
-                <i>￥{{item.price / 1000}}</i>
+                <p>产品名称: {{item.productName}}</p>
+                <i>单价：￥{{item.price / 1000}}</i>
                 <span @click="prodectDetail(item.code)">{{item.quantity}}瓶</span>
             </div>
         </div>
     </div>
 </template>
 <script>
-import {getCloud,getCloudDetail,getCloudList,productDetail} from 'api/baohuo';
-import {formatDate,formatImg} from 'common/js/util';
-import {setCookie,getCookie} from 'common/js/cookie.js';
+import {
+  getCloud,
+  getCloudDetail,
+  getCloudList,
+  productDetail
+} from "api/baohuo";
+import { formatDate, formatImg } from "common/js/util";
+import { setCookie, getCookie } from "common/js/cookie.js";
 export default {
-  name:'threshold',
-  data(){
-      return{
-          list:[],
-          account:0,
-          accountNumber:'',
-      }
+  name: "threshold",
+  data() {
+    return {
+      list: [],
+      account: 0,
+      accountNumber: ""
+    };
   },
-  methods:{
-
-  },
-  created(){
-      let level = getCookie('level')
-      //获取用户云仓账户
-      getCloud().then(res => {
-            this.account = res.amount;
-      })
-      getCloudList().then(res => {
-
-          //遍历格式化图片
-          res.list.map(function(item){
-
-            //查询产品详情
-            productDetail(item.productCode,level).then(info => {
-              item.pic = formatImg(info.pic)
-            })
-          })
-          this.list = res.list
-          console.log(this.list)
-      })
-  },
-}
+  methods: {},
+  created() {
+    let level = getCookie("level");
+    //获取用户云仓账户
+    getCloud().then(res => {
+      this.account = res.amount;
+    });
+    getCloudList().then(res => {
+      //遍历格式化图片
+      res.list.map(function(item) {
+        item.product.pic = formatImg(item.product.pic);
+        
+        //查询产品详情
+        // productDetail(item.productCode, level).then(info => {});
+      });
+      this.list = res.list;
+    });
+  }
+};
 </script>
 <style lang="scss" scoped>
 @import "../../common/scss/variable.scss";
 .threshold {
-    background-color: #f7f7f7;
-    height: 100%;
+  background-color: #f7f7f7;
+  height: 100%;
   .fl {
     float: left;
   }
@@ -143,7 +143,7 @@ export default {
         position: absolute;
         top: 0;
         right: 0;
-        font-size:$font-size-medium-x;
+        font-size: $font-size-medium-x;
         border-radius: 0.1rem;
         color: #333;
         text-align: center;

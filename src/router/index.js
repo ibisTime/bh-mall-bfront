@@ -5,7 +5,8 @@ import Router from 'vue-router'
 import login from '@/pages/login/login'
 import loginAwait from '@/pages/login/loginAwait'
 import replying from '@/pages/login/replying'
-
+import loginuserReferee from '@/pages/login/loginuserReferee'
+import reCharge from '@/pages/login/reCharge'
 //ceshi
 import ceshi from '@/pages/ceshi/ceshi'
 
@@ -14,6 +15,7 @@ import ceshi from '@/pages/ceshi/ceshi'
 import home from '@/pages/home/home'
 import threshold from '@/pages/threshold/threshold'
 import buyCloud from '@/pages/buyCloud/buyCloud'
+import tijiaodingdan from '@/pages/buyCloud/tijiaodingdan'
 import acceptimg from '@/pages/acceptimg/acceptimg'
 import agentTrajectory from '@/pages/agentTrajectory/agentTrajectory'
 import structure from '@/pages/structure/structure'
@@ -95,6 +97,16 @@ export default new Router({
       path: '/login/replying',
       name: 'replying',
       component: replying
+    },
+    {
+      path: '/login/loginuserReferee',
+      name: 'loginuserReferee',
+      component: loginuserReferee
+    },
+    {
+      path: '/login/reCharge',
+      name: 'reCharge',
+      component: reCharge
     },
     {
       path: '/login/login',
@@ -208,6 +220,11 @@ export default new Router({
       path: '/buyCloud',
       name: 'buyCloud',
       component: buyCloud
+    },
+    {
+      path: '/buyCloud/tijiaodingdan',
+      name: 'tijiaodingdan',
+      component: tijiaodingdan
     },
     //取现订单
     {

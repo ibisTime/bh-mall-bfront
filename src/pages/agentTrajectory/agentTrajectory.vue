@@ -3,8 +3,8 @@
         <div class="header">
             <p><span>微信：</span> <i>{{info.wxId}}</i></p>
             <p><span>当前等级：</span> <i>{{level}}</i></p>
-            <p><span>当前上级：</span> <i>{{highuser}}</i></p>
-            <p><span>微信推荐人：</span> <i></i></p>
+            <p><span>当前上级：</span> <i>{{highUserId}}</i></p>
+            <p><span>推荐人：</span> <i>{{realName}}</i></p>
         </div>
         <div class="blank"></div>
         <div class="content">
@@ -52,7 +52,9 @@ export default {
             highuser: '',
             logList:[],
             status:[],
-            userId: ''
+            userId: '',
+            highUserId: '',
+            realName: ''
         }
     },
     methods:{
@@ -67,29 +69,17 @@ export default {
             this.info = res
             this.logList = res.logList
             this.userId = res.userId
-
+            this.highUserId = res.logList[0].highUserId
+            this.realName = res.realName
             //当前等级
             getLevel(this.info.level).then(res =>{
                 this.level = res[0].name;
             })
 
-            //当前上级
-            if(res.highUserId) {
-                getUserById(userId).then(res => {
-                    this.highuser = res.realName
-                })
-            }
-
             //遍历轨迹 重新生成轨迹数组
 
             this.logList.map(function(item){
                 item.applyDatetime = formatDate(item.applyDatetime)
-            })
-
-            this.logList.map(function(item){
-                getUserById(userId).then(res => {
-                    item.applyUser = res.realName
-                })
             })
 
         })

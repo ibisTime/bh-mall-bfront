@@ -26,24 +26,11 @@
               </div>
               <img :src="item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
               <div class="detail">
-                  <p class="datail-money">+{{item.outAmount}}</p>
+                  <p class="datail-money">{{item.bizNote}}   {{item.outAmount / 1000}}</p>
                   <p class="detail-text">{{item.remark}}</p>
               </div>
               </div>
           </div>
-          <!-- <div class="item">
-              <div class="center">
-              <div class="item-time">
-                  <p class="day">15日</p>
-                  <p class="minute">21:46</p>
-              </div>
-              <img src="../../assets/threshold/zhi.png" alt="">
-              <div class="detail">
-                  <p class="datail-money">-2.00</p>
-                  <p class="detail-text">[公益消费收益] 分红权ID1231231</p>
-              </div>
-              </div>
-          </div> -->
       </div>
   </div>
 </template>

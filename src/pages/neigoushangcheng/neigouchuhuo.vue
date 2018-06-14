@@ -1,5 +1,5 @@
 <template>
-    <div class="woyaochuhuo">
+    <div class="neigouchuhuo">
         <div class="top" @click="$router.push('/dizhi?address=' + 3)">
             <img src="../../assets/imgs/more@2x.png" class="right">
             <img src="../../assets/imgs/shouhuodizhi@2x.png" class="left">

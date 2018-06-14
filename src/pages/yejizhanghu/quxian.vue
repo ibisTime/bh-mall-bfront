@@ -33,174 +33,179 @@
   </div>
 </template>
 <script>
-import {getCookie} from 'common/js/cookie'
-import {queryAmount,queryBankCard,getPercent,quxian,queryBankCardDetail} from 'api/baohuo'
+import { getCookie } from "common/js/cookie";
+import {
+  queryAmount,
+  queryBankCard,
+  getPercent,
+  quxian,
+  queryBankCardDetail
+} from "api/baohuo";
 export default {
-    name:'quxian',
-    data(){
-        return{
-            account:'',
-            percent :'',
-            show:false,
-            cardList:[],
-            options:{
-                account:'',
-                accountNumber:'',
-                payCardInfo:'银行卡号',
-                payCardNo:'',
-            },
-            
-        }
+  name: "quxian",
+  data() {
+    return {
+      account: "",
+      percent: "",
+      show: false,
+      cardList: [],
+      options: {
+        account: "",
+        accountNumber: "",
+        payCardInfo: "银行卡号",
+        payCardNo: ""
+      }
+    };
+  },
+  methods: {
+    recharge() {
+      quxian(this.options).then(res => {
+        console.log(res);
+      });
     },
-    methods:{
-        recharge(){
-            quxian(this.options).then(res => {
-                console.log(res)
-            })
-        },
-        queryBankCardDetail(code){
-            this.changeShow()
-            queryBankCardDetail(code).then(res=>{
-                this.options.payCardInfo = res.bankName
-                this.options.payCardNo = res.bankcardNumber
-            })
-        },
-        changeShow(){
-            this.show = !this.show
-        }
+    queryBankCardDetail(code) {
+      this.changeShow();
+      queryBankCardDetail(code).then(res => {
+        this.options.payCardInfo = res.bankName;
+        this.options.payCardNo = res.bankcardNumber;
+      });
     },
-    mounted(){
-        this.options.accountNumber = this.$route.query.accountNumber
-        queryAmount(this.options.accountNumber).then(res => {
-            this.account = res.amount
-        })
-        getPercent('BUSERQXFL').then(res => {
-            this.percent = res.cvalue
-        })
-        queryBankCard().then(res => {
-            this.cardList = res
-        })
-    },
-    computed:{
-        servicCharge(){
-            let sum = this.options.account * this.percent
-            return sum.toFixed(2)
-        },
+    changeShow() {
+      this.show = !this.show;
     }
-}
+  },
+  mounted() {
+    this.options.accountNumber = this.$route.query.accountNumber;
+    queryAmount(this.options.accountNumber).then(res => {
+      this.account = res.amount;
+    });
+    getPercent("BUSERQXFL").then(res => {
+      this.percent = res.cvalue;
+    });
+    queryBankCard().then(res => {
+      this.cardList = res;
+    });
+  },
+  computed: {
+    servicCharge() {
+      let sum = this.options.account * this.percent;
+      return sum.toFixed(2);
+    }
+  }
+};
 </script>
 <style lang="scss" scoped>
-@import '../../common/scss/variable.scss';
-    .recharge{
-        background-color: #f7f7f7;
-        height: 100%;
-        .bank-card{
-            height: 1rem;
-            line-height: 1rem;
-            padding: 0 0.3rem;
-            font-size: $font-size-medium-x;
-            color: #333;
-            background-color: #fff;
-            position: relative;
-            z-index: 10;
-            .carnum{
-                position: absolute;
-                left: 2.5rem;
-            }
-            .downward{
-                position: absolute;
-                top: 50%;
-                right: 0.3rem;
-                transform: translateY(-50%) rotateZ(90deg);
-                width: 1rem;
-                text-align: center;
-            }
-        }
-        .menu{
-            width: 100%;
-            position: absolute;
-            background-color: #333;
-            font-size: $font-size-medium-x;
-            color: #f7f7f7;
-            z-index: 3;
-            display: none;
-            &.show{
-                display: block;
-            }
-            .item{
-                display: block;
-                padding: 0 0.3rem;
-                line-height: 0.7rem;
-                border-bottom: 1px dashed #eee;
-                z-index:10;
-                >i{
-                    position: absolute;
-                    left: 2.5rem;
-                }
-            }
-        }
-        .header{
-            margin-top: 0.2rem;
-            padding: 0.3rem;
-            background-color: #fff;
-            position: relative;
-            border: 1px solid #eee;
-            .top{
-                font-size: $font-size-medium-x;
-                color: #333;
-            }
-            .bottom{
-                font-size: $font-size-medium;
-                color: #999;
-            }
-            input{
-                width: 6rem;
-                margin: 0.58rem 0;
-                font-size: 0.6rem;
-                color: #333;
-                padding-left: 0.6rem;
-            }
-            .yuan{
-                position: absolute;
-                left: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                margin-left: 2px;
-            }
-        }
-        .servicCharge{
-            line-height: 1rem;
-            padding: 0 0.3rem;
-            font-size: $font-size-medium-x;
-            background-color: #fff;
-            span{
-                margin-left: 0.6rem;
-                color:$primary-color;
-            }
-        }
-        .footer{
-            height: 0.9rem;
-            margin-top: 0.8rem;
-            padding: 0 0.3rem;
-            span{
-                display: block;
-                width: 100%;
-                line-height: 0.9rem;
-                background-color: $primary-color;
-                border-radius: 0.1rem;
-                text-align: center;
-                color: #fff;
-                font-size: $font-size-medium-xx;
-            }
-        }
-        .tip{
-            margin-top: 0.2rem;
-            padding: 0 0.3rem;
-            p{
-                line-height: 0.6rem;
-                color: #999;
-                font-size: $font-size-medium-s;
-            }
-        }
+@import "../../common/scss/variable.scss";
+.recharge {
+  background-color: #f7f7f7;
+  height: 100%;
+  .bank-card {
+    height: 1rem;
+    line-height: 1rem;
+    padding: 0 0.3rem;
+    font-size: $font-size-medium-x;
+    color: #333;
+    background-color: #fff;
+    position: relative;
+    z-index: 10;
+    .carnum {
+      position: absolute;
+      left: 2.5rem;
     }
+    .downward {
+      position: absolute;
+      top: 50%;
+      right: 0.3rem;
+      transform: translateY(-50%) rotateZ(90deg);
+      width: 1rem;
+      text-align: center;
+    }
+  }
+  .menu {
+    width: 100%;
+    position: absolute;
+    background-color: #333;
+    font-size: $font-size-medium-x;
+    color: #f7f7f7;
+    z-index: 3;
+    display: none;
+    &.show {
+      display: block;
+    }
+    .item {
+      display: block;
+      padding: 0 0.3rem;
+      line-height: 0.7rem;
+      border-bottom: 1px dashed #eee;
+      z-index: 10;
+      > i {
+        position: absolute;
+        left: 2.5rem;
+      }
+    }
+  }
+  .header {
+    margin-top: 0.2rem;
+    padding: 0.3rem;
+    background-color: #fff;
+    position: relative;
+    border: 1px solid #eee;
+    .top {
+      font-size: $font-size-medium-x;
+      color: #333;
+    }
+    .bottom {
+      font-size: $font-size-medium;
+      color: #999;
+    }
+    input {
+      width: 6rem;
+      margin: 0.58rem 0;
+      font-size: 0.6rem;
+      color: #333;
+      padding-left: 0.6rem;
+    }
+    .yuan {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: 2px;
+    }
+  }
+  .servicCharge {
+    line-height: 1rem;
+    padding: 0 0.3rem;
+    font-size: $font-size-medium-x;
+    background-color: #fff;
+    span {
+      margin-left: 0.6rem;
+      color: $primary-color;
+    }
+  }
+  .footer {
+    height: 0.9rem;
+    margin-top: 0.8rem;
+    padding: 0 0.3rem;
+    span {
+      display: block;
+      width: 100%;
+      line-height: 0.9rem;
+      background-color: $primary-color;
+      border-radius: 0.1rem;
+      text-align: center;
+      color: #fff;
+      font-size: $font-size-medium-xx;
+    }
+  }
+  .tip {
+    margin-top: 0.2rem;
+    padding: 0 0.3rem;
+    p {
+      line-height: 0.6rem;
+      color: #999;
+      font-size: $font-size-medium-s;
+    }
+  }
+}
 </style>

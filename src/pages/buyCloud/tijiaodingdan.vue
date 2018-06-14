@@ -1,6 +1,6 @@
 <template>
     <div class="goumaishangping">
-        <div class="top" @click="$router.push('/dizhi?address=' + 1)">
+        <div class="top" @click="$router.push('/dizhi?address=' + 2)">
             <img src="../../assets/imgs/more@2x.png" class="right">
             <img src="../../assets/imgs/shouhuodizhi@2x.png" class="left">
             <p class="name-mobile">
@@ -16,10 +16,9 @@
         </div>
         <div class="item">
             <img :src="thingInfo.pic" alt="">
-            <div class="content">
+            <div class="content" v-if="thingInfo.specsList">
                 <p>{{thingInfo.name}}</p>
-                <!-- <div class="guige">包装：{{options.baozhuan}}   规格：{{options.guige}}g</div> -->
-                <i>￥{{thingInfo.price / 1000}}</i>
+                <i>￥{{thingInfo.specsList[0].price.price / 1000}}</i>
                 <span>X{{number}}</span>
             </div>
         </div>
@@ -28,21 +27,21 @@
             <input v-model="options.applyNote" type="text" placeholder="说点什么">
         </div>
         <div class="center">
-                <div class="mode">充值方式</div>
-                <div class="chongzhi" @click="changeStatus(0)">
-                    <img class="zhifu" src="../../assets/imgs/xianxiachongzhi@2x.png">
-                    余额支付
-                    <img :class="['xuanzhong', status == 0 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
-                </div>
-                <div class="chongzhi" @click="changeStatus(1)">
-                    <img class="zhifu" src="../../assets/imgs/weixinchongzhi@2x.png">
-                    微信支付
-                    <img :class="['xuanzhong', status == 1 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
-                </div>
+            <div class="mode">充值方式</div>
+            <div class="chongzhi" @click="changeStatus(0)">
+                <img class="zhifu" src="../../assets/imgs/xianxiachongzhi@2x.png">
+                余额支付
+                <img :class="['xuanzhong', status == 0 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+            </div>
+            <div class="chongzhi" @click="changeStatus(1)">
+                <img class="zhifu" src="../../assets/imgs/weixinchongzhi@2x.png">
+                微信支付
+                <img :class="['xuanzhong', status == 1 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+            </div>
         </div>
-        <div class="footer">
+        <div class="footer" v-if="thingInfo.specsList">
             <div class="f-left">
-                <span class="price">￥{{thingInfo.price * number / 1000}}</span>
+                <span class="price">￥{{thingInfo.specsList[0].price.price * number / 1000}}</span>
                 <span class="total">总计：</span>
             </div>
             <div class="f-right" @click="buy">确认购买</div>
@@ -55,11 +54,11 @@ import {
   queryDefaultAddress,
   palceOrder,
   shopBill,
-  payment,
-  neigouProductDetail
+  cloudPayment,
+  productDetail,
+  cloudBill
 } from "api/baohuo";
 import { setCookie, getCookie } from "common/js/cookie.js";
-import { queryConfig, queryAmount, thingDrtail } from "api/baohuo";
 import { formatImg } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 import { initPay } from "common/js/weixin";
@@ -72,6 +71,7 @@ export default {
       code: "",
       thingInfo: [],
       number: "",
+      productSpecsCode: "",
       status: 0
     };
   },
@@ -80,6 +80,7 @@ export default {
       this.status = status;
     },
     buy() {
+      let code = this.$route.query.code;
       let options = {
         address: this.address.address,
         area: this.address.area,
@@ -87,15 +88,15 @@ export default {
         mobile: this.address.mobile,
         province: this.address.province,
         signer: this.address.code,
-        productCode: getCookie("shangpincode"),
+        productSpecsCode: this.productSpecsCode,
         quantity: this.number,
-        applyNote: this.applyNote
+        applyNote: this.applyNote,
+        toUser: this.$route.query.highUserId
       };
-      palceOrder(options).then(res => {
+      cloudBill(options).then(res => {
         let code = res.code;
-        payment(code, this.status).then(res => {
+        cloudPayment([code], this.status).then(res => {
           let data = res;
-          console.log(data);
           if (this.status === 0) {
             alert("支付成功！");
           } else if (this.status === 1) {
@@ -116,48 +117,21 @@ export default {
   mounted() {
     //获取用户等级
     let level = getCookie("level");
-
-    //获取用户订单详情
-    // this.options = JSON.parse(getCookie('options'))
-    // console.log(this.options)
-
-    //查询详情地址
-
-    if (!this.$route.query.number && this.$route.query.code) {
-      this.number = getCookie("neigoushuliang");
-      neigouProductDetail(getCookie("shangpincode")).then(item => {
-        item.pic = formatImg(item.pic);
-        this.thingInfo = item;
-      });
-      queryDefaultAddress().then(res => {
-        this.address = res[0];
-      });
-    } else if (this.$route.query.pay === "1") {
-      let code = this.$route.query.code;
-
-      thingDrtail(code).then(item => {
-        item.pic = formatImg(item.pic);
-        this.thingInfo = item;
-      });
-      queryDefaultAddress().then(res => {
-        this.address = res[0];
-      });
-    } else {
-      let code = this.$route.query.code;
-      this.code = code;
-
-      let number = this.$route.query.number;
-      this.number = number;
-      setCookie("neigoushuliang", this.number);
-      setCookie("shangpincode", this.code);
-      neigouProductDetail(code).then(item => {
-        item.pic = formatImg(item.pic);
-        this.thingInfo = item;
-      });
-      queryDefaultAddress().then(res => {
-        this.address = res[0];
-      });
-    }
+    let code = this.$route.query.code;
+    this.code = code;
+    let number = this.$route.query.number;
+    this.number = number;
+    setCookie("yuncangshuliang", this.number);
+    setCookie("yuncangcode", this.code);
+    productDetail(code, level).then(item => {
+      item.pic = formatImg(item.pic);
+      this.thingInfo = item;
+      this.productSpecsCode = item.specsList[0].price.productSpecsCode;
+    });
+    queryDefaultAddress().then(res => {
+      this.address = res[0];
+      // this.changeOptions(this.address)
+    });
   }
 };
 </script>
@@ -260,37 +234,6 @@ export default {
       // margin-left: 1.8rem;
     }
   }
-  .center {
-    margin-top: 0.2rem;
-    background-color: #fff;
-    .mode {
-      line-height: 0.6rem;
-      padding-left: 0.3rem;
-      color: #999;
-      font-size: $font-size-small;
-    }
-    .chongzhi {
-      line-height: 1rem;
-      padding: 0 0.3rem;
-      font-size: $font-size-medium-x;
-      border-top: 1px solid #eee;
-      .zhifu {
-        width: 0.5rem;
-        margin-right: 0.2rem;
-        vertical-align: sub;
-      }
-      .xuanzhong {
-        width: 0.4rem;
-        float: right;
-        margin-top: 0.5rem;
-        transform: translateY(-50%);
-        display: none;
-        &.show {
-          display: block;
-        }
-      }
-    }
-  }
   .footer {
     line-height: 1rem;
     overflow: hidden;
@@ -321,6 +264,37 @@ export default {
       background-color: $primary-color;
       color: #fff;
       font-size: $font-size-medium-x;
+    }
+  }
+}
+.center {
+  margin-top: 0.2rem;
+  background-color: #fff;
+  .mode {
+    line-height: 0.6rem;
+    padding-left: 0.3rem;
+    color: #999;
+    font-size: $font-size-small;
+  }
+  .chongzhi {
+    line-height: 1rem;
+    padding: 0 0.3rem;
+    font-size: $font-size-medium-x;
+    border-top: 1px solid #eee;
+    .zhifu {
+      width: 0.5rem;
+      margin-right: 0.2rem;
+      vertical-align: sub;
+    }
+    .xuanzhong {
+      width: 0.4rem;
+      float: right;
+      margin-top: 0.5rem;
+      transform: translateY(-50%);
+      display: none;
+      &.show {
+        display: block;
+      }
     }
   }
 }

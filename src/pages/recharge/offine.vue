@@ -61,7 +61,6 @@ export default {
     methods:{
         sendMoney(){
             sendMoney(this.accountNumber,this.moneyNum  * 1000,this.pdf).then(res => {
-                console.log(res)
                 if(res.code !== '') {
                     this.text = '提交成功，待审核'
                     this.$refs.toast.show(this.tiaozhuan);

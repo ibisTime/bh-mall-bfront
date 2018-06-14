@@ -120,7 +120,6 @@ export default {
           this.show = !this.show;
           var userId = event.target.getAttribute('id')
             getBill(userId).then(res => {
-                console.log(res)
                 this.amount = res[0].amount
             })
             getUserById(userId).then(res => {

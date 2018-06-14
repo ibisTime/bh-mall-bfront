@@ -12,6 +12,10 @@
             <i v-show="errors.has('wxNum')" class="error-tip">{{errors.first('wxNum')}}</i>
             <span>微信号</span> <input v-model="options.wxId" v-validate="'required'" type="text" name="wxNum" placeholder="请输入微信号">
         </div>
+          <div>
+            <i v-show="errors.has('wxNum')" class="error-tip">{{errors.first('wxNum')}}</i>
+            <span>证件号</span> <input v-model="options.idNo" v-validate="'required'" type="text" name="idNo" placeholder="请输入id号">
+        </div>
         <div class="area">
             <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>            
             <span>省份、市、区</span><img class="more" src="../../assets/imgs/more@2x.png" alt="">
@@ -38,9 +42,9 @@
     </div>
 </template>
 <script>
-import { getAppId, getAllLevel, replyAgent, _replyAgent } from "api/baohuo";
+import { getAppId, getAllLevel, replyAgent } from "api/baohuo";
 import { isLogin, setUser, getWxMobAndCapt } from "common/js/util";
-import { setCookie } from "common/js/cookie";
+import { getCookie, setCookie } from "common/js/cookie";
 import CityPicker from "base/city-picker/city-picker";
 export default {
   data() {
@@ -56,8 +60,10 @@ export default {
         mobile: "",
         province: "",
         realName: "",
-        wxId: ""
+        wxId: "",
+        idNo:""
       },
+      userReferee: '',
       userId: ""
     };
   },
@@ -66,8 +72,9 @@ export default {
   },
   methods: {
     apply() {
-      // this.options.userReferee = this.userReferee
-      _replyAgent(this.options, this.userId).then(res => {
+      this.options.userReferee = this.userReferee;
+      this.options.userId = this.userId;
+      replyAgent(this.options).then(res => {
         this.$router.push("/login/replying");
       });
     },
@@ -88,33 +95,13 @@ export default {
       this.options.province = prov;
       this.options.city = city;
       this.options.district = district;
-    },
-    showplace() {
-      console.log(this.options);
-    },
-    AppId() {
-      getAppId("wx_h5_access_key").then(res => {
-        var appId = res.cvalue;
-        console.log(appId);
-        let redirectUri = encodeURIComponent(
-          `${location.origin}?${location.hash}`
-        );
-        let url = "https://open.weixin.qq.com/connect/oauth2/authorize";
-        let suffix =
-          "&response_type=code&scope=snsapi_userinfo#wechat_redirect";
-        setTimeout(() => {
-          location.replace(
-            `${url}?appid=${appId}&redirect_uri=${redirectUri}${suffix}`
-          );
-        }, 100);
-      });
     }
   },
 
   mounted() {
     this.userId = this.$route.query.userId;
-    setCookie('userId',this.userId);
-    // this.userReferee = getCookie('userReferee')
+    setCookie('userId', this.userId);
+    this.userReferee = this.$route.query.userReferee;
     getAllLevel().then(res => {
       this.levelList = res.list;
       this.levelList = this.levelList;

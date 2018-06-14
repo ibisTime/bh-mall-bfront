@@ -108,9 +108,7 @@ export default {
             options.dateStart = this.year + '-' + this.month + '-' + this.day
             options.dateEnd = this.endyear + '-' + this.endmonth + '-' + this.endday
             award(options).then(res => {
-                console.log(res)
                 res.list.map(function(item){
-
                     //格式化时间
                     item.createDatetime = formatDate(item.createDatetime)
                 })
