@@ -57,12 +57,8 @@ export default {
         });
       } else {
         usergo1(this.code).then(info => {
-<<<<<<< HEAD
           // alert(info.status + '专爱');
           alert('hahaha'+JSON.stringify(info));
-=======
-          alert(info.status + "专爱");
->>>>>>> 1c23b1237469e1335a50c9e6d6e11d0a14c49823
           this.info = info;
           // setCookie("token", info.token);
           setUser(info);
@@ -103,11 +99,7 @@ export default {
   mounted() {
     alert('999'+getCookie('userId'));
     if (!isLogin()) {
-<<<<<<< HEAD
       alert(location.href + '666地址');
-=======
-      alert(location.href + "地址");
->>>>>>> 1c23b1237469e1335a50c9e6d6e11d0a14c49823
       if (/userReferee=([^&]+)&code=([^&]+)&state=/.exec(location.href)) {
         this.userReferee = RegExp.$1;
         this.code = RegExp.$2;
