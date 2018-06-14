@@ -7,6 +7,7 @@ import loginAwait from '@/pages/login/loginAwait'
 import replying from '@/pages/login/replying'
 import loginuserReferee from '@/pages/login/loginuserReferee'
 import reCharge from '@/pages/login/reCharge'
+import supplyInfo from '@/pages/login/supplyInfo'
 //ceshi
 import ceshi from '@/pages/ceshi/ceshi'
 
@@ -112,6 +113,11 @@ export default new Router({
       path: '/login/login',
       name: 'login',
       component: login
+    },
+    {
+      path: '/login/supplyInfo',
+      name: 'supplyInfo',
+      component: supplyInfo
     },
     //主页面
     {

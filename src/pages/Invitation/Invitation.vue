@@ -1,6 +1,6 @@
 <template>
   <div class="invitation">
-      <div class="container">
+      <div class="container" v-if = "this.status == '0' || this.status == '7' || this.status == '12' || this.status == '13' || this.status == '14' ||this.status == '15' ||this.status == '17'">
           <div class="top">
               <div>
                   <span>成功邀请（人）</span>
@@ -84,6 +84,7 @@ export default {
     }
   },
   mounted() {
+    this.status = getCookie('status');
     if (isLogin()) {
       let userReferee = getCookie("userId");
       this.wxUrl += userReferee;
