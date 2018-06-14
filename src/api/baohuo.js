@@ -321,6 +321,16 @@ export function upgrade(userId) {
   });
 }
 
+//升级申请
+export function upgradeApplica(options) {
+  return fetch(627262, {
+    highLevel: options.highLevel,
+    padAmount: options.padAmount,
+    payPdf: options.payPdf,
+    userId: getUserId()
+  })
+}
+
 //审核取消授权
 export function accreditCancel(userId) {
   return fetch(627258, {

@@ -26,6 +26,7 @@ import IntentionalAgent from '@/pages/IntentionalAgent/IntentionalAgent'
 import detail from '@/pages/IntentionalAgent/detail'
 import logout from '@/pages/logout/logout'
 import check from '@/pages/check/check'
+import upgrade from '@/pages/upgrade/upgrade'
 import checkdispose from '@/pages/check/checkdispose'
 import chargemoney from '@/pages/chargemoney/chargemoney'
 import journal from '@/pages/journal/journal'
@@ -196,6 +197,11 @@ export default new Router({
       path: '/check',
       name: 'check',
       component: check
+    },
+    {
+      path: '/upgrade',
+      name: 'upgrade',
+      component: upgrade
     },
     //代理审核 2级页面
     {

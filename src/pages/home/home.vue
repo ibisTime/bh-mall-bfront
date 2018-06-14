@@ -156,6 +156,11 @@ export default {
           to: "/check"
         },
         {
+          text: "申请升级",
+          src: require("../../assets/imgs/cancel@2x.png"),
+          to: "/upgrade"
+        },
+        {
           text: "申请退出",
           src: require("../../assets/imgs/cancel@2x.png"),
           to: "/logout"
