@@ -1,33 +1,54 @@
 <template>
   <div class="offine">
+      <div class="login">
+        <div>
+            <span>证件号码</span> <input v-model="idNo" v-validate="'required'" type="text" name="idNo" placeholder="请输入证件号码">
+        </div>
+        <div>
+            <span>介绍人</span> <input v-model="introducer" v-validate="'required'" type="text" name="idNo" placeholder="请输入介绍人">
+        </div>
+      </div>
+       
       <qiniu
             ref="qiniu"
             style="visibility: hidden;position: absolute;"
             :token="token"
             :uploadUrl="uploadUrl"></qiniu>
-      <div class="header">
-          <p>充值品牌：悟空</p>
-          <p>充值类型：我空</p>
-          <p>当前余额：￥<i class="money">{{account / 1000}}</i></p>
-      </div>
       <form ref="form">
-        <input type="number" class="money-num" v-model="moneyNum" placeholder="请输入金额（必填）">
         <div class="img">
                 <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
-                <p>上传打款图片（如有多张，请合并上传）</p>
-                <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange" accept="image/*">
-                <div class="item" v-for="(photo,index) in photos" ref="photoItem" @click="choseItem(index)">
+                <p>上传身份证正面图片</p>
+                <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(1,$event)" accept="image/*">
+                <div class="item" v-for="(photo,index) in photos1" ref="photoItem" @click="choseItem(index)">
+                    <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
+                    <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
+                </div>
+        </div>
+        <div class="img">
+                <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
+                <p>上传身份证反面图片</p>
+                <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(2,$event)" accept="image/*">
+                <div class="item" v-for="(photo,index) in photos2" ref="photoItem" @click="choseItem(index)">
+                    <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
+                    <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
+                </div>
+        </div>
+        <div class="img">
+                <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
+                <p>上传手持身份证图片</p>
+                <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(3,$event)" accept="image/*">
+                <div class="item" v-for="(photo,index) in photos3" ref="photoItem" @click="choseItem(index)">
                     <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
                     <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
                 </div>
         </div>
       </form>
       <toast ref="toast" :text="text"></toast>
-      <span class="btn" @click="sendMoney">提交充值</span>
+      <span class="btn" @click="submit">提交充值</span>
   </div>
 </template>
 <script>
-import {sendMoney,queryAmount} from 'api/baohuo'
+import {supplyInfo,queryAmount,isRealName} from 'api/baohuo'
 import {getQiniuToken} from 'api/general'
 import BScroll from 'better-scroll';
 import EXIF from 'exif-js';
@@ -48,10 +69,18 @@ export default {
             account:'',
             currentItem: null,
             text: '',
-            photos: [],
+            photos1: [],
+            photos2: [],
+            photos3: [],
+            photos111: '',
+            photos222: '',
+            photos333: '',
             token: '',
             message:'',
             accountNumber:'',
+            idKind:'',
+            idNo:'',
+            introducer:''
         }
     },
     created() {
@@ -59,18 +88,58 @@ export default {
         this.uploadUrl = 'http://up-z0.qiniu.com';
     },
     methods:{
-        sendMoney(){
-            sendMoney(this.accountNumber,this.moneyNum  * 1000,this.photos[0].key).then(res => {
-                if(res.code !== '') {
-                    this.text = '提交成功，待审核'
-                    this.$refs.toast.show(this.tiaozhuan);
-                    this.photos = []
-                    this.moneyNum = ''
+        submit(){
+            // this.userId = 'U201806142229374042532';
+            isRealName(this.userId).then(res => {
+                console.log(this.idNo);
+                if(res.isSuccess) {
+                    // 需要实名
+                    if(this.idNo && this.introducer && this.photos1[0].key && this.photos2[0].key && this.photos3[0].key) {
+                        supplyInfo('1',this.idNo,this.introducer,this.photos1[0].key,this.photos21[0].key,this.photos3[0].key,this.userId).then(res => {
+                            alert(res);
+                            alert('4');
+                            if(res.code !== '') {
+                                this.text = '提交成功，待审核'
+                                this.$refs.toast.show(this.tiaozhuan);
+                                this.photos = []
+                                this.moneyNum = ''
+                            } else {
+                                this.text = '请确认信息全部填写完整';
+                                this.$refs.toast.show();
+                            }
+                        }) 
+                    }
+                } else {
+                    if(!this.photos1[0]) {
+                        this.photos111 = ''
+                    }
+                    if(!this.photos2[0]) {
+                        this.photos222 = ''
+                    }
+                    if(!this.photos3[0]) {
+                        this.photos333 = ''
+                    }
+                    if(!this.idNo) {
+                        this.idNo = ''
+                    }
+                    if(!this.introducer) {
+                        this.introducer = ''
+                    }
+                    supplyInfo('1',this.idNo,this.introducer,this.photos111,this.photos222,this.photos333,this.userId).then(res => {
+                        alert(res);
+                        alert('4');
+                        if(res.code !== '') {
+                            this.text = '提交成功，待审核'
+                            this.$refs.toast.show(this.tiaozhuan);
+                            this.photos = []
+                            this.moneyNum = ''
+                        }
+                    })
                 }
             })
         },
-        tiaozhuan(){
-          this.$router.push('/home')
+        tiaozhuan() {
+          this.$router.push('/login/replying')
         },
         /**
          * 选中要操作的图片
@@ -131,18 +200,15 @@ export default {
         /**
          * 从相册中选择图片
          * */
-        fileChange(e) {
+        fileChange(index, e) {
             let files;
             if (e.dataTransfer) {
             files = e.dataTransfer.files;
             } else if (e.target) {
             files = e.target.files;
             }
-            if (this.photos.length + files.length > MAX_LENGTH) {
-            this.text = '图片最多上传12张';
-            this.$refs.toast.show();
-            files = Array.prototype.slice.call(files, 0, MAX_LENGTH);
-            }
+            console.log(files);
+            console.log(this.photos);
             let self = this;
             let len = files.length;
             for (let i = 0; i < files.length; i++) {
@@ -163,18 +229,24 @@ export default {
                     type: file.type,
                     key: _url.split('/').pop() + '.' + file.name.split('.').pop()
                     };
-                    self.photos.push(item);
+                    if(index == '1') {
+                      self.photos1.push(item);
+                    } else if (index == '2') {
+                      self.photos2.push(item);
+                    } else {
+                      self.photos3.push(item);
+                    }
                     self.uploadPhoto(data, item.key).then(() => {
-                    item = {
-                        ...item,
-                        ok: true
-                    };
-                    self.updatePhotos(item);
+                      item = {
+                          ...item,
+                          ok: true
+                      };
+                      self.updatePhotos(item, index);
                     }).catch((err) => {
-                    self.onUploadError(err);
+                      self.onUploadError(err);
                     });
                     if (i + 1 === len) {
-                    self.$refs.fileInput.value = null;
+                      self.$refs.fileInput.value = null;
                     }
                 });
                 };
@@ -185,13 +257,29 @@ export default {
         /**
          * 图片上传完成后更新photos
          * */
-        updatePhotos(item) {
-            for (let i = 0; i < this.photos.length; i++) {
-            if (this.photos[i].key === item.key) {
-                this.photos.splice(i, 1, item);
-                break;
+        updatePhotos(item, index) {
+          if(index == '1') {
+            for (let i = 0; i < this.photos1.length; i++) {
+              if (this.photos1[i].key === item.key) {
+                  this.photos1.splice(i, 1, item);
+                  break;
+              }
             }
+          } else if(index == '2') {
+            for (let i = 0; i < this.photos2.length; i++) {
+              if (this.photos2[i].key === item.key) {
+                  this.photos2.splice(i, 1, item);
+                  break;
+              }
             }
+          } else {
+            for (let i = 0; i < this.photos3.length; i++) {
+              if (this.photos3[i].key === item.key) {
+                  this.photos3.splice(i, 1, item);
+                  break;
+              }
+            }
+          }
         },
         deletePhoto(index) {
             this.photos.splice(index, 1);
@@ -214,12 +302,8 @@ export default {
         }
     },
     mounted(){
-        this.accountNumber = this.$route.query.accountNumber
-
+        this.userId = this.$route.query.userId
         //查询账户余额
-        queryAmount(this.accountNumber).then(res => {
-            this.account = res.amount
-        })
 
         //查询七牛token
         getQiniuToken().then(res => {
@@ -320,4 +404,68 @@ export default {
             margin-top: -0.24rem;
         }
     }
+    .textInfo {
+        font-size: $font-size-large-s;
+    }
+    .login {
+  font-size: $font-size-large-s;
+  > div {
+    position: relative;
+    height: 1rem;
+    padding: 0.3rem;
+    border-bottom: 1px solid #eee;
+    > i {
+      position: absolute;
+      top: 0.02rem;
+      color: $primary-color;
+      font-size: $font-size-small-ss;
+    }
+    span {
+      display: inline-block;
+      width: 2.2rem;
+    }
+    .more {
+      width: 0.2rem;
+      float: right;
+    }
+    .rotate {
+      transform: rotateZ(90deg);
+    }
+    &.area {
+      position: relative;
+      .item-input {
+        position: absolute;
+        top: 0.3rem;
+        left: 2.8rem;
+      }
+      ul {
+        width: 100%;
+        // background-color: red;
+        position: absolute;
+        top: 1rem;
+        display: none;
+        &.show {
+          display: block;
+        }
+        li {
+          width: 100%;
+          line-height: 0.7rem;
+          font-size: $font-size-medium-s;
+          text-align: center;
+          border-bottom: 1px dashed #f7f7f7;
+        }
+      }
+    }
+  }
+  .btn {
+    display: block;
+    width: 90%;
+    line-height: 0.9rem;
+    margin: 4rem auto;
+    background-color: $primary-color;
+    color: #fff;
+    text-align: center;
+    border-radius: 0.1rem;
+  }
+}
 </style>

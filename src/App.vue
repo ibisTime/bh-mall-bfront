@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { isLogin, setUser, getWxMobAndCapt } from "common/js/util";
+import { isLogin } from "common/js/util";
 export default {
   name: "App",
   mounted() {

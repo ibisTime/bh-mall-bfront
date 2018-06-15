@@ -113,7 +113,7 @@ export default {
 
   mounted() {
     this.userId = this.$route.query.userId;
-    setCookie('userId',this.userId);
+    // setCookie('userId',this.userId);
     // this.userReferee = getCookie('userReferee')
     getAllLevel().then(res => {
       this.levelList = res.list;
@@ -185,4 +185,5 @@ export default {
     border-radius: 0.1rem;
   }
 }
+
 </style>

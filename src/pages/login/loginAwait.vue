@@ -47,16 +47,21 @@ export default {
     toOther() {
       if (this.userReferee) {
         usergo2(this.code, this.userReferee).then(info => {
+          alert('hahaha'+JSON.stringify(info));
           this.info = info;
           let userId = info.userId;
-          setCookie("token", info.token);
+          let status = info.status;
+          // setCookie("token", info.token);
+          setUser(info);
           this.goLogin(userId, status);
         });
       } else {
         usergo1(this.code).then(info => {
-          alert(info.status + "专爱");
+          // alert(info.status + '专爱');
+          alert('hahaha'+JSON.stringify(info));
           this.info = info;
-          setCookie("token", info.token);
+          // setCookie("token", info.token);
+          setUser(info);
           let userId = info.userId;
           let status = info.status;
           this.goLogin(userId, status);
@@ -64,11 +69,12 @@ export default {
       }
     },
     goLogin(userId, status) {
+      setCookie("status", status);
       alert(status + "状态");
       //1,2禁止登陆
       if (status == 1 || status == 2) {
         alert("对不起，你被禁登录");
-      } else if (status == 16 && this.userReferee) {
+      } else if (status == 19) {
         this.$router.push(
           "/login/loginuserReferee?userId=" +
             userId +
@@ -77,10 +83,12 @@ export default {
         );
       } else if (status == 16) {
         this.$router.push("/login/login?userId=" + userId);
-      } else if (status == 6 || status == 5) {
+      } else if (status == 18) {
+        this.$router.push("/login/supplyInfo?userId=" + userId);
+      } else if (status == 6 || status == 5 || status == 11) {
         this.$router.push("/login/replying");
         //10没通过
-      } else if (status == 4 || status == 9) {
+      } else if (status == 3 || status == 4 || status == 9 || status == 10) {
         alert("对不起,您没有被授权！");
       } else {
         this.$router.push("/home?userId=" + userId);
@@ -89,8 +97,9 @@ export default {
   },
 
   mounted() {
+    alert('999'+getCookie('userId'));
     if (!isLogin()) {
-      alert(location.href + "地址");
+      alert(location.href + '666地址');
       if (/userReferee=([^&]+)&code=([^&]+)&state=/.exec(location.href)) {
         this.userReferee = RegExp.$1;
         this.code = RegExp.$2;
@@ -105,19 +114,19 @@ export default {
         this.AppId();
       }
     } else {
-      let status = getCookie("status");
-      if (status == 1 || status == 2) {
-        alert("对不起,你被禁登录");
-      } else if (status == 3) {
-        this.$router.push("/login/login");
-      } else if (status == 6 || status == 5) {
-        this.$router.push("/login/replying");
-        //10没通过
-      } else if (status == 4 || status == 9) {
-        alert("对不起,您没有被授权！");
-      } else {
-        this.$router.push("/home");
-      }
+      // let status = getCookie("status");
+      // if (status == 1 || status == 2) {
+      //   alert("对不起,你被禁登录");
+      // } else if (status == 3) {
+      //   this.$router.push("/login/login");
+      // } else if (status == 6 || status == 5) {
+      //   this.$router.push("/login/replying");
+      //   //10没通过
+      // } else if (status == 4 || status == 9) {
+      //   alert("对不起,您没有被授权！");
+      // } else {
+      //   this.$router.push("/home");
+      // }
     }
   },
   components: {

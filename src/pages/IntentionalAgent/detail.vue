@@ -101,7 +101,7 @@ export default {
       });
     },
     ignore() {
-      ignoreAgent(this.userId).then(res => {
+      ignoreAgent(this.options.userId).then(res => {
         if (res.isSuccess) {
           this.text = "忽略成功";
           this.$refs.mytoast.show();
