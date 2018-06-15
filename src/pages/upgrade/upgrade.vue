@@ -396,7 +396,7 @@ export default {
         color: #fff;
       }
       ul {
-        width: 80%;
+        width: 96%;
         background-color: #333;
         position: absolute;
         color: #eee;

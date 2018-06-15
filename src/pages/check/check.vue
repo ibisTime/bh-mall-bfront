@@ -46,10 +46,7 @@ export default {
       agent(index).then(res => {
         res.list.map(function(item) {
           getLevel(item.applyLevel).then(res => {
-            item.user.level = res[0].name;
-          });
-          getLevel(item.user.applyLevel).then(res => {
-            item.user.applyLevel = res[0].name;
+            item.applyLevel = res[0].name;
           });
         }); 
         if (index === 6) {
