@@ -169,8 +169,8 @@ export default {
               this.photos3[0].key,
               this.userId
             ).then(res => {
-              alert(res);
-              alert("4");
+              // alert(res);
+              // alert("4");
               if (res.code !== "") {
                 this.text = "提交成功，待审核";
                 this.$refs.toast.show(this.tiaozhuan);
@@ -207,8 +207,8 @@ export default {
             this.photos333,
             this.userId
           ).then(res => {
-            alert(res);
-            alert("4");
+            // alert(res);
+            // alert("4");
             if (res.code !== "") {
               this.text = "提交成功，待审核";
               this.$refs.toast.show(this.tiaozhuan);
@@ -229,7 +229,10 @@ export default {
       this.options.idFront = this.photos2[0].key;
       this.options.idHand = this.photos3[0].key;
       this.options.idNo = this.options.idNo
+      // alert(1);
+      // alert(JSON.stringify(this.options));
       replyAgent(this.options).then(res => {
+      // alert(JSON.stringify(this.options));
         this.$router.push("/login/replying");
       });
     },

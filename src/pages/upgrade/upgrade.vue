@@ -24,7 +24,7 @@
         <div class="img">
             <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
             <p>上传打款图片（如有多张，请合并上传）</p>
-            <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange" accept="image/*">
+            <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(1,$event)" accept="image/*">
             <div class="item" v-for="(photo,index) in photos" ref="photoItem" @click="choseItem(index)">
                 <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
                 <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
@@ -86,7 +86,8 @@ export default {
       token: "",
       message: "",
       accountNumber: "",
-      btntext: "选择你要升级的等级"
+      btntext: "选择你要升级的等级",
+      photos: []
     };
   },
   created() {
@@ -113,11 +114,11 @@ export default {
       this.btntext1 = this.level;
     },
     upgradeApplica1() {
-      console.log(this.pdf);
+      // console.log(this.pdf);
       let options = {};
       options.highLevel = this.options.applyLevel;
       options.padAmount = this.padAmount;
-      options.payPdf = this.pdf;
+      options.payPdf = this.photos[0].key;
       upgradeApplica(options).then(res => {
         if (res.isSuccess) {
           alert("申请成功！");
@@ -180,7 +181,7 @@ export default {
     /**
      * 从相册中选择图片
      * */
-    fileChange(e) {
+    fileChange(index, e) {
       let files;
       if (e.dataTransfer) {
         files = e.dataTransfer.files;
