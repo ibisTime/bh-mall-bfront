@@ -89,13 +89,12 @@ export default {
     },
     methods:{
         submit(){
-            // this.userId = 'U201806142229374042532';
             isRealName(this.userId).then(res => {
                 console.log(this.idNo);
                 if(res.isSuccess) {
                     // 需要实名
                     if(this.idNo && this.introducer && this.photos1[0].key && this.photos2[0].key && this.photos3[0].key) {
-                        supplyInfo('1',this.idNo,this.introducer,this.photos1[0].key,this.photos21[0].key,this.photos3[0].key,this.userId).then(res => {
+                        supplyInfo('1',this.idNo,this.introducer,this.photos1[0].key,this.photos2[0].key,this.photos3[0].key,this.userId).then(res => {
                             alert(res);
                             alert('4');
                             if(res.code !== '') {
@@ -113,7 +112,7 @@ export default {
                     if(!this.photos1[0]) {
                         this.photos111 = ''
                     }
-                    if(!this.photos2[0]) {
+                    if(!this.photos2[0]) { 
                         this.photos222 = ''
                     }
                     if(!this.photos3[0]) {
