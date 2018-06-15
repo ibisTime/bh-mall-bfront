@@ -306,7 +306,7 @@ export default {
       var userId = getCookie("userId");
     }
     checkRed(userId).then(res => {
-      if (res.result !== "0") {
+      if (res.result == "0") {
         this.$router.push("/login/reCharge");
       } else if (res.result == "1") {
         alert("您需要下授权单！");

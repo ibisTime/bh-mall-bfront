@@ -736,5 +736,18 @@ export function isRealName(userId) {
   return fetch(627363, {
     userId: userId
   });
-  
+}
+
+//确认收货普通订单
+export function receiveNromalOrder(code) {
+  return fetch(627649, {
+    code: code
+  });
+}
+
+//确认收货内购订单
+export function receiveNeigouOrder(code) {
+  return fetch(627726, {
+    code: code
+  });
 }

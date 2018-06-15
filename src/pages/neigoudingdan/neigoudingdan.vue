@@ -13,6 +13,9 @@
           <div @click="changeIndex(2)" :class="[index === 2 ? 'active' : '']">
               <i>待收货</i>
           </div>
+          <div @click="changeIndex(4)" :class="[index == '4' ? 'active' : '']">
+              <i>已收货</i>
+          </div>
       </div>
       <div class="item clearfix" v-for="(item,index) in list">
             <div class="top clearfix">
@@ -26,6 +29,7 @@
                 <p>下单时间：{{item.applyDatetime}}</p>
                 <p>收货人：{{item.signer}}（{{item.mobile}}）</p>
                 <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
+                <div @click="shouhuo(item.code)" v-if="item.status == '2'" class="receive">收货</div>
             </div>
             <div class="pic">
                 <img :src="item.pic" alt="">
@@ -40,15 +44,16 @@
                 <div @click="goPay(item.code)">去付款</div>
             </div>
       </div>
+      <toast ref="toast" :text="toastText"></toast>
   </div>
 </template>
 <script>
-import { queryShopForm } from "api/baohuo";
+import Toast from 'base/toast/toast';
+import { queryShopForm, receiveNeigouOrder } from "api/baohuo";
 import { formatDate, formatImg } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 import { setCookie, getCookie } from "common/js/cookie.js";
 export default {
-  name: "IntentionalAgent",
   data() {
     return {
       index: "",
@@ -63,7 +68,8 @@ export default {
         "申请取消",
         "已取消"
       ],
-      options: {}
+      options: {},
+      toastText: ''
     };
   },
   methods: {
@@ -92,10 +98,26 @@ export default {
       if (index) {
         this.$router.push("/xuangoushangpin/shangpingoumai?pay=" + 1 + '&code=' + index);
       }
+    },
+    shouhuo(code) {
+      receiveNeigouOrder(code).then(res => {                               
+        if(res.isSuccess) {
+          this.toastText = '收货成功';
+          this.$refs.toast.show();
+          this.list.map(item => {
+            if(item.code == code) {
+              item.status = '3'
+            }
+          })
+        }
+      })
     }
   },
   mounted() {
     this.check();
+  },
+  components: {
+      Toast
   }
 };
 </script>
@@ -112,7 +134,7 @@ export default {
     background-color: #fff;
     > div {
       float: left;
-      width: 25%;
+      width: 20%;
       height: 0.9rem;
       position: relative;
       i {
@@ -120,7 +142,7 @@ export default {
         color: #333;
         line-height: 0.9rem;
         position: absolute;
-        left: 50%;
+        left: 43%;
         transform: translateX(-50%);
         &.width {
           width: 1.2rem;
@@ -234,5 +256,14 @@ export default {
       }
     }
   }
+}
+.receive {
+  font-size: 0.3rem;
+  position: absolute;
+  top: 1.15rem;
+  right: 0.2rem;
+  border: 1px solid #333;
+  border-radius: 0.03rem;
+  padding: 0.03rem
 }
 </style>

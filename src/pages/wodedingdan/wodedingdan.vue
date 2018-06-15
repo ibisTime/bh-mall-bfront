@@ -10,6 +10,9 @@
           <div @click="changeIndex('3')" :class="[index == '3' ? 'active' : '']">
               <i>已发货</i>
           </div>
+          <div @click="changeIndex('4')" :class="[index == '4' ? 'active' : '']">
+              <i>已收货</i>
+          </div>
           <div @click="changeIndex('5')" :class="[index == '5' ? 'active' : '']">
               <i class="width">申请取消</i>
           </div>
@@ -33,13 +36,16 @@
                     <p>{{item.productName}}</p>
                     <i>￥{{item.price/1000}}</i>
                     <span>{{item.quantity}}瓶</span>
+                    <div @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
                 </div>
             </div>
       </div>
+      <toast ref="toast" :text="toastText"></toast>
   </div>
 </template>
 <script>
-import { queryOrderForm } from "api/baohuo";
+import Toast from 'base/toast/toast';
+import { queryOrderForm, receiveNromalOrder } from "api/baohuo";
 import { formatDate } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 export default {
@@ -58,7 +64,8 @@ export default {
         "已收货",
         "申请取消",
         "已取消"
-      ]
+      ],
+      toastText: ''
     };
   },
   methods: {
@@ -105,10 +112,27 @@ export default {
           this.list = res.list;
         });
       }
+    },
+    shouhuo(code) {
+      receiveNromalOrder(code).then(res => {
+        console.log(res)
+        if(res.isSuccess == true) {
+          this.toastText = '收货成功';
+          this.$refs.toast.show();
+          this.list.map(item => {
+            if(item.code == code) {
+              item.status = '4'
+            }
+          })
+        }
+      })
     }
   },
   mounted() {
     this.check();
+  },
+  components: {
+      Toast
   }
 };
 </script>
@@ -125,7 +149,7 @@ export default {
     background-color: #fff;
     > div {
       float: left;
-      width: 25%;
+      width: 20%;
       height: 0.9rem;
       position: relative;
       i {
@@ -133,7 +157,7 @@ export default {
         color: #333;
         line-height: 0.9rem;
         position: absolute;
-        left: 50%;
+        left: 43%;
         transform: translateX(-50%);
         &.width {
           width: 1.2rem;
@@ -228,6 +252,15 @@ export default {
           border-radius: 0.1rem;
           color: #333;
           text-align: center;
+        }
+        div {
+          font-size: 0.3rem;
+          position: absolute;
+          top: 1.15rem;
+          right: 0.2rem;
+          border: 1px solid #333;
+          border-radius: 0.03rem;
+          padding: 0.03rem
         }
       }
     }
