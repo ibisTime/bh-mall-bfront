@@ -21,7 +21,7 @@
                 <li v-for="item in levelList" v-if="item.level != 6" :level="item.level" @click="chooseLevel">{{item.name}}</li>
             </ul>
         </div>
-          <div class="img">
+        <div class="img">
             <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
             <p>上传打款图片（如有多张，请合并上传）</p>
             <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange" accept="image/*">

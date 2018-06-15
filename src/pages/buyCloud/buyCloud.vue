@@ -159,7 +159,7 @@ export default {
         city: res.city,
         mobile: res.mobile,
         province: res.province,
-        highUserId: res.highUserId
+        highUserId: res.highUserId || ''
       };
       //商品列表查询
       queryProduct(res.level).then(res => {

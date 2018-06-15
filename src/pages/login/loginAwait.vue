@@ -47,7 +47,7 @@ export default {
     toOther() {
       if (this.userReferee) {
         usergo2(this.code, this.userReferee).then(info => {
-          alert('hahaha'+JSON.stringify(info));
+          // alert('hahaha'+JSON.stringify(info));
           this.info = info;
           let userId = info.userId;
           let status = info.status;
@@ -58,7 +58,7 @@ export default {
       } else {
         usergo1(this.code).then(info => {
           // alert(info.status + '专爱');
-          alert('hahaha'+JSON.stringify(info));
+          // alert('hahaha'+JSON.stringify(info));
           this.info = info;
           // setCookie("token", info.token);
           setUser(info);
@@ -70,7 +70,7 @@ export default {
     },
     goLogin(userId, status) {
       setCookie("status", status);
-      alert(status + "状态");
+      // alert(status + "状态");
       //1,2禁止登陆
       if (status == 1 || status == 2) {
         alert("对不起，你被禁登录");
@@ -97,9 +97,9 @@ export default {
   },
 
   mounted() {
-    alert('999'+getCookie('userId'));
+    // alert('999'+getCookie('userId'));
     if (!isLogin()) {
-      alert(location.href + '666地址');
+      // alert(location.href + '666地址');
       if (/userReferee=([^&]+)&code=([^&]+)&state=/.exec(location.href)) {
         this.userReferee = RegExp.$1;
         this.code = RegExp.$2;

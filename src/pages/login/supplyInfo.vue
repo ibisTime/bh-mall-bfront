@@ -44,7 +44,7 @@
         </div>
       </form>
       <toast ref="toast" :text="text"></toast>
-      <span class="btn" @click="submit">提交充值</span>
+      <span class="btn" @click="submit">确定</span>
   </div>
 </template>
 <script>
@@ -95,8 +95,8 @@ export default {
                     // 需要实名
                     if(this.idNo && this.introducer && this.photos1[0].key && this.photos2[0].key && this.photos3[0].key) {
                         supplyInfo('1',this.idNo,this.introducer,this.photos1[0].key,this.photos2[0].key,this.photos3[0].key,this.userId).then(res => {
-                            alert(res);
-                            alert('4');
+                            // alert(res);
+                            // alert('4');
                             if(res.code !== '') {
                                 this.text = '提交成功，待审核'
                                 this.$refs.toast.show(this.tiaozhuan);
@@ -125,8 +125,8 @@ export default {
                         this.introducer = ''
                     }
                     supplyInfo('1',this.idNo,this.introducer,this.photos111,this.photos222,this.photos333,this.userId).then(res => {
-                        alert(res);
-                        alert('4');
+                        // alert(res);
+                        // alert('4');
                         if(res.code !== '') {
                             this.text = '提交成功，待审核'
                             this.$refs.toast.show(this.tiaozhuan);
