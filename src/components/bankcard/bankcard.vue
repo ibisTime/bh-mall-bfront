@@ -224,7 +224,7 @@
 
         &.add {
           font-size: $font-size-medium;
-          color: $color-cancel-background;
+          // color: $color-cancel-background;
 
           .content {
             background: transparent;

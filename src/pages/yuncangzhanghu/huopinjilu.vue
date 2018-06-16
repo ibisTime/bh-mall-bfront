@@ -1,23 +1,27 @@
 <template>
     <div class="huopinjilu">
         <div class="header">
-            <img src="../../assets/imgs/buyimg.png" alt="">
+            <img :src="formatImg(info.product.advPic)" alt="">
             <div class="content">
-                <p>{{ info[0].product.name}}</p>
-                <i>￥{{ info[0].product.adPrice /1000}}</i>
-                <span>{{info[0].quantity}}瓶</span>
+                <p>{{ info.productName}}</p>
+                <i v-for="item in info.specsList" class="guige">￥{{ item.price /1000}}元/{{item.productSpecsName}}</br></i>
             </div>
         </div>
     </div>
 </template>
 <script>
 import {queryProductDetail,getCloudDetail} from 'api/baohuo'
-import {formatDate} from 'common/js/util';
+import {formatDate,formatImg} from 'common/js/util';
 export default {
   data(){
       return{
           info:{}
       }
+  },
+  methods: {
+    formatImg(pic) {
+        return formatImg(pic);
+    }
   },
   mounted(){
       let code =  this.$route.query.code
@@ -31,8 +35,7 @@ export default {
     //         })
     //       this.list = res.list
     //   })
-      getCloudDetail(productCode).then(res => {
-          console.log(res)
+      getCloudDetail(code).then(res => {
           this.info = res
       })
   }
@@ -43,6 +46,7 @@ export default {
     .huopinjilu{
         background-color: #f7f7f7;
         height: 100%;
+        line-height: 0.03rem !important;
         .header {
             margin-bottom: 0.2rem;
             padding: 0.2rem 0.3rem;
@@ -63,9 +67,6 @@ export default {
                     line-height: 0.4rem;
                 }
                 i {
-                    position: absolute;
-                    top: 1.15rem;
-                    left: 0;
                     font-size: $font-size-small;
                     color: $primary-color;
                 }
@@ -79,6 +80,12 @@ export default {
                     border-radius: 0.1rem;
                     color: #333;
                     text-align: center;
+                }
+                .guige {
+                    display: inline-block;
+                    width: 100%;
+                    margin: 0;
+                    padding: 0
                 }
             }
         }

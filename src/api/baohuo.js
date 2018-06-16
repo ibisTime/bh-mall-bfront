@@ -8,7 +8,6 @@ import {
 
 // 获取门槛账户
 export function getBill(userId) {
-  console.log(getUserId());
   return fetch(627453, {
     userId: userId || getUserId(),
     currency: 'MK_CNY'

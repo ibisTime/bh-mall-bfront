@@ -5,46 +5,46 @@
         <div class="form-item border-bottom-1px">
           <div class="item-label">真实姓名</div>
           <div class="item-input-wrapper">
-            <input type="text" class="item-input" v-model="realName" @change="_realNameValid" placeholder="请输入真实姓名">
-            <span v-show="realErr" class="error-tip">{{realErr}}</span>
+            <input type="text" class="item-input" v-model="realName" v-validate="'required'" name="realName" placeholder="请输入真实姓名">
+            <span v-show="errors.has('realName')" class="error-tip">{{errors.first('realName')}}</span>
           </div>
         </div>
         <div class="form-item border-bottom-1px">
           <div class="item-label">开户银行</div>
           <div class="item-input-wrapper">
-            <select class="item-input" v-model="bankName" @change="_bankNameValid">
+            <select class="item-input" v-model="bankName" name="bankName" v-validate="'required'">
               <option v-for="(bankcode,index) in bankcodeList" :key="index" :value="bankcode">
                 {{bankcode.bankName}}
               </option>
             </select>
             <i class="arrow"></i>
-            <span v-show="bankErr" class="error-tip">{{bankErr}}</span>
+            <span v-show="errors.has('bankName')" class="error-tip">{{errors.first('bankName')}}</span>
           </div>
         </div>
         <div class="form-item border-bottom-1px">
           <div class="item-label">开户支行</div>
           <div class="item-input-wrapper">
-            <input type="text" class="item-input" v-model="subbranch" @change="_subbranchValid" placeholder="请输入开户支行">
-            <span v-show="subErr" class="error-tip">{{subErr}}</span>
+            <input type="text" class="item-input" v-model="subbranch" name="subbranch" v-validate="'required'" placeholder="请输入开户支行">
+            <span v-show="errors.has('subbranch')" class="error-tip">{{errors.first('subbranch')}}</span>
           </div>
         </div>
         <div class="form-item border-bottom-1px">
           <div class="item-label">银行卡号</div>
           <div class="item-input-wrapper">
-            <input type="tel" class="item-input" v-model="bankcardNumber" @change="_bankcardNumberValid" placeholder="请输入银行卡号">
-            <span v-show="cardErr" class="error-tip">{{cardErr}}</span>
+            <input type="text" class="item-input" v-model="bankcardNumber" name="bankCardNumber" v-validate="'required|bankcardNum'" placeholder="请输入银行卡号">
+            <span v-show="errors.has('bankCardNumber')" class="error-tip">{{errors.first('bankCardNumber')}}</span>
           </div>
         </div>
         <div class="form-item">
           <div class="item-label">手机号</div>
           <div class="item-input-wrapper">
-            <input type="tel" class="item-input" v-model="bindMobile" @change="_mobileValid" placeholder="请输入预留手机号">
-            <span v-show="mobErr" class="error-tip">{{mobErr}}</span>
+            <input type="tel" class="item-input" v-model="bindMobile" name="mobile" v-validate="'required|mobile'" placeholder="请输入预留手机号">
+            <span v-show="errors.has('mobile')" class="error-tip">{{errors.first('mobile')}}</span>
           </div>
         </div>
 
-        <div class="form-btn">
-          <button :disabled="setting" @click="saveBankCard">保存</button>
+        <div class="buttons">
+          <button :disabled="setting" @click="saveBankCard" class="btn">保存</button>
         </div>
         <full-loading v-show="showLoading()"></full-loading>
         <toast ref="toast" :text="text"></toast>
@@ -53,10 +53,8 @@
   </transition>
 </template>
 <script>
-  import {mapGetters, mapMutations, mapActions} from 'vuex';
   import {SET_BANKCARD_LIST} from 'store/mutation-types';
   import {getBankCardList, getBankCodeList, addBankCard, editBankCard} from 'api/account';
-  import {mobileValid, realNameValid, subbranchValid, bankcardNumberValid, bankNameValid, setTitle} from 'common/js/util';
   import FullLoading from 'base/full-loading/full-loading';
   import Toast from 'base/toast/toast';
 
@@ -66,26 +64,15 @@
         bankcodeList: [],
         setting: false,
         realName: '',
-        realErr: '',
         bankName: '',
-        bankErr: '',
         subbranch: '',
-        subErr: '',
         bankcardNumber: '',
-        cardErr: '',
         bindMobile: '',
-        mobErr: '',
         text: '新增成功'
       };
     },
-    computed: {
-      ...mapGetters([
-        'bankcardList'
-      ])
-    },
     created() {
       if (this.$route.params.id) {
-        setTitle('修改银行卡');
         Promise.all([
           this._getBankCardList(),
           this._getBankCodeList()
@@ -93,7 +80,6 @@
           this._initPageData(bankCard, bankCode);
         }).catch(() => {});
       } else {
-        setTitle('新增银行卡');
         Promise.all([
           this._getBankCardList(),
           this._getBankCodeList()
@@ -156,23 +142,51 @@
         }
       },
       saveBankCard() {
-        if (this._valid()) {
-          this.setting = true;
-          let param = {
-            bankcardNumber: this.bankcardNumber,
-            bankCode: this.bankName.bankCode,
-            bankName: this.bankName.bankName,
-            subbranch: this.subbranch,
-            bindMobile: this.bindMobile,
-            realName: this.realName
-          };
-          if (this.$route.params.id) {
-            param.code = this.$route.params.id;
-            this._editBankCard(param);
-          } else {
-            this._addBankCard(param);
+        console.log('999');
+        // if (this._valid()) {
+        //   console.log('888');
+        //   // this.setting = true;
+        //   let param = {
+        //     bankcardNumber: this.bankcardNumber,
+        //     bankCode: this.bankName.bankCode,
+        //     bankName: this.bankName.bankName,
+        //     subbranch: this.subbranch,
+        //     bindMobile: this.bindMobile,
+        //     realName: this.realName
+        //   };
+        //   if (this.$route.params.id) {
+        //     param.code = this.$route.params.id;
+        //     this._editBankCard(param);
+        //   } else {
+        //     console.log('999');
+            
+        //     this._addBankCard(param);
+        //   }
+        // }
+        this.$validator.validateAll().then((result) => {
+          console.log(result);
+          if(result) {
+            console.log('888');
+            // this.setting = true;
+            let param = {
+              bankcardNumber: this.bankcardNumber,
+              bankCode: this.bankName.bankCode,
+              bankName: this.bankName.bankName,
+              subbranch: this.subbranch,
+              bindMobile: this.bindMobile,
+              realName: this.realName
+            };
+            if (this.$route.params.id) {
+              param.code = this.$route.params.id;
+              this._editBankCard(param);
+            } else {
+              console.log('999');
+              
+              this._addBankCard(param);
+            }
           }
-        }
+        })
+        
       },
       _addBankCard(param) {
         addBankCard(param).then((code) => {
@@ -207,14 +221,14 @@
           this.setting = false;
         });
       },
-      _valid() {
-        let r1 = this._realNameValid();
-        let r2 = this._bankNameValid();
-        let r3 = this._subbranchValid();
-        let r4 = this._bankcardNumberValid();
-        let r5 = this._mobileValid();
-        return r1 && r2 && r3 && r4 && r5;
-      },
+      // _valid() {
+      //   let r1 = this._realNameValid();
+      //   let r2 = this._bankNameValid();
+      //   let r3 = this._subbranchValid();
+      //   let r4 = this._bankcardNumberValid();
+      //   let r5 = this._mobileValid();
+      //   return r1 && r2 && r3 && r4 && r5;
+      // },
       _realNameValid() {
         let result = realNameValid(this.realName);
         this.realErr = result.msg;
@@ -239,14 +253,14 @@
         let result = mobileValid(this.bindMobile);
         this.mobErr = result.msg;
         return !result.err;
-      },
-      ...mapMutations({
-        setBankCardList: SET_BANKCARD_LIST
-      }),
-      ...mapActions([
-        'addBankCard',
-        'editBankCard'
-      ])
+      }
+      // ...mapMutations({
+      //   setBankCardList: SET_BANKCARD_LIST
+      // }),
+      // ...mapActions([
+      //   'addBankCard',
+      //   'editBankCard'
+      // ])
     },
     components: {
       FullLoading,
@@ -259,12 +273,14 @@
   @import "~common/scss/mixin";
 
   .bankcard-edit-wrapper {
+    padding:0.3rem;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background: $color-background;
+    font-size: $font-size-large-xxx;
 
     .arrow {
       position: absolute;
@@ -286,4 +302,204 @@
   .slide-enter, .slide-leave-to {
     transform: translate3d(100%, 0, 0);
   }
+  .btn {
+    display: block;
+    width: 90%;
+    line-height: 0.9rem;
+    margin: 4rem auto;
+    background-color: $primary-color;
+    color: #fff;
+    text-align: center;
+    border-radius: 0.1rem;
+  }
+  .error-tip {
+    position: absolute;
+    right: 0.16rem;
+    top: 0.38rem;
+    white-space: nowrap;
+    font-size: $font-size-medium;
+    color: #ff0000;
+  }
+  .item-input-wrapper {
+      position: relative;
+      -webkit-box-flex: 1;
+      -ms-flex: 1;
+      flex: 1;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      height: 1rem;
+      padding: 0 0.16rem;
+      padding-left: 0.2rem;
+      min-width: 2.56rem;
+
+      .item-input {
+        padding: 0.12rem 0;
+        -webkit-box-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+        line-height: 1.2;
+        background: transparent;
+      }
+
+      .hide-area {
+        position: absolute;
+        visibility: hidden;
+      }
+
+      textarea {
+        width: 100%;
+        background: transparent;
+      }
+
+      .error-tip {
+        position: absolute;
+        right: 0.16rem;
+        top: 0.38rem;
+        white-space: nowrap;
+        font-size: $font-size-medium;
+        color: #ff0000;
+      }
+    }
+    .form-wrapper {
+  .form-item {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    font-size: $font-size-medium-x;
+    background-color: #fff;
+
+    &.border-bottom-1px {
+      @include border-bottom-1px($color-border);
+    }
+
+    &:last-child {
+      @include border-none();
+    }
+
+    &.is-textarea {
+      .item-input-wrapper {
+        padding: 0.1rem 0.2rem;
+      }
+    }
+
+    .item-label {
+      width: 2rem;
+      -webkit-box-flex: 0;
+      -ms-flex: 0 0 2rem;
+      flex: 0 0 2rem;
+      text-align: left;
+      padding-left: 0.3rem;
+    }
+
+    .inner-label {
+      padding: 0 0.16rem;
+      height: 1rem;
+      line-height: 1rem;
+    }
+
+    .item-input-wrapper {
+      position: relative;
+      -webkit-box-flex: 1;
+      -ms-flex: 1;
+      flex: 1;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      height: 1rem;
+      padding: 0 0.16rem;
+      padding-left: 0.2rem;
+      min-width: 2.56rem;
+
+      .item-input {
+        padding: 0.12rem 0;
+        -webkit-box-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+        line-height: 1.2;
+        background: transparent;
+      }
+
+      .hide-area {
+        position: absolute;
+        visibility: hidden;
+      }
+
+      textarea {
+        width: 100%;
+        background: transparent;
+      }
+
+      .error-tip {
+        position: absolute;
+        right: 0.16rem;
+        top: 0.38rem;
+        white-space: nowrap;
+        font-size: $font-size-medium;
+        color: #ff0000;
+      }
+    }
+    .item-btn {
+      padding-left: 0.3rem;
+      width: 2.1rem;
+      padding-right: 0.3rem;
+      @include border-left-1px($color-border);
+
+      &::after {
+        height: 1em;
+        bottom: 50%;
+        transform: translate(0, 50%);
+      }
+
+      button {
+        width: 100%;
+        height: 0.6rem;
+        line-height: 0.6rem;
+        white-space: nowrap;
+        border-radius: 0.1rem;
+        font-size: $font-size-medium-s;
+        background: transparent;
+        color: $primary-color;
+
+        &[disabled] {
+          color: $color-disable-background;
+        }
+      }
+    }
+  }
+
+  select {
+    font-size: $font-size-medium-x;
+  }
+
+  .form-btn {
+    margin-top: 0.8rem;
+    padding: 0 0.3rem;
+    width: 100%;
+
+    button {
+      display: block;
+      width: 100%;
+      line-height: 0.9rem;
+      border-radius: 0.1rem;
+      font-size: $font-size-large-s;
+      background: $primary-color;
+      color: #fff;
+
+      &[disabled] {
+        background: $color-disable-background;
+      }
+    }
+  }
+}
 </style>

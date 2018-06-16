@@ -45,9 +45,9 @@
           <i class="sum">{{detail.specsList[0].price.price / 1000 * number}}</i>
         </div>
         <div class="right">
-          <span class="diamonds" @click="add">+</span>
-          <span class="num">{{number}}</span>
-          <span class="diamonds" @click="sub">-</span>
+          <span class="diamonds right-item" @click="add">+</span>
+          <input class="num right-item" v-model="number"></span>
+          <span class="diamonds right-item" @click="sub">-</span>
         </div>
       </div>
       <div class="buypart-bottom" @click="confirm(detail.code)">
@@ -405,7 +405,7 @@ export default {
         }
       }
       .right {
-        span {
+        .right-item {
           margin-top: 0.4rem;
           float: right;
           text-align: center;

@@ -17,12 +17,10 @@
                 </div>
             </div>
         </div>
-        <div class="item" v-for="item in list" @click="$router.push('/yuncangzhanghu/huopinjilu?code=' + item.code + '&productCode=' + item.productCode)">      
-        <img :src="item.product.pic" alt="">
+        <div class="item" v-for="item in list" @click="$router.push('/yuncangzhanghu/huopinjilu?code=' + item.code + '&productCode=' + item.productCode)">
+          <img :src="formatImg(item.product.advPic)" alt="">
             <div class="content">
                 <p>产品名称: {{item.productName}}</p>
-                <i>单价：￥{{item.price / 1000}}</i>
-                <span @click="prodectDetail(item.code)">{{item.quantity}}瓶</span>
             </div>
         </div>
     </div>
@@ -45,7 +43,11 @@ export default {
       accountNumber: ""
     };
   },
-  methods: {},
+  methods: {
+    formatImg(pic) {
+      return formatImg(pic);
+    }
+  },
   created() {
     let level = getCookie("level");
     //获取用户云仓账户
@@ -55,13 +57,13 @@ export default {
     getCloudList().then(res => {
       //遍历格式化图片
       res.list.map(function(item) {
-        item.product.pic = formatImg(item.product.pic);
-        
+        // item.product.pic = formatImg(item.product.pic);
         //查询产品详情
         // productDetail(item.productCode, level).then(info => {});
       });
       this.list = res.list;
     });
+    
   }
 };
 </script>

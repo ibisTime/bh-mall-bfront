@@ -72,9 +72,9 @@ export function getPageFlow(start, limit, accountNumber) {
   });
 }
 
-// 获取银行数据字典列表
+// 获取银行列表
 export function getBankCodeList() {
-  return fetch(802116);
+  return fetch(627106);
 }
 // 根据code获取银行卡详情
 export function getBankCard(code) {
@@ -85,7 +85,7 @@ export function getBankCard(code) {
  * @param params {bankcardNumber, bankCode, bankName, subbranch, bindMobile, realName}
  */
 export function addBankCard(params) {
-  return fetch(802010, {
+  return fetch(627520, {
     userId: getUserId(),
     type: 1,
     currency: 'CNY',
@@ -106,7 +106,7 @@ export function deleteBankCard(code) {
  * @param params {code, bankcardNumber, bankCode, bankName, subbranch, bindMobile, realName}
  */
 export function editBankCard(params) {
-  return fetch(802012, {
+  return fetch(627522, {
     status: 1,
     type: 1,
     currency: 'CNY',
@@ -116,7 +116,7 @@ export function editBankCard(params) {
 }
 // 获取银行卡列表
 export function getBankCardList() {
-  return fetch(802016, {
+  return fetch(627531, {
     userId: getUserId(),
     status: 1
   });

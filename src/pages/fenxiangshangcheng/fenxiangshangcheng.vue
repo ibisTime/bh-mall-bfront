@@ -39,7 +39,6 @@ export default {
     mounted(){
         this.userId = getCookie('userId') || this.$route.query.userId
         this.wxUrl += this.userId
-        console.log(this.wxUrl)
         getUserById(this.userId).then(res =>{
             this.nickname = res.nickname
         })

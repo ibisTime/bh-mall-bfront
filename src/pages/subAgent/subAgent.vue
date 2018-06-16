@@ -132,6 +132,7 @@ export default {
               this.levelArr = res.list
           })
       })
+      this.getMysub();
       //获取全部等级
   },
   computed:{

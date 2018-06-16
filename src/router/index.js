@@ -40,6 +40,7 @@ import quxiandingdan from '@/pages/quxiandingdan/quxiandingdan'
 import yejizhanghu from '@/pages/yejizhanghu/yejizhanghu'
 import quxian from '@/pages/yejizhanghu/quxian'
 import zhuanrumenkan from '@/pages/yejizhanghu/zhuanrumenkan'
+import addBankCard from '@/components/bankcard-addedit/bankcard-addedit'
 
 import tixianjilu from '@/pages/tixianjilu/tixianjilu'
 
@@ -255,6 +256,12 @@ export default new Router({
       path: '/yejizhanghu/quxian',
       name: 'quxian',
       component: quxian
+    },
+    //添加银行卡(业绩账户-取现-添加银行卡)
+    {
+      path: '/yejizhanghu/addBankCard',
+      name: 'addBankCard',
+      component: addBankCard
     },
     //转入门槛(业绩账户二级页面)
     {

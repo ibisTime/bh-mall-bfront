@@ -36,10 +36,10 @@
                 </div>
               </div>
               <div class="packaging">
-                <p>包装</p>
-              </div>
-              <div class="packaging">
-                <p>规格</p><input type="text" v-model="toUser" placeholder="输入收件人">
+                <p>规格</p>
+                <div class="select">
+                  <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(item.productSpecsCode,index,$event)" :class="[num === index ? 'active' : '']">{{item.productSpecsName}}</span>
+                </div>
               </div>
               <div class="total-money">
                 <div class="left">
@@ -53,7 +53,7 @@
                   <span class="diamonds" @click="sub">-</span>
                 </div>
               </div>
-              <div class="buypart-bottom" @click="confirm(detail.productSpecsCode)">
+              <div class="buypart-bottom" @click="confirm()">
                 提交订单
               </div>
             </div>
@@ -81,7 +81,8 @@ export default {
       text: "",
       num: 0,
       number: 1,
-      toUser: ""
+      toUser: "",
+      productSpecsCode: ''
     };
   },
   methods: {
@@ -114,7 +115,7 @@ export default {
         this.number--;
       }
     },
-    confirm(code) {
+    confirm() {
       let options = {
         address: this.address.address,
         area: this.address.area,
@@ -122,7 +123,7 @@ export default {
         province: this.address.province,
         mobile: this.address.mobile,
         quantity: this.number,
-        productSpecsCode: code,
+        productSpecsCode: this.productSpecsCode,
         signer: this.toUser
       };
 
@@ -138,10 +139,14 @@ export default {
       //保存this
       let self = this;
       getCloudDetail(code).then(res => {
-        res[0].product.pic = formatImg(res[0].product.pic);
-        self.detail = res[0];
+        res.product.pic = formatImg(res.product.pic);
+        self.detail = res;
         console.log(self.detail);
       });
+    },
+    chooseSize(code,index) {
+      this.num = index;
+      this.productSpecsCode = code;
     }
   },
   mounted() {
@@ -278,7 +283,7 @@ export default {
   }
   .buypart {
     width: 100%;
-    height: 8rem;
+    height: 6rem;
     position: fixed;
     bottom: 0;
     background-color: #fff;
