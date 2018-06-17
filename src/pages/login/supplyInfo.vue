@@ -93,7 +93,7 @@ export default {
                 console.log(this.idNo);
                 if(res.isSuccess) {
                     // 需要实名
-                    if(this.idNo && this.introducer && this.photos1[0].key && this.photos2[0].key && this.photos3[0].key) {
+                    if(this.idNo && this.photos1[0].key && this.photos2[0].key && this.photos3[0].key) {
                         supplyInfo('1',this.idNo,this.introducer,this.photos1[0].key,this.photos2[0].key,this.photos3[0].key,this.userId).then(res => {
                             // alert(res);
                             // alert('4');

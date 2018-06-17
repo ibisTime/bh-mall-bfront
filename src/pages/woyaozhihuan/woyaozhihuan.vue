@@ -8,11 +8,16 @@
             <div :class="['pic',cloudDetailFlag ? 'show' : '']">
                 <img :src="cloudDetailPic">
                 <div class="content">
-                    <p>{{cloudDetail.name}}</p>
-                    <i>￥{{cloudDetail.specsList[count].price.price / 1000 * cloudDetail.specsList[count].number}}</i>
+                    <p>{{cloudDetail.product.name}}</p>
+                    <!--
+                    <i>￥{{cloudDetail.specsList[count].price / 1000 * cloudDetail.specsList[count].number}}</i>
+                    -->
+                    <i>￥{{cloudDetail.specsList[count].price / 1000 * initNum}}</i>
                     <div class="guige">
+                        <!--
                         <span>{{cloudDetail.specsList[count].number}}{{cloudDetail.specsList[count].name}}</span>
-                        <span>{{cloudDetail.specsList[count].weight}}g</span>
+                        -->
+                        <span>{{initNum}}{{cloudDetail.specsList[count].productSpecsName}}</span>
                     </div>
                     <button class="huan" @click="_genghuan">更换规格</button>
                 </div>
@@ -30,7 +35,6 @@
                     <i>￥{{detail.specsList[num].price.price / 1000 * detail.specsList[num].number}}</i>
                     <div class="guige">
                         <span>{{detail.specsList[num].number}}{{detail.specsList[num].name}}</span>
-                        <span>{{detail.specsList[num].weight}}g</span>
                     </div>
                     <button class="huan" @click="genghuan">更换规格</button>
                 </div>
@@ -54,25 +58,14 @@
                 </div>
             </div>
             <div class="packaging">
-                <p>包装</p>
+                <p>规格</p>
                 <div class="select">
                     <span
                       v-for="(item,index) in detail.specsList"
                       :code="item.code"
-                      @click="chooseSize(index)"
+                      @click="chooseSize(item,index)"
                       :class="[num === index ? 'active' : '']"
                       >{{item.name}}</span>
-                </div>
-            </div>
-            <div class="packaging">
-                <p>规格</p>
-                <div class="select">
-                    <span 
-                      v-for="(item,index) in detail.specsList"
-                      :code="item.code"
-                      @click="choose_Size(index)"
-                      :class="[number === index ? 'active' : '']"
-                      >{{item.weight}}g</span>
                 </div>
             </div>
             <div class="total-money">
@@ -82,12 +75,10 @@
                     <i class="sum">{{detail.specsList[num].price.price / 1000 * detail.specsList[num].number}}</i>
                 </div>
                 <div class="right">
-                    <span class="diamonds" @click="add">+</span>
                     <span class="num">{{detail.specsList[num].number}}</span>
-                    <span class="diamonds" @click="sub">-</span>
                 </div>
             </div>
-            <div class="buypart-bottom" @click="certain">
+            <div class="buypart-bottom" @click="certain(num)">
                 确认
             </div>
         </div>
@@ -103,37 +94,28 @@
                 </div>
             </div>
             <div class="packaging">
-                <p>包装</p>
+                <p>规格</p>
                 <div class="select">
                     <span
                       v-for="(item,index) in cloudDetail.specsList"
                       :code="item.code"
                       @click="_chooseSize(index)"
                       :class="[count === index ? 'active' : '']"
-                      >{{item.name}}</span>
-                </div>
-            </div>
-            <div class="packaging">
-                <p>规格</p>
-                <div class="select">
-                    <span 
-                      v-for="(item,index) in cloudDetail.specsList"
-                      :code="item.code"
-                      @click="_chooseSize(index)"
-                      :class="[number2 === index ? 'active' : '']"
-                      >{{item.weight}}g</span>
+                      >{{item.productSpecsName}}</span>
                 </div>
             </div>
             <div class="total-money">
                 <div class="left">
                     <i class="text">合计：</i>
                     <i class="symbol">￥</i>
-                    <i class="sum">{{cloudDetail.specsList[count].price.price / 1000 * cloudDetail.specsList[count].number}}</i>
+                    <!--<i class="sum">{{cloudDetail.specsList[count].price.price / 1000 * cloudDetail.specsList[count].number}}</i>-->
+                    <i class="sum">{{cloudDetail.specsList[count].price / 1000 * initNum}}</i>
                 </div>
                 <div class="right">
-                    <span class="diamonds" @click="_add">+</span>
-                    <span class="num">{{cloudDetail.specsList[count].number}}</span>
-                    <span class="diamonds" @click="_sub">-</span>
+                    <span class="diamonds right-item" @click="_add">+</span>
+                    <!--<input class="num right-item" v-model="cloudDetail.specsList[count].number"></span>-->
+                    <input class="num right-item" v-model="initNum"></span>
+                    <span class="diamonds right-item" @click="_sub">-</span>
                 </div>
             </div>
             <div class="buypart-bottom" @click="_certain">
@@ -145,7 +127,6 @@
 </template>
 <script>
 import {
-  queryProduct,
   productDetail,
   cloudBill,
   getCloudDetail,
@@ -163,8 +144,16 @@ export default {
       buypartFlag: false,
       cloudFlag: false,
       level: "",
-      detail: {},
-      cloudDetail: {},
+      detail: {
+        specsList: [
+          { price: 0 }
+        ]
+      },
+      cloudDetail: {
+        specsList: [
+          { price: 0 }
+        ]
+      },
       num: 0,
       count: 0,
       number: 0,
@@ -174,7 +163,8 @@ export default {
       money: 0,
       detailFlag: true,
       cloudDetailFlag: true,
-      text: ""
+      text: "",
+      initNum: 1
     };
   },
   methods: {
@@ -182,9 +172,10 @@ export default {
     requestNode() {
       console.log(this.cloudDetail);
       let options = {
-        changeSpecsCode: this.cloudDetail.specsList[0].code,
-        productSpecsCode: this.detail.specsList[0].code,
-        quantity: this.cloudDetail.specsList[this.count].number
+        changeSpecsCode: this.detail.specsList[0].code,
+        productSpecsCode: this.cloudDetail.specsList[0].price.productSpecsCode,
+        // quantity: this.cloudDetail.specsList[this.count].number
+        quantity: this.initNum
       };
       requestNode(options).then(res => {
         this.text = "提交成功";
@@ -195,15 +186,18 @@ export default {
       this.$router.push("/home");
     },
     //查询置换价格
-    queryMoney() {
+    queryMoney(index) {
       if (this.cloudDetail.name !== "") {
         let options = {
-          changeSpecsCode: this.cloudDetail.specsList[0].code,
-          productSpecsCode: this.detail.specsList[0].code,
-          quantity: this.cloudDetail.specsList[this.count].number
+          changeSpecsCode: this.changeSpecsCode,
+          productSpecsCode: this.cloudDetail.specsList[0].productSpecsCode,
+          // quantity: this.cloudDetail.specsList[this.count].number
+          quantity: this.initNum
         };
+        console.log(index);
+        console.log(this.cloudDetail.specsList[index]);
         queryMoney(options).then(res => {
-          console.log(res);
+          this.detail.specsList[index].number = res.canChangeQuantity;
         });
       }
     },
@@ -224,6 +218,11 @@ export default {
     genghuan() {
       this.changeFlag();
       this.changebuypartFlag();
+      if(!this.changeSpecsCode) {
+        this.changeSpecsCode = this.detail.specsList[0].price.productSpecsCode;
+        setCookie("myDetail", JSON.stringify(this.detail));
+      }
+      this.queryMoney(this.num);
     },
     _genghuan() {
       this.changeFlag();
@@ -231,27 +230,38 @@ export default {
     },
     //选购产品数量+1
     add() {
-      this.detail.specsList[this.num].number++;
+      // this.detail.specsList[this.num].number++;
+      this.initNum++;
     },
     //选购产品数量+1
     _add() {
-      this.cloudDetail.specsList[this.count].number++;
+      // this.cloudDetail.specsList[this.count].number++;
+      this.initNum++;
     },
     // 选购产品数量-1
     sub() {
-      if (this.detail.specsList[this.num].number >= 2) {
-        this.detail.specsList[this.num].number--;
+      // if (this.detail.specsList[this.num].number >= 2) {
+      //   this.detail.specsList[this.num].number--;
+      // }
+      if (this.initNum >= 2) {
+        this.initNum--;
       }
     },
     // 选购产品数量-1
     _sub() {
-      if (this.cloudDetail.specsList[this.count].number >= 2) {
-        this.cloudDetail.specsList[this.count].number--;
+      // if (this.cloudDetail.specsList[this.count].number >= 2) {
+      //   this.cloudDetail.specsList[this.count].number--;
+      // }
+      if (this.initNum >= 2) {
+        this.initNum--;
       }
     },
     //选择规格
-    chooseSize(index) {
+    chooseSize(item, index) {
       this.num = index;
+      this.changeSpecsCode = item.code;
+      console.log(index);
+      this.queryMoney(index);
     },
     choose_Size(index) {
       this.number = index;
@@ -264,8 +274,9 @@ export default {
       this.number2 = index;
     },
     //确定规格
-    certain() {
+    certain(num) {
       this.genghuan();
+      this.queryMoney(num);
       setCookie("myDetail", JSON.stringify(this.detail));
     },
     //确定规格
@@ -273,28 +284,22 @@ export default {
       this._genghuan();
       setCookie("myDetail", JSON.stringify(this.detail));
       setCookie("cloudDetail", JSON.stringify(this.cloudDetail));
-      this.queryMoney();
     }
   },
   mounted() {
     //库存商品信息
     if (JSON.parse(getCookie("myDetail")) !== null) {
       this.detail = JSON.parse(getCookie("myDetail"));
-      console.log(this.detail);
-    }
-    if (JSON.parse(getCookie("myDetail")) !== null) {
+      // this.detail.specsList.number = this.detail[0].number
       this.detailPic = formatImg(this.detail.pic);
+      // this.queryMoney(0);
     } else {
       this.detailFlag = false;
     }
     //云仓商品信息
     if (JSON.parse(getCookie("cloudDetail")) !== null) {
       this.cloudDetail = JSON.parse(getCookie("cloudDetail"));
-      console.log(this.cloudDetail);
-    }
-
-    if (JSON.parse(getCookie("cloudDetail")) !== null) {
-      this.cloudDetailPic = formatImg(this.cloudDetail.pic);
+      this.cloudDetailPic = formatImg(this.cloudDetail.product.advPic);
     } else {
       this.cloudDetailFlag = false;
     }
@@ -423,7 +428,7 @@ export default {
   }
   .buypart {
     width: 100%;
-    height: 8rem;
+    height: 6rem;
     position: fixed;
     bottom: 0;
     background-color: #fff;
@@ -540,7 +545,7 @@ export default {
         }
       }
       .right {
-        span {
+        .right-item {
           margin-top: 0.4rem;
           float: right;
           text-align: center;

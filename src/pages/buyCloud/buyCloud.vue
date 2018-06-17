@@ -27,15 +27,9 @@
         </div>
       </div>
       <div class="packaging">
-        <p>包装</p>
-        <div class="select">
-          <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(index,$event)" :class="[num === index ? 'active' : '']">{{item.name}}</span>
-        </div>
-      </div>
-      <div class="packaging">
         <p>规格</p>
         <div class="select">
-          <span v-for="(item,index) in detail.specsList" :code="item.code" @click="_chooseSize(index,$event)" :class="[number === index ? 'active' : '']">{{item.weight}}g</span>
+          <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(item.productSpecsCode,index,$event)" :class="[num === index ? 'active' : '']">{{item.name}}</span>
         </div>
       </div>
       <div class="total-money">
@@ -95,7 +89,9 @@ export default {
     //确认商品
     confirm(code) {
       let ref = this;
-      this.$router.push(
+      this.buy();
+      // .then(res => {
+        this.$router.push(
         "/buyCloud/tijiaodingdan?code=" +
           code +
           "&number=" +
@@ -103,6 +99,7 @@ export default {
           "&highUserId=" +
           ref.options.highUserId
       );
+      // })
     },
     genghuan() {
       this.changeFlag();
@@ -120,8 +117,9 @@ export default {
       }
     },
     //选择规格
-    chooseSize(index) {
+    chooseSize(code,index) {
       this.num = index;
+      this.productSpecsCode = code;
     },
     //选择规格
     _chooseSize(index) {
@@ -139,11 +137,11 @@ export default {
     //产品购买
     buy() {
       this.options.productSpecsCode = this.detail.specsList[this.num].code;
-      this.options.quantity = this.detail.specsList[this.num].number;
+      this.options.quantity = this.number;
       alert(this.options.quantity);
       cloudBill(this.options).then(res => {
         this.text = "提交成功";
-        this.$refs.mytoast.show(this.tiaozhuan);
+        this.$refs.mytoast.show();
       });
     },
     tiaozhuan() {
@@ -159,7 +157,7 @@ export default {
         city: res.city,
         mobile: res.mobile,
         province: res.province,
-        highUserId: res.highUserId || ''
+        toUser: res.highUserId || ''
       };
       //商品列表查询
       queryProduct(res.level).then(res => {
@@ -287,7 +285,7 @@ export default {
   }
   .buypart {
     width: 100%;
-    height: 8rem;
+    height: 6rem;
     position: fixed;
     bottom: 0;
     background-color: #fff;

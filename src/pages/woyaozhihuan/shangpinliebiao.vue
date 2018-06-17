@@ -14,7 +14,7 @@
                 <span>1{{item.specsList[0].name}}</span>
             </div>
         </div>
-        <div v-else="flag == 2" class="item" v-for="(item,index) in list" @click="choose(item.productCode,index)">
+        <div v-else="flag == 2" class="item" v-for="(item,index) in list" @click="choose(item.code,index)">
             <div :class="['circle',num === index ? 'active' : '']"></div>
             <img :src="item.pic">
             <div class="content">
@@ -49,7 +49,7 @@ export default {
                     setCookie('myDetail',JSON.stringify(res))
                 })
             }else if(this.flag == 2) {
-                productDetail(this.code,this.level).then(res => {
+                getCloudDetail(this.code).then(res => {
                     setCookie('cloudDetail',JSON.stringify(res))
                 })
             }
@@ -83,7 +83,7 @@ export default {
                 res.list.map(function(item){
                     
                     //查询产品详情
-                    productDetail(item.productCode,self.level).then(info => {
+                    getCloudDetail(item.code).then(info => {
                         item.pic = formatImg(info.pic)
                     })
                 })

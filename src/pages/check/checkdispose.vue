@@ -53,7 +53,7 @@ export default {
                        alert('审核失败');
                     }
               })
-          }else if(index == 12){
+          }else if(this.index == 12){
               upgrade(this.userId).then(res => {
                     if(res.isSuccess){
                         this.text = '审核成功'
@@ -65,7 +65,7 @@ export default {
 
               })
           }else if(this.index == 8) {
-              accreditCancel(userId).then(res => {
+              accreditCancel(this.userId).then(res => {
                     if(res.isSuccess){
                         this.text = '审核成功'
                         this.$refs.mytoast.show()
