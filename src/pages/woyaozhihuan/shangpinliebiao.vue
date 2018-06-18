@@ -71,7 +71,7 @@ export default {
 
             
             //查询我的商品
-            queryProduct(this.level).then(res =>{
+            queryProduct(this.level, '2').then(res =>{
                 res.list.map(function(item){
                     item.pic = formatImg(item.pic)
                 })

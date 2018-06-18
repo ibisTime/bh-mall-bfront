@@ -340,19 +340,21 @@ export function accreditCancel(userId) {
 }
 
 //分页查询产品
-export function queryProduct(level) {
+export function queryProduct(level, status) {
   return fetch(627555, {
     start: 0,
     limit: 100,
-    level: level
+    level: level,
+    status: status || ''
   });
 }
 
 //获取内购商品列表
-export function neigouProduct() {
+export function neigouProduct(status) {
   return fetch(627710, {
     start: 1,
-    limit: 100
+    limit: 100,
+    status: status || ''
   })
 }
 

@@ -31,7 +31,7 @@
               </div>
               <img :src="item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
               <div class="detail">
-                  <p class="datail-money">+{{item.outAmount}}</p>
+                  <p class="datail-money">+{{item.outAmount / 1000}}</p>
                   <p class="detail-text">{{item.remark}}</p>
               </div>
               </div>
@@ -57,7 +57,6 @@ export default {
     //获取用户业绩账户
     getPerformance().then(res => {
       this.accountNumber = res[0].accountNumber;
-      console.log(this.accountNumber);
       this.account = res[0].amount;
       //查询业绩账户流水
       queryBill(res[0].accountNumber).then(res => {

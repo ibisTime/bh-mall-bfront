@@ -175,7 +175,7 @@ export default {
         toUser: res.highUserId || ''
       };
       //商品列表查询
-      queryProduct(res.level).then(res => {
+      queryProduct(res.level,'2').then(res => {
         res.list.map(function(item) {
           item.pic = formatImg(item.pic);
         });

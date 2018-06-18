@@ -186,11 +186,14 @@ export default {
   methods: {
     //提交置换
     requestNode() {
+      console.log(this.changeSpecsCode);
       console.log(this.productSpecsCode);
+      console.log(this.cloudDetail);
+      console.log(this.detail);
       let options = {
-        changeSpecsCode: this.changeSpecsCode,
+        changeSpecsCode: this.changeSpecsCode || this.detail.specsList[0].price.productSpecsCode,
         // productSpecsCode: this.cloudDetail.productSpecsCode,
-        productSpecsCode: this.productSpecsCode,
+        productSpecsCode: this.productSpecsCode || this.cloudDetail.specsList[0].productSpecsCode,
         // quantity: this.cloudDetail.specsList[this.count].number
         quantity: this.initNum
       };

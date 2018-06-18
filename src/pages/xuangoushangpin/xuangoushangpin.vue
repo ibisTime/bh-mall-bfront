@@ -47,7 +47,6 @@
 </template>
 <script>
 import {
-  queryProduct,
   neigouProductDetail,
   cloudBill,
   palceOrder,
@@ -140,7 +139,7 @@ export default {
   },
   mounted() {
     //商品列表查询
-    neigouProduct().then(res => {
+    neigouProduct('2').then(res => {
       res.list.map(function(item) {
         item.pic = formatImg(item.pic);
       });
