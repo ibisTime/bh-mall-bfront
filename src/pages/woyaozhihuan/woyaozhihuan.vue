@@ -99,7 +99,7 @@
                     <span
                       v-for="(item,index) in cloudDetail.specsList"
                       :code="item.code"
-                      @click="_chooseSize(index)"
+                      @click="_chooseSize(item, index)"
                       :class="[count === index ? 'active' : '']"
                       >{{item.productSpecsName}}</span>
                 </div>
@@ -145,13 +145,29 @@ export default {
       cloudFlag: false,
       level: "",
       detail: {
+        name: '产品名称',
         specsList: [
-          { price: 0 }
+          { 
+            price: {
+              price: '0'
+            } 
+          },
+          { name: '0' }
         ]
       },
+      // cloudDetail: {
+      //   specsList: [
+      //     { price: 0 }
+      //   ]
+      // },
       cloudDetail: {
+        name: '产品名称',
+        product: {
+          name: '产品名称'
+        },
         specsList: [
-          { price: 0 }
+          { price: '0' },
+          { productSpecsName: '规格名称' }
         ]
       },
       num: 0,
@@ -170,10 +186,11 @@ export default {
   methods: {
     //提交置换
     requestNode() {
-      console.log(this.cloudDetail);
+      console.log(this.productSpecsCode);
       let options = {
-        changeSpecsCode: this.detail.specsList[0].code,
-        productSpecsCode: this.cloudDetail.specsList[0].price.productSpecsCode,
+        changeSpecsCode: this.changeSpecsCode,
+        // productSpecsCode: this.cloudDetail.productSpecsCode,
+        productSpecsCode: this.productSpecsCode,
         // quantity: this.cloudDetail.specsList[this.count].number
         quantity: this.initNum
       };
@@ -189,13 +206,17 @@ export default {
     queryMoney(index) {
       if (this.cloudDetail.name !== "") {
         let options = {
+          // changeSpecsCode: this.changeSpecsCode,
+          // productSpecsCode: this.cloudDetail.specsList[0].productSpecsCode,
           changeSpecsCode: this.changeSpecsCode,
-          productSpecsCode: this.cloudDetail.specsList[0].productSpecsCode,
+          productSpecsCode: this.cloudDetail.specsList[this.count].productSpecsCode,
           // quantity: this.cloudDetail.specsList[this.count].number
           quantity: this.initNum
         };
-        console.log(index);
-        console.log(this.cloudDetail.specsList[index]);
+        if(!options.productSpecsCode) {
+          alert('请选择云仓产品!');
+          return
+        }
         queryMoney(options).then(res => {
           this.detail.specsList[index].number = res.canChangeQuantity;
         });
@@ -229,24 +250,24 @@ export default {
       this.changecloudFlag();
     },
     //选购产品数量+1
-    add() {
-      // this.detail.specsList[this.num].number++;
-      this.initNum++;
-    },
+    // add() {
+    //   // this.detail.specsList[this.num].number++;
+    //   this.initNum++;
+    // },
     //选购产品数量+1
     _add() {
       // this.cloudDetail.specsList[this.count].number++;
       this.initNum++;
     },
     // 选购产品数量-1
-    sub() {
-      // if (this.detail.specsList[this.num].number >= 2) {
-      //   this.detail.specsList[this.num].number--;
-      // }
-      if (this.initNum >= 2) {
-        this.initNum--;
-      }
-    },
+    // sub() {
+    //   // if (this.detail.specsList[this.num].number >= 2) {
+    //   //   this.detail.specsList[this.num].number--;
+    //   // }
+    //   if (this.initNum >= 2) {
+    //     this.initNum--;
+    //   }
+    // },
     // 选购产品数量-1
     _sub() {
       // if (this.cloudDetail.specsList[this.count].number >= 2) {
@@ -260,19 +281,19 @@ export default {
     chooseSize(item, index) {
       this.num = index;
       this.changeSpecsCode = item.code;
-      console.log(index);
       this.queryMoney(index);
     },
-    choose_Size(index) {
-      this.number = index;
-    },
+    // choose_Size(index) {
+    //   this.number = index;
+    // },
     //选择规格
-    _chooseSize(index) {
+    _chooseSize(item, index) {
       this.count = index;
+      this.productSpecsCode = item.productSpecsCode;
     },
-    _choose_Size(index) {
-      this.number2 = index;
-    },
+    // _choose_Size(index) {
+    //   this.number2 = index;
+    // },
     //确定规格
     certain(num) {
       this.genghuan();

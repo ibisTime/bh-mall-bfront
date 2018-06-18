@@ -72,7 +72,9 @@ export default {
       thingInfo: [],
       number: "",
       productSpecsCode: "",
-      status: 0
+      status: 0,
+      orderCode: '',
+      codeList: []
     };
   },
   methods: {
@@ -81,6 +83,7 @@ export default {
     },
     buy() {
       let code = this.$route.query.code;
+      let orderCode = this.$route.query.orderCode;
       let options = {
         address: this.address.address,
         area: this.address.area,
@@ -93,9 +96,13 @@ export default {
         applyNote: this.applyNote,
         toUser: this.$route.query.highUserId
       };
-      cloudBill(options).then(res => {
-        let code = res.code;
-        cloudPayment([code], this.status).then(res => {
+      // cloudBill(options).then(res => {
+      //   let code = res.code;
+        // cloudPayment([code], this.status).then(res => {
+        this.codeList.push(this.orderCode);
+        console.log(this.orderCode);
+        console.log(this.codeList);
+        cloudPayment(this.codeList, this.status).then(res => {
           let data = res;
           if (this.status === 0) {
             alert("支付成功！");
@@ -111,13 +118,14 @@ export default {
             initPay(wxConfig, this.success, this.error, this.cancel);
           }
         });
-      });
+      // });
     }
   },
   mounted() {
     //获取用户等级
     let level = getCookie("level");
     let code = this.$route.query.code;
+    this.orderCode = this.$route.query.orderCode;
     this.code = code;
     let number = this.$route.query.number;
     this.number = number;

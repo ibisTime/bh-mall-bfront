@@ -57,7 +57,7 @@ export default {
             this.account = res[0].amount;
             //查询门槛账户流水
             queryBill(res[0].accountNumber).then(res => {
-                  console.log(res)
+                //   console.log(res)
                   res.list.map(function(item){
 
                       //格式化日期时间

@@ -117,12 +117,13 @@ export default {
       // console.log(this.pdf);
       let options = {};
       options.highLevel = this.options.applyLevel;
-      options.padAmount = this.padAmount;
+      options.padAmount = this.padAmount * 1000;
       options.payPdf = this.photos[0].key;
       upgradeApplica(options).then(res => {
         if (res.isSuccess) {
           alert("申请成功！");
         }
+        res.isReset && alert(res.isReset);
       });
     },
     choseItem(index) {

@@ -2,10 +2,12 @@
   <div class="offine">
       <div class="login">
         <div>
-            <span>证件号码</span> <input v-model="idNo" v-validate="'required'" type="text" name="idNo" placeholder="请输入证件号码">
+            <span>证件号码</span>
+            <input v-model="idNo" v-validate="'required'" type="text" name="idNo" placeholder="请输入证件号码">
         </div>
         <div>
-            <span>介绍人</span> <input v-model="introducer" v-validate="'required'" type="text" name="idNo" placeholder="请输入介绍人">
+            <span>介绍人手机号</span>
+            <input v-model="introducer" v-validate="'required'" type="text" name="idNo" placeholder="请输入介绍人">
         </div>
       </div>
        

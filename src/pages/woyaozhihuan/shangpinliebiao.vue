@@ -14,9 +14,9 @@
                 <span>1{{item.specsList[0].name}}</span>
             </div>
         </div>
-        <div v-else="flag == 2" class="item" v-for="(item,index) in list" @click="choose(item.code,index)">
+        <div v-if="flag == 2" class="item" v-for="(item,index) in list" @click="choose(item.code,index)">
             <div :class="['circle',num === index ? 'active' : '']"></div>
-            <img :src="item.pic">
+            <img :src="item.product.advPic">
             <div class="content">
                 <p>{{item.productName}}</p>
                 <i>￥{{item.price / 1000}}</i>
@@ -64,8 +64,10 @@ export default {
     mounted(){
         this.flag = this.$route.query.flag
         this.level = getCookie('level')
-        let self = this
-        if(this.flag == 1) {
+        let self = this;
+        console.log(this.flag)
+        console.log(typeof this.flag)
+        if(this.flag == '1') {
 
             
             //查询我的商品
@@ -75,20 +77,21 @@ export default {
                 })
                 this.list = res.list
             })
-        }else if(this.flag == 2) {
+        }else if(this.flag == '2') {
 
             //获取云仓商品
             getCloudList().then(res => {    
                 //遍历格式化图片
                 res.list.map(function(item){
-                    
+                    item.product.advPic = formatImg(item.product.advPic)
                     //查询产品详情
-                    getCloudDetail(item.code).then(info => {
-                        item.pic = formatImg(info.pic)
-                    })
+                    // getCloudDetail(item.code).then(info => {
+                    //     item.pic = formatImg(info.pic)
+                    // })
                 })
                 console.log(res)
                 this.list = res.list
+                console.log(this.list);
             })
         }
     },

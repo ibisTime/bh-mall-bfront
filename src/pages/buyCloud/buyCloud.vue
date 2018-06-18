@@ -71,7 +71,8 @@ export default {
       i: 0,
       num: 0,
       number: 1,
-      text: ""
+      text: "",
+      orderCode: ''
     };
   },
   methods: {
@@ -88,17 +89,30 @@ export default {
     },
     //确认商品
     confirm(code) {
+      console.log(this.orderCode);
       let ref = this;
-      this.buy();
-      // .then(res => {
+      // this.buy();
+      this.options.productSpecsCode = this.detail.specsList[this.num].code;
+      this.options.quantity = this.number;
+      // alert(JSON.stringify(this.options));
+      cloudBill(this.options).then(res => {
+        this.text = "提交成功";
+        this.$refs.mytoast.show();
+        this.orderCode = res.code;
         this.$router.push(
         "/buyCloud/tijiaodingdan?code=" +
           code +
           "&number=" +
           ref.number +
           "&highUserId=" +
-          ref.options.highUserId
-      );
+          ref.options.highUserId + 
+          "&orderCode=" +
+          ref.orderCode
+        );
+      });
+      // .then(res => {
+        
+
       // })
     },
     genghuan() {
@@ -138,10 +152,11 @@ export default {
     buy() {
       this.options.productSpecsCode = this.detail.specsList[this.num].code;
       this.options.quantity = this.number;
-      alert(this.options.quantity);
+      // alert(JSON.stringify(this.options));
       cloudBill(this.options).then(res => {
         this.text = "提交成功";
         this.$refs.mytoast.show();
+        this.orderCode = res.code;
       });
     },
     tiaozhuan() {
