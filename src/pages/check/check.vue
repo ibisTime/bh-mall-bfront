@@ -18,7 +18,7 @@
       </div>
       <div :class="[index == 12 ? 'show' : '', 'item']" v-for="(item,key) in data2" :key="item.key"   @click="$router.push('/check/checkdispose?index=12&id=' + item.userId);">
           <p>姓名：{{item.realName}}</p>
-          <p><i>{{item.applyLevel}}</i> <img class="shengji" src="../../assets/imgs/shengji@2x.png" alt=""> <i>{{item.user.applyLevel}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
+          <p><i>{{item.level}}</i> <img class="shengji" src="../../assets/imgs/shengji@2x.png" alt=""> <i>{{item.applyLevel}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
           <p><span>微信号：{{item.wxId}}</span> <i class="tel">手机号：{{item.mobile}}</i> </p>
       </div>
       <div :class="[index == 8 ? 'show' : '', 'item']" v-for="(item,key) in data3" :key="item.key"   @click="$router.push('/check/checkdispose?index=8&id=' + item.userId);">
@@ -48,6 +48,9 @@ export default {
           getLevel(item.applyLevel).then(res => {
             item.applyLevel = res[0].name;
           });
+          getLevel(item.level).then(info => {
+            item.level = info[0].name;
+          });
         }); 
         if (index === 6) {
           this.data1 = res.list;
@@ -64,6 +67,9 @@ export default {
       res.list.map(function(item) {
         getLevel(item.applyLevel).then(res => {
           item.applyLevel = res[0].name;
+        });
+        getLevel(item.level).then(info => {
+          item.level = info[0].name;
         });
       });
       this.data1 = res.list;

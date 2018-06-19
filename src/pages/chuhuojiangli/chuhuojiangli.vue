@@ -44,7 +44,7 @@
               </div>
               <div class="bottom">
                   <p>奖励名称：<i>{{item.bizNote}}</i></p>
-                  <p>奖励金额：<i>{{item.transAmount}}</i></p>
+                  <p>奖励金额：<i>{{item.transAmount / 1000 }}</i></p>
                   <p>{{item.createDatetime}}</p>
                   <img class="more" src="../../assets/imgs/more@2x.png">
               </div>

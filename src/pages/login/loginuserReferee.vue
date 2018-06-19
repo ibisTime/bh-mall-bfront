@@ -12,9 +12,13 @@
             <i v-show="errors.has('wxNum')" class="error-tip">{{errors.first('wxNum')}}</i>
             <span>微信号</span> <input v-model="options.wxId" v-validate="'required'" type="text" name="wxNum" placeholder="请输入微信号">
         </div>
+        <div>
+            <i v-show="errors.has('mobile')" class="error-tip">{{errors.first('introducer')}}</i>
+            <span>介绍人手机号</span> <input v-model="options.introducer" v-validate="'required|mobile'" type="text" name="introducer" placeholder="请输入介绍人手机号">
+        </div>
           <div>
             <i v-show="errors.has('wxNum')" class="error-tip">{{errors.first('wxNum')}}</i>
-            <span>证件号</span> <input v-model="options.idNo" v-validate="'required'" type="text" name="idNo" placeholder="请输入id号">
+            <span>证件号</span> <input v-model="options.idNo" v-validate="'required'" type="text" name="idNo" placeholder="请输入证件号">
         </div>
               <qiniu
             ref="qiniu"
@@ -120,7 +124,8 @@ export default {
         idNo: "",
         idBehind: '',
         idFront: '',
-        idHand: ''
+        idHand: '',
+        introducer: ''
       },
       userReferee: "",
       userId: "",
@@ -149,20 +154,10 @@ export default {
   methods: {
     submit() {
       // this.userId = 'U201806142229374042532';
-      isRealName(this.userId).then(res => {
-        console.log(this.idNo);
-        if (res.isSuccess) {
-          // 需要实名
-          if (
-            this.idNo &&
-            this.introducer &&
-            this.photos1[0].key &&
-            this.photos2[0].key &&
-            this.photos3[0].key
-          ) {
-            supplyInfo(
+      supplyInfo(
               "1",
               this.idNo,
+              this.mobile,
               this.introducer,
               this.photos1[0].key,
               this.photos21[0].key,
@@ -181,43 +176,75 @@ export default {
                 this.$refs.toast.show();
               }
             });
-          }
-        } else {
-          if (!this.photos1[0]) {
-            this.photos111 = "";
-          }
-          if (!this.photos2[0]) {
-            this.photos222 = "";
-          }
-          if (!this.photos3[0]) {
-            this.photos333 = "";
-          }
-          if (!this.idNo) {
-            this.idNo = "";
-          }
-          if (!this.introducer) {
-            this.introducer = "";
-          }
-          supplyInfo(
-            "1",
-            this.idNo,
-            this.introducer,
-            this.photos111,
-            this.photos222,
-            this.photos333,
-            this.userId
-          ).then(res => {
-            // alert(res);
-            // alert("4");
-            if (res.code !== "") {
-              this.text = "提交成功，待审核";
-              this.$refs.toast.show(this.tiaozhuan);
-              this.photos = [];
-              this.moneyNum = "";
-            }
-          });
-        }
-      });
+      // isRealName(this.userId).then(res => {
+      //   console.log(this.idNo);
+      //   if (res.isSuccess) {
+      //     // 需要实名
+      //     if (
+      //       this.idNo &&
+      //       // this.introducer &&
+      //       this.photos1[0].key &&
+      //       this.photos2[0].key &&
+      //       this.photos3[0].key
+      //     ) {
+      //       supplyInfo(
+      //         "1",
+      //         this.idNo,
+      //         this.introducer,
+      //         this.photos1[0].key,
+      //         this.photos21[0].key,
+      //         this.photos3[0].key,
+      //         this.userId
+      //       ).then(res => {
+      //         // alert(res);
+      //         // alert("4");
+      //         if (res.code !== "") {
+      //           this.text = "提交成功，待审核";
+      //           this.$refs.toast.show(this.tiaozhuan);
+      //           this.photos = [];
+      //           this.moneyNum = "";
+      //         } else {
+      //           this.text = "请确认信息全部填写完整";
+      //           this.$refs.toast.show();
+      //         }
+      //       });
+      //     }
+      //   } else {
+      //     if (!this.photos1[0]) {
+      //       this.photos111 = "";
+      //     }
+      //     if (!this.photos2[0]) {
+      //       this.photos222 = "";
+      //     }
+      //     if (!this.photos3[0]) {
+      //       this.photos333 = "";
+      //     }
+      //     if (!this.idNo) {
+      //       this.idNo = "";
+      //     }
+      //     if (!this.introducer) {
+      //       this.introducer = "";
+      //     }
+      //     supplyInfo(
+      //       "1",
+      //       this.idNo,
+      //       this.introducer,
+      //       this.photos111,
+      //       this.photos222,
+      //       this.photos333,
+      //       this.userId
+      //     ).then(res => {
+      //       // alert(res);
+      //       // alert("4");
+      //       if (res.code !== "") {
+      //         this.text = "提交成功，待审核";
+      //         this.$refs.toast.show(this.tiaozhuan);
+      //         this.photos = [];
+      //         this.moneyNum = "";
+      //       }
+      //     });
+      //   }
+      // });
     },
     tiaozhuan() {
       this.$router.push("/login/replying");
@@ -231,7 +258,10 @@ export default {
       this.options.idNo = this.options.idNo
       // alert(1);
       // alert(JSON.stringify(this.options));
+      // console.log('111'+this.options);
+      alert(JSON.stringify(this.options));
       replyAgent(this.options).then(res => {
+        alert('222');
       // alert(JSON.stringify(this.options));
         this.$router.push("/login/replying");
       });

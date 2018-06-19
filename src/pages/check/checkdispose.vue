@@ -27,12 +27,14 @@
             <span class="footer-check" @click="audit">审核</span>
             <span class="footer-back" @click="$router.push('/check')">返回</span>
         </div>
+        <toast ref="mytoast" :text="text"></toast>
     </div>
+    
 </template>
 <script>
 import {accredit,upgrade,accreditCancel,getLevel} from 'api/baohuo'
 import {getUserById} from 'api/user'
-import toast from 'base/toast/toast'
+import Toast from 'base/toast/toast';
 export default {
   name:'checkdispose',
   data(){
@@ -88,6 +90,9 @@ export default {
             })
         })
   },
+  components: {
+      Toast
+    }
 }
 </script>
 <style lang="scss" scoped>

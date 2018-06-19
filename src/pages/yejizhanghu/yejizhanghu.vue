@@ -31,7 +31,7 @@
               </div>
               <img :src="item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
               <div class="detail">
-                  <p class="datail-money">+{{item.outAmount / 1000}}</p>
+                  <p class="datail-money">{{item.transAmount / 1000}}</p>
                   <p class="detail-text">{{item.remark}}</p>
               </div>
               </div>

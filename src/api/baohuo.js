@@ -183,6 +183,7 @@ export function replyAgent(options) {
     idFront: options.idFront,
     idHand: options.idHand,
     idNo: options.idNo,
+    idKind: '1',
     introducer: options.introducer,
     payPdf: options.payPdf,
     userReferee: options.userReferee,

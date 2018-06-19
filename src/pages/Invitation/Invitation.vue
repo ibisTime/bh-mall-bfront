@@ -101,9 +101,11 @@ export default {
         foreground: "#000000"
       });
       qr.make(this.wxUrl);
+      alert(this.wxUrl);
       getUser().then(res => {
         this.nickname = res.nickname;
       });
+      
     }
   }
 };
