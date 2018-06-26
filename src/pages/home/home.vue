@@ -324,13 +324,13 @@ export default {
 <style lang="scss" scoped>
 @import "../../common/scss/mixin.scss";
 @import "../../common/scss/variable.scss";
-.full-screen-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
+// .full-screen-wrapper {
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+// }
 .home {
   .fl {
     float: left;
