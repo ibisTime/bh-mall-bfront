@@ -58,7 +58,7 @@ export default {
       flag: false,
       wxUrl: "http://bh.bfront.hichengdai.com?userReferee=",
       info: {
-        title: "奇遇科技邀请链接",
+        title: "麦记新零售邀请链接",
         desc: "邀请链接",
         link: location.href.split('#')[0],
         imgUrl: "http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg"
