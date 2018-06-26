@@ -56,7 +56,7 @@ export default {
   data() {
     return {
       flag: false,
-      wxUrl: "http://front.bhxt.hichengdai.com?userReferee=",
+      wxUrl: "http://bh.bfront.hichengdai.com?userReferee=",
       info: {
         title: "奇遇科技邀请链接",
         desc: "邀请链接",
