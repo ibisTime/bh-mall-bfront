@@ -2,23 +2,23 @@
     <div class="login">
         <div>
             <i v-show="errors.has('username')" class="error-tip">{{errors.first('username')}}</i>
-            <span>姓名</span> <input v-model="options.realName" v-validate="'required'" type="text" name="username" placeholder="请输入姓名">
+            <span>姓名</span> <input class="pl2rem" v-model="options.realName" v-validate="'required'" type="text" name="username" placeholder="请输入姓名">
         </div>
         <div>
             <i v-show="errors.has('mobile')" class="error-tip">{{errors.first('mobile')}}</i>
-            <span>手机号</span> <input v-model="options.mobile" v-validate="'required|mobile'" type="text" name="mobile" placeholder="请输入手机号">
+            <span>手机号</span> <input class="pl2rem" v-model="options.mobile" v-validate="'required|mobile'" type="text" name="mobile" placeholder="请输入手机号">
         </div>
         <div>
             <i v-show="errors.has('wxNum')" class="error-tip">{{errors.first('wxNum')}}</i>
-            <span>微信号</span> <input v-model="options.wxId" v-validate="'required'" type="text" name="wxNum" placeholder="请输入微信号">
+            <span>微信号</span> <input class="pl2rem" v-model="options.wxId" v-validate="'required'" type="text" name="wxNum" placeholder="请输入微信号">
         </div>
         <div>
-            <i v-show="errors.has('mobile')" class="error-tip">{{errors.first('introducer')}}</i>
-            <span>介绍人手机号</span> <input v-model="options.introducer" v-validate="'required|mobile'" type="text" name="introducer" placeholder="请输入介绍人手机号">
+            <i v-show="errors.has('introducer')" class="error-tip">{{errors.first('introducer')}}</i>
+            <span>介绍人手机号</span> <input @keyup="introducerChange" class="pl2rem" v-model="options.introducer" type="text" name="introducer" placeholder="请输入介绍人手机号">
         </div>
           <div>
-            <i v-show="errors.has('wxNum')" class="error-tip">{{errors.first('wxNum')}}</i>
-            <span>证件号</span> <input v-model="options.idNo" v-validate="'required'" type="text" name="idNo" placeholder="请输入证件号">
+            <i v-show="errors.has('idNo')" class="error-tip">{{errors.first('idNo')}}</i>
+            <span>证件号</span> <input class="pl2rem" v-model="options.idNo" type="text" name="idNo" placeholder="请输入证件号">
         </div>
               <qiniu
             ref="qiniu"
@@ -26,24 +26,6 @@
             :token="token"
             :uploadUrl="uploadUrl"></qiniu>
       <form ref="form">
-        <div class="img">
-                <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
-                <p>上传身份证正面图片</p>
-                <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(1,$event)" accept="image/*">
-                <div class="item" v-for="(photo,index) in photos1" ref="photoItem" @click="choseItem(index)">
-                    <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
-                    <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
-                </div>
-        </div>
-        <div class="img">
-                <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
-                <p>上传身份证反面图片</p>
-                <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(2,$event)" accept="image/*">
-                <div class="item" v-for="(photo,index) in photos2" ref="photoItem" @click="choseItem(index)">
-                    <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
-                    <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
-                </div>
-        </div>
         <div class="img">
                 <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
                 <p>上传手持身份证图片</p>
@@ -55,28 +37,35 @@
         </div>
       </form>
         <div class="area">
-            <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>            
-            <span>省份、市、区</span><img class="more" src="../../assets/imgs/more@2x.png" alt="">
-            <city-picker class="item-input"
-                        v-validate="'required'"
+            <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>
+            <span>省份、市、区</span>
+            <city-picker class="item-input pl2rem"
                         :province="options.province"
                         :city="options.city"
                         :district="options.district"
-                        name="area"
                         @change="cityChange">
             </city-picker>
+            <img class="more" src="../../assets/imgs/more@2x.png" alt="">
         </div>
         <div>
-            <i v-show="errors.has('address')" class="error-tip">{{errors.first('address')}}</i>  
-            <span>详细地址</span> <input v-model="options.address" v-validate="'required'" type="text" name="address" placeholder="请输入详细地址">
+            <i v-show="errors.has('address')" class="error-tip">{{errors.first('address')}}</i>
+            <span>详细地址</span> <input class="pl2rem" v-model="options.address" v-validate="'required'" type="text" name="address" placeholder="请输入详细地址">
         </div>
-        <div class="area" @click="chooseLevel">
-            <span>等级</span> <span>{{level}}</span><img class="more rotate" src="../../assets/imgs/more@2x.png" alt="">
-            <ul  :class="[panelLevelShow ? 'show' : '','panel']" @click="selectLevel($event)">
-                <li v-for="item in levelList" v-if="item.level != 6" :level="item.level">{{item.name}}</li>
-            </ul>
+        <div class="area">
+            <i v-show="errors.has('applyLevel')" class="error-tip">{{errors.first('applyLevel')}}</i>
+            <span>等级</span><span class="pl2rem item-input">{{level}}</span><img class="more" src="../../assets/imgs/more@2x.png" alt="">
+            <select v-validate="'required'" name="applyLevel" v-model="options.applyLevel" @change="chooseLevel">
+              <option v-for="item in levelList" :value="item.level">{{item.name}}</option>
+            </select>
+        </div>
+        <div>
+            <span>团队名称</span>
+            <span class="pl2rem" v-if="options.applyLevel != '1'">{{teamName}}</span>
+            <input class="pl2rem" v-else v-model="teamName" v-validate="'required'" type="text" name="teamName" placeholder="请输入团队名称">
         </div>
         <button class="btn" @click="apply">申请代理</button>
+        <full-loading :title="title" v-show="loading"></full-loading>
+        <toast ref="toast" :text="text"></toast>
     </div>
 </template>
 <script>
@@ -98,17 +87,21 @@ import {
 import { getCookie, setCookie } from "common/js/cookie";
 import CityPicker from "base/city-picker/city-picker";
 import { getQiniuToken } from "api/general";
+import { getUser, getUserByMobile } from 'api/user';
 import BScroll from "better-scroll";
 import EXIF from "exif-js";
 import Qiniu from "base/qiniu/qiniu";
 import Toast from "base/toast/toast";
 import Loading from "base/loading/loading";
+import FullLoading from 'base/full-loading/full-loading';
 import PhotoEdit from "components/photo-edit/photo-edit";
 const MAX_LENGTH = 12;
 
 export default {
   data() {
     return {
+      loading: true,
+      title: '正在载入...',
       panelLevelShow: false,
       levelList: [],
       level: "",
@@ -127,13 +120,7 @@ export default {
         idHand: '',
         introducer: ''
       },
-      userReferee: "",
-      userId: "",
-      photos1: [],
-      photos2: [],
       photos3: [],
-      photos111: "",
-      photos222: "",
       photos333: "",
       token: "",
       currentItem: null,
@@ -144,140 +131,132 @@ export default {
       idKind: "",
       idNo: "",
       introducer: "",
-      moneyNum: ""
+      moneyNum: "",
+      teamName: "",
+      allLevelList: []
     };
   },
   created() {
-    this.multiple = true;
+    this.multiple = false;
     this.uploadUrl = "http://up-z0.qiniu.com";
   },
+  mounted() {
+    this.options.userId = this.$route.query.userId;
+    setCookie("userId", this.options.userId);
+    this.options.userReferee = this.$route.query.userReferee;
+    Promise.all([
+      getUser(),
+      getAllLevel()
+    ]).then(([userInfo, levelList]) => {
+      this.loading = false;
+      this.userInfo = userInfo;
+      let list = levelList.list.filter(l => {
+        return l.level != '6';
+      });
+      this.allLevelList = list;
+      if (userInfo.highUser) {
+        this.highUserName = userInfo.highUser.realName;
+        this.teamName = userInfo.highUser.teamName;
+        let level = userInfo.highUser.level || 0;
+        this.levelList = list.filter(l => {
+          return l.level > level;
+        });
+        if (!this.levelList.length) {
+          this.levelList = list.filter(l => l.level == level);
+        }
+        if (this.levelList.length === 1) {
+          this.applyLevel = this.levelList[0].level;
+          this.level = this.levelList[0].name;
+        }
+      } else {
+        this.levelList = list;
+      }
+    }).catch(() => this.loading = false);
+    //查询七牛token
+    getQiniuToken().then(res => {
+      this.token = res.uploadToken
+    }).catch(() => {});
+  },
   methods: {
-    submit() {
-      // this.userId = 'U201806142229374042532';
-      supplyInfo(
-              "1",
-              this.idNo,
-              this.mobile,
-              this.introducer,
-              this.photos1[0].key,
-              this.photos21[0].key,
-              this.photos3[0].key,
-              this.userId
-            ).then(res => {
-              // alert(res);
-              // alert("4");
-              if (res.code !== "") {
-                this.text = "提交成功，待审核";
-                this.$refs.toast.show(this.tiaozhuan);
-                this.photos = [];
-                this.moneyNum = "";
-              } else {
-                this.text = "请确认信息全部填写完整";
-                this.$refs.toast.show();
-              }
-            });
-      // isRealName(this.userId).then(res => {
-      //   console.log(this.idNo);
-      //   if (res.isSuccess) {
-      //     // 需要实名
-      //     if (
-      //       this.idNo &&
-      //       // this.introducer &&
-      //       this.photos1[0].key &&
-      //       this.photos2[0].key &&
-      //       this.photos3[0].key
-      //     ) {
-      //       supplyInfo(
-      //         "1",
-      //         this.idNo,
-      //         this.introducer,
-      //         this.photos1[0].key,
-      //         this.photos21[0].key,
-      //         this.photos3[0].key,
-      //         this.userId
-      //       ).then(res => {
-      //         // alert(res);
-      //         // alert("4");
-      //         if (res.code !== "") {
-      //           this.text = "提交成功，待审核";
-      //           this.$refs.toast.show(this.tiaozhuan);
-      //           this.photos = [];
-      //           this.moneyNum = "";
-      //         } else {
-      //           this.text = "请确认信息全部填写完整";
-      //           this.$refs.toast.show();
-      //         }
-      //       });
-      //     }
-      //   } else {
-      //     if (!this.photos1[0]) {
-      //       this.photos111 = "";
-      //     }
-      //     if (!this.photos2[0]) {
-      //       this.photos222 = "";
-      //     }
-      //     if (!this.photos3[0]) {
-      //       this.photos333 = "";
-      //     }
-      //     if (!this.idNo) {
-      //       this.idNo = "";
-      //     }
-      //     if (!this.introducer) {
-      //       this.introducer = "";
-      //     }
-      //     supplyInfo(
-      //       "1",
-      //       this.idNo,
-      //       this.introducer,
-      //       this.photos111,
-      //       this.photos222,
-      //       this.photos333,
-      //       this.userId
-      //     ).then(res => {
-      //       // alert(res);
-      //       // alert("4");
-      //       if (res.code !== "") {
-      //         this.text = "提交成功，待审核";
-      //         this.$refs.toast.show(this.tiaozhuan);
-      //         this.photos = [];
-      //         this.moneyNum = "";
-      //       }
-      //     });
-      //   }
-      // });
-    },
-    tiaozhuan() {
-      this.$router.push("/login/replying");
-    },
     apply() {
-      this.options.userReferee = this.userReferee;
-      this.options.userId = this.userId;
-      this.options.idBehind = this.photos1[0].key;
-      this.options.idFront = this.photos2[0].key;
-      this.options.idHand = this.photos3[0].key;
-      this.options.idNo = this.options.idNo
-      // alert(1);
-      // alert(JSON.stringify(this.options));
-      // console.log('111'+this.options);
-      alert(JSON.stringify(this.options));
-      replyAgent(this.options).then(res => {
-        alert('222');
-      // alert(JSON.stringify(this.options));
-        this.$router.push("/login/replying");
+      this.$validator.validateAll().then((result) => {
+        if (result) {
+          if (!this.teamName || !this.options.applyLevel) {
+            this.text = '等级或团队信息未填写';
+            this.$refs.toast.show();
+            return;
+          }
+          if (!this.options.province) {
+            this.text = '省份信息未填写';
+            this.$refs.toast.show();
+            return;
+          }
+          this.loading = true;
+          this.title = '提交中...';
+          this.options.idHand = this.photos3[0].key;
+          this.options.idNo = this.options.idNo;
+          this.options.teamName = this.teamName;
+          replyAgent(this.options).then(res => {
+            this.loading = false;
+            this.text = '提交成功，待审核';
+            this.$refs.toast.show(() => {
+              this.$router.push("/login/replying");
+            });
+          }).catch(() => this.loading = false);
+        }
       });
     },
-    changLevelShow() {
-      this.panelLevelShow = !this.panelLevelShow;
+    introducerChange(e) {
+      let mobile = e.target.value;
+      if (/^1[3|4|5|6|7|8|9]\d{9}$/.test(mobile)) {
+        if (this.timer) {
+          clearTimeout(this.timer);
+        }
+        this.timer = setTimeout(() => {
+          getUserByMobile(mobile).then(user => {
+            let leftLevel = this.userInfo.highUser.level || 0;
+            let rightLevel = user.level;
+            let list = this.allLevelList.filter(l => l.level > leftLevel && l.level < rightLevel);
+            if (!list.length) {
+              this.text = '暂无可选择的等级';
+              this.$refs.toast.show();
+              this.applyLevel = '';
+            } else {
+              this.levelList = list;
+              this.applyLevel = list[0].level;
+              this.teamName = list[0].level == '1' ? '' : this.userInfo.teamName;
+            }
+          }).catch(() => {
+            this.noLevel();
+          });
+        }, 300);
+      } else {
+        this.noLevel();
+      }
     },
-    chooseLevel() {
-      this.changLevelShow();
+    noLevel() {
+      let leftLevel = this.userInfo.highUser.level || 0;
+      let list = this.allLevelList.filter(l => l.level > leftLevel);
+      if (!list.length) {
+        this.text = '暂无可选择的等级';
+        this.$refs.toast.show();
+        this.applyLevel = '';
+      } else {
+        this.levelList = list;
+        this.applyLevel = list[0].level;
+        this.teamName = list[0].level == '1' ? '' : this.userInfo.teamName;
+      }
     },
-    selectLevel(event) {
-      console.log(this.panelLevelShow);
-      this.changLevelShow();
-      this.panelLevelShow = !this.panelLevelShow;
-      this.options.applyLevel = event.target.getAttribute("level");
-      this.level = event.target.innerHTML;
+    chooseLevel(e) {
+        let val = e.target.value;
+        let level = this.levelList.find(v => v.level == val);
+        this.level = level.name;
+        this.options.applyLevel = val;
+        if (val == 1) {
+            this.teamName = '';
+        } else {
+            this.teamName = this.userInfo.highUser && this.userInfo.highUser.teamName || '';
+        }
     },
     cityChange(prov, city, district) {
       this.options.province = prov;
@@ -347,80 +326,45 @@ export default {
       } else if (e.target) {
         files = e.target.files;
       }
-      console.log(files);
-      console.log(this.photos);
       let self = this;
-      let len = files.length;
-      for (let i = 0; i < files.length; i++) {
-        (function(i) {
-          let file = files[i];
-          let orientation;
-
-          EXIF.getData(file, function() {
-            orientation = EXIF.getTag(this, "Orientation");
-          });
-          let reader = new FileReader();
-          reader.onload = function(e) {
-            getImgData(file.type, this.result, orientation, function(data) {
-              let _url = URL.createObjectURL(file);
-              let item = {
-                preview: data,
-                ok: false,
-                type: file.type,
-                key: _url.split("/").pop() + "." + file.name.split(".").pop()
-              };
-              if (index == "1") {
-                self.photos1.push(item);
-              } else if (index == "2") {
-                self.photos2.push(item);
-              } else {
-                self.photos3.push(item);
-              }
-              self
-                .uploadPhoto(data, item.key)
-                .then(() => {
-                  item = {
-                    ...item,
-                    ok: true
-                  };
-                  self.updatePhotos(item, index);
-                })
-                .catch(err => {
-                  self.onUploadError(err);
-                });
-              if (i + 1 === len) {
-                self.$refs.fileInput.value = null;
-              }
-            });
+      let file = files[0];
+      let orientation;
+      EXIF.getData(file, function() {
+        orientation = EXIF.getTag(this, "Orientation");
+      });
+      let reader = new FileReader();
+      reader.onload = function(e) {
+        getImgData(file.type, this.result, orientation, function(data) {
+          let _url = URL.createObjectURL(file);
+          let item = {
+            preview: data,
+            ok: false,
+            type: file.type,
+            key: _url.split("/").pop() + "." + file.name.split(".").pop()
           };
-          reader.readAsDataURL(file);
-        })(i);
-      }
+          self.photos3 = [item];
+          self.uploadPhoto(data, item.key).then(() => {
+              item = {
+                ...item,
+                ok: true
+              };
+              self.updatePhotos(item, index);
+          }).catch(err => {
+              self.onUploadError(err);
+          });
+          self.$refs.fileInput.value = null;
+        });
+      };
+      reader.readAsDataURL(file);
     },
     /**
      * 图片上传完成后更新photos
      * */
     updatePhotos(item, index) {
-      if (index == "1") {
-        for (let i = 0; i < this.photos1.length; i++) {
-          if (this.photos1[i].key === item.key) {
-            this.photos1.splice(i, 1, item);
-            break;
-          }
-        }
-      } else if (index == "2") {
-        for (let i = 0; i < this.photos2.length; i++) {
-          if (this.photos2[i].key === item.key) {
-            this.photos2.splice(i, 1, item);
-            break;
-          }
-        }
-      } else {
-        for (let i = 0; i < this.photos3.length; i++) {
-          if (this.photos3[i].key === item.key) {
-            this.photos3.splice(i, 1, item);
-            break;
-          }
+      for (let i = 0; i < this.photos3.length; i++) {
+        if (this.photos3[i].key === item.key) {
+          this.photos3.splice(i, 1, item);
+          break;
         }
       }
     },
@@ -435,10 +379,7 @@ export default {
      * @param error 错误信息
      */
     onUploadError(error) {
-      this.text =
-        (error.body && error.body.error) ||
-        `${error.message}:10M` ||
-        "图片上传出错";
+      this.text = (error.body && error.body.error) || `${error.message}:10M` || "图片上传出错";
       this.$refs.toast.show();
     },
     getSrc(photo) {
@@ -465,56 +406,52 @@ export default {
     Qiniu,
     Toast,
     Loading,
+    FullLoading,
     PhotoEdit,
     CityPicker
-  },
-  mounted() {
-    this.userId = this.$route.query.userId;
-    setCookie("userId", this.userId);
-    this.userReferee = this.$route.query.userReferee;
-    getAllLevel().then(res => {
-      this.levelList = res.list;
-      this.levelList = this.levelList;
-    });
-    //查询七牛token
-    getQiniuToken().then(res => {
-      this.token = res.uploadToken;
-    });
   }
 };
 </script>
 <style lang="scss" scoped>
 @import "../../common/scss/variable.scss";
 .login {
+  padding: 0 0.3rem;
+  width: 100%;
   font-size: $font-size-large-s;
   > div {
     position: relative;
+    display: flex;
+    width: 100%;
+    align-items: center;
     height: 1rem;
     padding: 0.3rem;
     border-bottom: 1px solid #eee;
     > i {
       position: absolute;
-      top: 0.02rem;
-      color: $primary-color;
-      font-size: $font-size-small-ss;
+      top: 0.4rem;
+      right: 0.6rem;
+      color: $color-red;
+      font-size: $font-size-medium-s;
     }
     span {
       display: inline-block;
       width: 2.2rem;
+      flex: 0 0 2.2rem;
     }
     .more {
       width: 0.2rem;
-      float: right;
+      flex: 0 0 0.2rem;
     }
     .rotate {
       transform: rotateZ(90deg);
     }
+    input {
+      flex: 1;
+    }
     &.area {
       position: relative;
       .item-input {
-        position: absolute;
-        top: 0.3rem;
-        left: 2.8rem;
+        flex: 1;
       }
       ul {
         width: 100%;
@@ -572,11 +509,23 @@ export default {
     display: block;
     width: 90%;
     line-height: 0.9rem;
-    margin: 4rem auto;
+    margin: 0.6rem auto;
+    font-size: $font-size-large-ss;
     background-color: $primary-color;
     color: #fff;
     text-align: center;
     border-radius: 0.1rem;
+  }
+  select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+  .pl2rem {
+    padding-left: 0.2rem;
   }
 }
 </style>

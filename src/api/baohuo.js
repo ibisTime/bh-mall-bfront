@@ -714,23 +714,21 @@ export function queryFodderName() {
     // limit:100,
     parentKey: 'material_type',
   });
-  
+
 }
 
 //补充信息
-export function supplyInfo(kind,No,introducer,idFront,idBehind,idHand,userId) {
+export function supplyInfo(idKind, idNo, introducer, idHand, teamName, applyLevel, userId) {
   return fetch(627362, {
-    // start:0,
-    // limit:100,
-    idKind: kind,
-    idNo: No,
-    introducer: introducer,
-    idFront: idFront,
-    idBehind: idBehind,
-    idHand: idHand,
-    userId: userId
+    idKind,
+    idNo,
+    introducer,
+    idHand,
+    teamName,
+    applyLevel,
+    userId
   });
-  
+
 }
 
 //该等级是否需要实名认证

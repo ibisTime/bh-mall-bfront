@@ -11,7 +11,7 @@
           <p>团队：{{userinfo.teamName}}</p>
         </div>
       </div>
-      <div class="header-bottom">
+      <!-- <div class="header-bottom">
         <div class="header-bottom-left">
           <img src="../../assets/imgs/certificate@2x.png" alt="">
           <span>财富管理</span>
@@ -20,10 +20,10 @@
           <img src="../../assets/imgs/xitongxiaoxi@2x.png" alt="">
           <span>系统消息</span>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="middle">
-      <div class="middle-top">
+      <div class="middle-top" @click="goYuncan">
         <span class="asset fl">余额</span>
         <span class="money fl">￥{{balance / 1000}}</span>
         <i class="fr more">
@@ -108,7 +108,7 @@
 import { setCookie, getCookie, clearAllCookie } from "common/js/cookie.js";
 import { isLogin } from "common/js/util";
 import { getUser1, getUserById } from "api/user";
-import { getBill, checkRed, getLevel } from "api/baohuo";
+import { getBill, getLevel } from "api/baohuo";
 export default {
   name: "home",
   data() {
@@ -293,6 +293,9 @@ export default {
     };
   },
   methods: {
+    goYuncan() {
+      this.$router.push('/yuncangzhanghu');
+    },
     tuichu() {
       clearAllCookie();
       this.$router.push("/home");
@@ -305,13 +308,6 @@ export default {
     } else {
       var userId = getCookie("userId");
     }
-    checkRed(userId).then(res => {
-      if (res.result == "0") {
-        this.$router.push("/login/reCharge");
-      } else if (res.result == "1") {
-        alert("您需要下授权单！");
-      }
-    });
     getUser1(userId).then(res => {
       this.userinfo = res;
       setCookie("level", res.level);
@@ -348,7 +344,6 @@ export default {
     background: $color-blank;
   }
   .header {
-    height: 4.4rem;
     background-image: url("../../assets/imgs/background@2x.png");
     .header-top {
       height: 3.5rem;
@@ -506,4 +501,3 @@ export default {
   }
 }
 </style>
-   

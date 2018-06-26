@@ -1,7 +1,7 @@
 <template>
     <div class="huopinjilu">
         <div class="header">
-            <img :src="formatImg(info.product.advPic)" alt="">
+            <img :src="formatImg(info.product && info.product.advPic)" alt="">
             <div class="content">
                 <p>{{ info.productName}}</p>
                 <i v-for="item in info.specsList" class="guige">￥{{ item.price /1000}}元/{{item.productSpecsName}}</br></i>

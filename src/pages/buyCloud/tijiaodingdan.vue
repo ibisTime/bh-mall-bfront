@@ -46,6 +46,9 @@
             </div>
             <div class="f-right" @click="buy">确认购买</div>
         </div>
+        <full-loading :title="title" v-show="loading"></full-loading>
+        <confirm ref="confirm" :text="confirmText" :isAlert="isAlert" @confirm="handleConfirm"></confirm>
+        <toast ref="toast" :text="text"></toast>
     </div>
 </template>
 <script>
@@ -59,12 +62,22 @@ import {
   cloudBill
 } from "api/baohuo";
 import { setCookie, getCookie } from "common/js/cookie.js";
-import { formatImg } from "common/js/util";
+import { formatImg, getUserId, formatAmount } from "common/js/util";
 import { getUser, getUserById } from "api/user";
+import { checkRed } from 'api/baohuo';
+import Toast from 'base/toast/toast';
+import FullLoading from 'base/full-loading/full-loading';
+import Confirm from 'base/confirm/confirm';
 import { initPay } from "common/js/weixin";
+
 export default {
   data() {
     return {
+      isAlert: true,
+      confirmText: '',
+      loading: true,
+      text: "",
+      title: "正在载入...",
       userinfo: {},
       options: {},
       address: {},
@@ -82,6 +95,8 @@ export default {
       this.status = status;
     },
     buy() {
+      this.title = "提交中...";
+      this.loading = true;
       let code = this.$route.query.code;
       let orderCode = this.$route.query.orderCode;
       let options = {
@@ -96,29 +111,61 @@ export default {
         applyNote: this.applyNote,
         toUser: this.$route.query.highUserId
       };
-      // cloudBill(options).then(res => {
-      //   let code = res.code;
-        // cloudPayment([code], this.status).then(res => {
-        this.codeList.push(this.orderCode);
-        console.log(this.orderCode);
-        console.log(this.codeList);
-        cloudPayment(this.codeList, this.status).then(res => {
-          let data = res;
-          if (this.status === 0) {
-            alert("支付成功！");
-          } else if (this.status === 1) {
-            let wxConfig = {
-              appId: data.appId, // 公众号名称，由商户传入
-              timeStamp: data.timeStamp, // 时间戳，自1970年以来的秒数
-              nonceStr: data.nonceStr, // 随机串
-              wechatPackage: data.wechatPackage,
-              signType: data.signType, // 微信签名方式：
-              paySign: data.paySign // 微信签名
-            };
-            initPay(wxConfig, this.success, this.error, this.cancel);
-          }
-        });
-      // });
+      this.codeList.push(this.orderCode);
+      cloudPayment(this.codeList, this.status).then(data => {
+        if (this.status === 0) {
+          this.success();
+        } else if (this.status === 1) {
+          let wxConfig = {
+            appId: data.appId, // 公众号名称，由商户传入
+            timeStamp: data.timeStamp, // 时间戳，自1970年以来的秒数
+            nonceStr: data.nonceStr, // 随机串
+            wechatPackage: data.wechatPackage,
+            signType: data.signType, // 微信签名方式：
+            paySign: data.paySign // 微信签名
+          };
+          initPay(wxConfig, this.success, this.error, this.cancel);
+        }
+      }).catch(() => this.loading = false);
+    },
+    cancel() {
+      this.loading = false;
+    },
+    error() {
+      this.loading = false;
+      this.text = '支付失败！';
+      this.$refs.toast.show();
+    },
+    success() {
+      this.loading = false;
+      this.text = '支付成功！';
+      this.$refs.toast.show();
+      this.checkUser(getUserId());
+    },
+    handleConfirm() {
+      this.$router.push(this.url);
+    },
+    checkUser(userId) {
+      checkRed(userId).then(res => {
+        if (res.result == '4') {
+          this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge');
+        } else if (res.result == "0") {
+          this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
+        } else if (res.result == '1') {
+          this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的授权单`, '/woyaochuhuo');
+        } else if (res.result == '2') {
+          this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的升级单`, '/woyaochuhuo');
+        } else if (res.result == '3') {
+          this.redirectPage(`您的门槛余额已经高于${formatAmount(res.minAmount)}元，请前去购买云仓`, '/threshold');
+        } else {
+          this.$router.push('/home');
+        }
+      }).catch(() => {});
+    },
+    redirectPage(text, url) {
+      this.confirmText = text;
+      this.$refs.confirm.show();
+      this.url = url;
     }
   },
   mounted() {
@@ -131,15 +178,21 @@ export default {
     this.number = number;
     setCookie("yuncangshuliang", this.number);
     setCookie("yuncangcode", this.code);
-    productDetail(code, level).then(item => {
+    Promise.all([
+      productDetail(code, level),
+      queryDefaultAddress()
+    ]).then(([item, res]) => {
+      this.loading = false;
       item.pic = formatImg(item.pic);
       this.thingInfo = item;
       this.productSpecsCode = item.specsList[0].price.productSpecsCode;
-    });
-    queryDefaultAddress().then(res => {
       this.address = res[0];
-      // this.changeOptions(this.address)
-    });
+    }).catch(() => this.loading = false);
+  },
+  components: {
+    Toast,
+    Confirm,
+    FullLoading
   }
 };
 </script>
@@ -307,4 +360,3 @@ export default {
   }
 }
 </style>
-

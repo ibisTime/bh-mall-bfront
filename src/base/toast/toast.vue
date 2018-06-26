@@ -45,7 +45,7 @@ export default {
   @import "~common/scss/variable";
 
   .loading-module-cont {
-    position: fixed;
+    position: fixed !important;
     top: 40%;
     left: 50%;
     padding: 0.18rem 0.3rem;

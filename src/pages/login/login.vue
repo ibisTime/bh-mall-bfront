@@ -2,52 +2,73 @@
     <div class="login">
         <div>
             <i v-show="errors.has('username')" class="error-tip">{{errors.first('username')}}</i>
-            <span>姓名</span> <input v-model="options.realName" v-validate="'required'" type="text" name="username" placeholder="请输入姓名">
+            <span>姓名</span> <input class="pl2rem" v-model="options.realName" v-validate="'required'" type="text" name="username" placeholder="请输入姓名">
         </div>
         <div>
             <i v-show="errors.has('mobile')" class="error-tip">{{errors.first('mobile')}}</i>
-            <span>手机号</span> <input v-model="options.mobile" v-validate="'required|mobile'" type="text" name="mobile" placeholder="请输入手机号">
+            <span>手机号</span> <input class="pl2rem" v-model="options.mobile" v-validate="'required|mobile'" type="text" name="mobile" placeholder="请输入手机号">
         </div>
         <div>
             <i v-show="errors.has('wxNum')" class="error-tip">{{errors.first('wxNum')}}</i>
-            <span>微信号</span> <input v-model="options.wxId" v-validate="'required'" type="text" name="wxNum" placeholder="请输入微信号">
+            <span>微信号</span> <input class="pl2rem" v-model="options.wxId" v-validate="'required'" type="text" name="wxNum" placeholder="请输入微信号">
         </div>
         <div class="area">
-            <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>            
-            <span>省份、市、区</span><img class="more" src="../../assets/imgs/more@2x.png" alt="">
-            <city-picker class="item-input"
-                        v-validate="'required'"
+            <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>
+            <span>省份、市、区</span>
+            <city-picker class="item-input pl2rem"
                         :province="options.province"
                         :city="options.city"
                         :district="options.district"
                         name="area"
                         @change="cityChange">
             </city-picker>
+            <img class="more" src="../../assets/imgs/more@2x.png" alt="">
         </div>
         <div>
-            <i v-show="errors.has('address')" class="error-tip">{{errors.first('address')}}</i>  
-            <span>详细地址</span> <input v-model="options.address" v-validate="'required'" type="text" name="address" placeholder="请输入详细地址">
+            <i v-show="errors.has('address')" class="error-tip">{{errors.first('address')}}</i>
+            <span>详细地址</span> <input class="pl2rem" v-model="options.address" v-validate="'required'" type="text" name="address" placeholder="请输入详细地址">
         </div>
-        <div class="area" @click="chooseLevel">
-            <span>等级</span> <span>{{level}}</span><img class="more rotate" src="../../assets/imgs/more@2x.png" alt="">
-            <ul  :class="[panelLevelShow ? 'show' : '','panel']" @click="selectLevel($event)">
-                <li v-for="item in levelList" v-if="item.level != 6" :level="item.level">{{item.name}}</li>
-            </ul>
+        <div class="area">
+            <i v-show="errors.has('applyLevel')" class="error-tip">{{errors.first('applyLevel')}}</i>
+            <span>等级</span><span class="pl2rem item-input">{{level}}</span>
+            <select v-validate="'required'" name="applyLevel" v-model="options.applyLevel" @change="chooseLevel">
+              <option v-for="item in levelList" :value="item.level" v-if="item.level != 6">{{item.name}}</option>
+            </select>
+            <img class="more" src="../../assets/imgs/more@2x.png" alt="">
+        </div>
+        <div class="area">
+            <i v-show="errors.has('fromInfo')" class="error-tip">{{errors.first('fromInfo')}}</i>
+            <span>意向来源</span><span class="pl2rem item-input">{{fromInfo}}</span>
+            <select v-validate="'required'" name="fromInfo" v-model="options.fromInfo" @change="chooseFrom">
+              <option v-for="item in fromList" :value="item.dkey">{{item.dvalue}}</option>
+            </select>
+            <img class="more" src="../../assets/imgs/more@2x.png" alt="">
         </div>
         <button class="btn" @click="apply">申请代理</button>
+        <toast ref="toast" :text="text"></toast>
+        <full-loading :title="title" v-show="loading"></full-loading>
     </div>
 </template>
 <script>
 import { getAppId, getAllLevel, replyAgent, _replyAgent } from "api/baohuo";
+import { getDictList } from 'api/general';
 import { isLogin, setUser, getWxMobAndCapt } from "common/js/util";
 import { setCookie } from "common/js/cookie";
 import CityPicker from "base/city-picker/city-picker";
+import FullLoading from 'base/full-loading/full-loading';
+import Toast from "base/toast/toast";
+
 export default {
   data() {
     return {
+      loading: true,
+      title: '正在载入...',
+      text: '',
       panelLevelShow: false,
       levelList: [],
       level: "",
+      fromList: [],
+      fromInfo: "",
       options: {
         address: "",
         district: "",
@@ -62,40 +83,42 @@ export default {
     };
   },
   components: {
-    CityPicker
+    Toast,
+    CityPicker,
+    FullLoading
   },
   methods: {
     apply() {
-      // this.options.userReferee = this.userReferee
-      _replyAgent(this.options, this.userId).then(res => {
-        this.$router.push("/login/replying");
+      this.$validator.validateAll().then((result) => {
+        if (result) {
+          this.title = '提交中...';
+          this.loading = true;
+          _replyAgent(this.options, this.userId).then(res => {
+            this.loading = false;
+            this.text = '提交成功，待审核';
+            this.$refs.toast.show(() => this.$router.push("/login/replying"));
+          }).catch(() => this.loading = false);
+        }
       });
     },
-    changLevelShow() {
-      this.panelLevelShow = !this.panelLevelShow;
+    chooseLevel(e) {
+      let val = e.target.value;
+      let level = this.levelList.find(v => v.level == val);
+      this.level = level.name;
     },
-    chooseLevel() {
-      this.changLevelShow();
-    },
-    selectLevel(event) {
-      console.log(this.panelLevelShow);
-      this.changLevelShow();
-      this.panelLevelShow = !this.panelLevelShow;
-      this.options.applyLevel = event.target.getAttribute("level");
-      this.level = event.target.innerHTML;
+    chooseFrom(e) {
+      let val = e.target.value;
+      let from = this.fromList.find(v => v.dkey == val);
+      this.fromInfo = from.dvalue;
     },
     cityChange(prov, city, district) {
       this.options.province = prov;
       this.options.city = city;
       this.options.district = district;
     },
-    showplace() {
-      console.log(this.options);
-    },
     AppId() {
       getAppId("wx_h5_access_key").then(res => {
         var appId = res.cvalue;
-        console.log(appId);
         let redirectUri = encodeURIComponent(
           `${location.origin}?${location.hash}`
         );
@@ -110,14 +133,14 @@ export default {
       });
     }
   },
-
   mounted() {
     this.userId = this.$route.query.userId;
-    // setCookie('userId',this.userId);
-    // this.userReferee = getCookie('userReferee')
     getAllLevel().then(res => {
+      this.loading = false;
       this.levelList = res.list;
-      this.levelList = this.levelList;
+    }).catch(() => this.loading = false);
+    getDictList('source').then(list => {
+      this.fromList = list;
     });
   }
 };
@@ -126,34 +149,41 @@ export default {
 @import "../../common/scss/variable.scss";
 .login {
   font-size: $font-size-large-s;
+  width: 100%;
   > div {
     position: relative;
+    display: flex;
+    width: 100%;
+    align-items: center;
     height: 1rem;
     padding: 0.3rem;
     border-bottom: 1px solid #eee;
     > i {
       position: absolute;
-      top: 0.02rem;
-      color: $primary-color;
-      font-size: $font-size-small-ss;
+      top: 0.4rem;
+      right: 0.6rem;
+      color: $color-red;
+      font-size: $font-size-medium-s;
     }
     span {
       display: inline-block;
       width: 2.2rem;
+      flex: 0 0 2.2rem;
     }
     .more {
       width: 0.2rem;
-      float: right;
+      flex: 0 0 0.2rem;
     }
     .rotate {
       transform: rotateZ(90deg);
     }
+    input {
+      flex: 1;
+    }
     &.area {
       position: relative;
       .item-input {
-        position: absolute;
-        top: 0.3rem;
-        left: 2.8rem;
+        flex: 1;
       }
       ul {
         width: 100%;
@@ -172,13 +202,25 @@ export default {
           border-bottom: 1px dashed #f7f7f7;
         }
       }
+      select {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+      }
     }
+  }
+  .pl2rem {
+    padding-left: 0.2rem;
   }
   .btn {
     display: block;
     width: 90%;
     line-height: 0.9rem;
     margin: 4rem auto;
+    font-size: $font-size-large-ss;
     background-color: $primary-color;
     color: #fff;
     text-align: center;

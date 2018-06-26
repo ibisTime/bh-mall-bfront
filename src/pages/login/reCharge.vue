@@ -1,9 +1,6 @@
 <template>
     <div class="replying">
-        <div class="tip">请补缴门槛费
-          <button @click="reCharge">前去充值</button>
-          </div>
-        
+        <div class="tip">充值审核中，请您耐心等待</div>
     </div>
 </template>
 <script>
@@ -17,19 +14,10 @@ export default {
 </script>
 <style lang="scss" scoped>
 .replying {
-  font-size: 0.3rem;
+  font-size: 0.32rem;
   .tip {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  button {
-    display: inline-block;
-    width: 2rem;
-    height: 1rem;
-    background-color: #7171c6;
-    border-radius: 5px;
+    text-align: center;
+    margin-top: 2rem;
   }
 }
 </style>

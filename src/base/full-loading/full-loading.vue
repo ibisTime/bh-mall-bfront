@@ -22,7 +22,7 @@
   @import "~common/scss/variable";
 
   .full-loading-wrapper {
-    position: absolute;
+    position: fixed !important;
     top: 0;
     left: 0;
     width: 100%;

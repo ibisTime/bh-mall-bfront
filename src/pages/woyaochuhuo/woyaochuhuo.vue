@@ -14,49 +14,57 @@
                 <i>{{address.area}}</i> {{address.address}}
             </p>
         </div>
-        <div class="item" v-for="item in list">
+        <div class="item" v-for="(item, index) in list">
             <img :src="item.product.pic" alt="">
             <div class="content">
-                <div><p>产品名称：{{item.productName}}<p>数量：{{item.quantity}}</p><p>价格：{{item.product.price / 1000}}</p></p></div>
-                
+                <div>
+                  <p>产品名称：{{item.productName}}
+                    <p>规格：{{specsList[index].quantity}}</p>
+                    <p>数量：{{prodNum[index]}}</p>
+                    <p>价格：¥{{formatAmount(specsList[index].price * prodNum[index])}}</p>
+                  </p>
+                </div>
                 <!-- <i>规格：{{item.product.specsList[0].name}}</i> -->
-                <span @click="prodectDetail(item.code)">我要出货</span>
+                <span @click="prodectDetail(item.code, index)">我要出货</span>
             </div>
         </div>
-            <div :class="['mask',flag ? 'show' : '']" @click="genghuan"></div>
-            <div :class="['buypart',buypartFlag ? 'show' : '']" v-if="detail.product">
-              <div class="title">
-                <div class="title-pic">
-                  <img :src="detail.product.pic" alt="">
-                </div>
-                <div class="title-right">
-                  <p>产品名称：{{detail.productName}}</p>
-                  <span>请选择</span>
-                  <i @click="genghuan">X</i>
-                </div>
-              </div>
-              <div class="packaging">
-                <p>规格</p>
-                <div class="select">
-                  <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(item.productSpecsCode,index,$event)" :class="[num === index ? 'active' : '']">{{item.productSpecsName}}</span>
-                </div>
-              </div>
-              <div class="total-money">
-                <div class="left">
-                  <i class="text">合计：</i>
-                  <i class="symbol">￥</i>
-                  <i class="sum">{{detail.product.price / 1000 * number}}</i>
-                </div>
-                <div class="right">
-                  <span class="diamonds right-item" @click="add">+</span>
-                  <input class="num right-item" v-model="number"></span>
-                  <span class="diamonds right-item" @click="sub">-</span>
-                </div>
-              </div>
-              <div class="buypart-bottom" @click="confirm()">
-                提交订单
-              </div>
+        <div :class="['mask',flag ? 'show' : '']" @click="close"></div>
+        <div :class="['buypart',buypartFlag ? 'show' : '']" v-if="detail.product">
+          <div class="title">
+            <div class="title-pic">
+              <img :src="detail.product.pic" alt="">
             </div>
+            <div class="title-right">
+              <p>产品名称：{{detail.productName}}</p>
+              <span>请选择</span>
+              <i @click="close">X</i>
+            </div>
+          </div>
+          <div class="packaging">
+            <p>规格</p>
+            <div class="select">
+              <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(index)" :class="[num === index ? 'active' : '']">{{item.productSpecsName}}</span>
+            </div>
+          </div>
+          <div class="total-money">
+            <div class="left">
+              <i class="text">合计：</i>
+              <i class="symbol">￥</i>
+              <i class="sum">{{formatAmount(specsList[curIndex].price * number)}}</i>
+            </div>
+            <div class="right">
+              <span class="diamonds right-item" @click="add">+</span>
+              <input class="num right-item" v-model="number"></span>
+              <span class="diamonds right-item" @click="sub">-</span>
+            </div>
+          </div>
+          <div class="buypart-bottom" @click="confirm()">
+            提交订单
+          </div>
+        </div>
+        <full-loading :title="title" v-show="loading"></full-loading>
+        <toast ref="toast" :text="text"></toast>
+        <confirm ref="confirm" :text="confirmText" :isAlert="isAlert" @confirm="handleConfirm"></confirm>
     </div>
 </template>
 <script>
@@ -65,100 +73,158 @@ import {
   getCloudList,
   queryDefaultAddress,
   getCloudDetail,
-  cloudSend
+  cloudSend,
+  checkRed
 } from "api/baohuo";
-import { formatImg } from "common/js/util";
+import { formatImg, formatAmount, getUserId } from "common/js/util";
+import FullLoading from 'base/full-loading/full-loading';
+import Toast from 'base/toast/toast';
+import Confirm from 'base/confirm/confirm';
+
 export default {
   data() {
     return {
+      confirmText: '',
+      isAlert: true,
       tipshow: false,
       buypartFlag: false,
       flag: false,
       userinfo: {},
       list: [],
+      specsList: [],
+      prodNum: [],
       detail: {},
       address: {},
       text: "",
       num: 0,
       number: 1,
       toUser: "",
-      productSpecsCode: ''
+      productSpecsCode: '',
+      curIndex: 0,
+      title: '正在载入...',
+      loading: true
     };
   },
   methods: {
+    formatAmount(price) {
+      return formatAmount(price);
+    },
     changeTipShow() {
       this.tipshow = !this.tipshow;
     },
-
     //变换遮罩层显示与隐藏
     changeFlag() {
       this.flag = !this.flag;
     },
-
     //我的商品详情展示与隐藏
     changebuypartFlag() {
       this.buypartFlag = !this.buypartFlag;
     },
-    genghuan() {
+    close() {
       this.changeFlag();
       this.changebuypartFlag();
-      this.num = 0;
+    },
+    genghuan(index) {
+      this.curIndex = index;
+      this.number = this.prodNum[index];
+      this.detail = this.list[index];
+      this.changeFlag();
+      this.changebuypartFlag();
+      this.num = this.detail.specsList.findIndex(v => v.code == this.specsList[this.curIndex].code);
     },
     //选购产品数量+1
     add() {
       this.number++;
+      this.prodNum[this.curIndex] = this.number;
     },
-
     // 选购产品数量-1
     sub() {
       if (this.number >= 2) {
         this.number--;
       }
+      this.prodNum[this.curIndex] = this.number;
+    },
+    checkUser(userId) {
+      checkRed(userId).then(res => {
+        if (res.result == '4') {
+          this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge');
+        } else if (res.result == "0") {
+          this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
+        } else if (res.result == '1') {
+          this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的授权单`, '/woyaochuhuo');
+        } else if (res.result == '2') {
+          this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的升级单`, '/woyaochuhuo');
+        } else if (res.result == '3') {
+          this.redirectPage(`您的门槛余额已经高于${formatAmount(res.minAmount)}元，请前去购买云仓`, '/threshold');
+        } else {
+          this.$router.push('/home');
+        }
+      });
+    },
+    redirectPage(text, url) {
+      this.confirmText = text;
+      this.$refs.confirm.show();
+      this.url = url;
+    },
+    handleConfirm() {
+      this.$router.push(this.url);
     },
     confirm() {
+      this.loading = true;
+      this.title = '下单中...';
       let options = {
         address: this.address.address,
         area: this.address.area,
         city: this.address.city,
         province: this.address.province,
         mobile: this.address.mobile,
-        quantity: this.number,
-        productSpecsCode: this.productSpecsCode,
+        quantity: this.prodNum[0],
+        productSpecsCode: this.specsList[0].productSpecsCode,
         signer: this.toUser
       };
-
       cloudSend(options).then(res => {
+        this.loading = false;
         if (res.isSuccess) {
-          alert("发件成功！");
+          this.text = '下单成功！';
+          this.$refs.toast.show();
+          this.checkUser(getUserId());
+        } else {
+          this.text = '下单失败！';
+          this.$refs.toast.show();
         }
-      });
+      }).catch(() => this.loading = false);
     },
-    prodectDetail(code) {
-      this.genghuan();
-
-      //保存this
-      let self = this;
-      getCloudDetail(code).then(res => {
-        res.product.pic = formatImg(res.product.pic);
-        self.detail = res;
-        console.log(self.detail);
-      });
+    prodectDetail(code, index) {
+      this.genghuan(index);
     },
-    chooseSize(code,index) {
+    chooseSize(index) {
       this.num = index;
-      this.productSpecsCode = code;
+      this.specsList[this.curIndex] = this.detail.specsList[index];
     }
   },
   mounted() {
-    getCloudList().then(res => {
+    Promise.all([
+      getCloudList(),
+      queryDefaultAddress()
+    ]).then(([res, res1]) => {
+      this.loading = false;
+      let specsList = [];
+      let prodNum = [];
       res.list.map(function(item) {
         item.product.pic = formatImg(item.product.pic);
+        specsList.push(item.specsList[0]);
+        prodNum.push(1);
       });
       this.list = res.list;
-    });
-    queryDefaultAddress().then(res => {
-      this.address = res[0];
-    });
+      this.specsList = specsList;
+      this.prodNum = prodNum;
+      this.address = res1[0];
+    }).catch(res => this.loading = false);
+  },
+  components: {
+    Toast,
+    Confirm,
+    FullLoading
   }
 };
 </script>

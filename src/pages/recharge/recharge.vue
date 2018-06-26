@@ -22,60 +22,108 @@
       <div class="footer">
           <span  @click="recharge" >充值</span>
       </div>
+      <toast ref="toast" :text="text"></toast>
+      <full-loading :title="title" v-show="loading"></full-loading>
+      <confirm ref="confirm" :text="confirmText" :isAlert="isAlert" @confirm="handleConfirm"></confirm>
   </div>
 </template>
 <script>
-import {getCookie} from 'common/js/cookie'
-import {queryConfig,queryAmount} from 'api/baohuo'
-import {initPay} from 'common/js/weixin'
+import Toast from 'base/toast/toast';
+import FullLoading from 'base/full-loading/full-loading';
+import Confirm from 'base/confirm/confirm';
+import { getCookie } from 'common/js/cookie'
+import { queryConfig, queryAmount, getBill, checkRed } from 'api/baohuo'
+import { initPay } from 'common/js/weixin';
+import { getUserId, formatAmount } from 'common/js/util';
 export default {
   name:'recharge',
-  data(){
-      return{
-          status:'',
-          moneyNum:'',
-          accountNumber:'',
-          account:'',
-      }
+  data() {
+      return {
+          isAlert: true,
+          confirmText: '',
+          status: '',
+          moneyNum: '',
+          accountNumber: '',
+          account: '',
+          text: '',
+          loading: true,
+          title: '正在载入...'
+      };
   },
   methods:{
-        changeStatus(status){
-            this.status = status
-        },
-        success(){
-            // alert('success')
-        },
-        error(err){
-            alert(JSON.stringify(err));
-        },
-        cancel(){
-            // alert('cancel')
-        },
-        
-        recharge(){
-            if(this.status === 1) {
-                this.$router.push('/recharge/offine?accountNumber=' + this.accountNumber)
-            }else if(this.status === 2) {
-                queryConfig(this.accountNumber,this.moneyNum * 1000).then(res => {
-                    let wxConfig = {
-                        appId: res.appId, // 公众号名称，由商户传入
-                        timeStamp: res.timeStamp, // 时间戳，自1970年以来的秒数
-                        nonceStr: res.nonceStr, // 随机串
-                        wechatPackage: res.wechatPackage,
-                        signType: res.signType, // 微信签名方式：
-                        paySign: res.paySign // 微信签名
-                    }
-                    initPay(wxConfig, this.success, this.error, this.cancel)
-                })
-            }
-        }
+      handleConfirm() {
+        this.$router.push(this.url);
+      },
+      checkUser() {
+        checkRed(getUserId()).then(res => {
+          if (res.result == '4') {
+            this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge');
+          } else if (res.result == "0") {
+            this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
+          } else if (res.result == '1') {
+            this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的授权单`, '/woyaochuhuo');
+          } else if (res.result == '2') {
+            this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的升级单`, '/woyaochuhuo');
+          } else if (res.result == '3') {
+            this.redirectPage(`您的门槛余额已经高于${formatAmount(res.minAmount)}元，请前去购买云仓`, '/threshold');
+          } else {
+            this.$router.push('/home');
+          }
+        });
+      },
+      redirectPage(text, url) {
+        this.confirmText = text;
+        this.$refs.confirm.show();
+        this.url = url;
+      },
+      changeStatus(status){
+          this.status = status
+      },
+      success() {
+          this.loading = false;
+          this.text = '充值成功';
+          this.$refs.toast.show(this.checkUser);
+      },
+      error(err) {
+          this.loading = false;
+          this.text = '充值失败';
+          this.$refs.toast.show();
+      },
+      cancel() {
+          this.loading = false;
+      },
+      recharge(){
+          if (this.status === 1) {
+              this.$router.push('/recharge/offine?accountNumber=' + this.accountNumber)
+          } else if(this.status === 2) {
+              this.loading = true;
+              this.title = '充值中...';
+              queryConfig(this.accountNumber,this.moneyNum * 1000).then(res => {
+                  let wxConfig = {
+                      appId: res.appId, // 公众号名称，由商户传入
+                      timeStamp: res.timeStamp, // 时间戳，自1970年以来的秒数
+                      nonceStr: res.nonceStr, // 随机串
+                      wechatPackage: res.wechatPackage,
+                      signType: res.signType, // 微信签名方式：
+                      paySign: res.paySign // 微信签名
+                  }
+                  initPay(wxConfig, this.success, this.error, this.cancel)
+              })
+          }
+      }
   },
   mounted(){
-      this.accountNumber = this.$route.query.accountNumber
-      queryAmount(this.accountNumber).then(res => {
-          this.account = res.amount
-      })
+      getBill().then(data => {
+        this.loading = false;
+        this.accountNumber = data[0].accountNumber;
+        this.account = data[0].amount;
+      }).catch(() => this.loading = false);
   },
+  components: {
+    Toast,
+    Confirm,
+    FullLoading
+  }
 }
 </script>
 <style lang="scss" scoped>

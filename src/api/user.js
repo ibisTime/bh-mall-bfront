@@ -189,12 +189,12 @@ export function saveLoginLog () {
     userId: getUserId()
   });
 }
+
 /** 修改模板名称
  * @param code
  * @param name
  * @param updater
  */
-
 export function changeTempletName(code, name) {
   return fetch(805234, {
     code: code,
@@ -208,4 +208,11 @@ export function operationHelp() {
   return fetch(805917, {
     ckey: 'supportCenter'
   });
+}
+
+/** 根据手机号获取用户
+ * @param mobile
+ */
+export function getUserByMobile(mobile) {
+  return fetch(627364, { mobile });
 }

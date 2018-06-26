@@ -23,26 +23,30 @@
         </div>
       </form>
       <toast ref="toast" :text="text"></toast>
+      <full-loading :title="title" v-show="loading"></full-loading>
       <span class="btn" @click="sendMoney">提交充值</span>
   </div>
 </template>
 <script>
-import {sendMoney,queryAmount} from 'api/baohuo'
-import {getQiniuToken} from 'api/general'
+import { sendMoney, queryAmount, checkRed } from 'api/baohuo'
+import { getQiniuToken } from 'api/general'
 import BScroll from 'better-scroll';
 import EXIF from 'exif-js';
 import Qiniu from 'base/qiniu/qiniu';
 import Toast from 'base/toast/toast';
 import Loading from 'base/loading/loading';
-import {getImgData, formatImg} from 'common/js/util';
+import FullLoading from 'base/full-loading/full-loading';
+import { getImgData, formatImg, getUserId } from 'common/js/util';
 import PhotoEdit from 'components/photo-edit/photo-edit';
 
 const MAX_LENGTH = 12;
 
 export default {
     name:'offine',
-    data(){
-        return{
+    data() {
+        return {
+            loading: true,
+            title: '正在载入...',
             moneyNum:'',
             pdf:'',
             account:'',
@@ -60,17 +64,31 @@ export default {
     },
     methods:{
         sendMoney(){
-            sendMoney(this.accountNumber,this.moneyNum  * 1000,this.photos[0].key).then(res => {
-                if(res.code !== '') {
-                    this.text = '提交成功，待审核'
-                    this.$refs.toast.show(this.tiaozhuan);
-                    this.photos = []
-                    this.moneyNum = ''
+            this.loading = true;
+            sendMoney(this.accountNumber,this.moneyNum * 1000, this.photos[0].key).then(res => {
+                if (res.code !== '') {
+                    this.photos = [];
+                    this.moneyNum = '';
+                    this.checkUser();
+                } else {
+                    this.text = '提交失败';
+                    this.$refs.toast.show();
                 }
-            })
+            }).catch(() => this.loading = false);
         },
-        tiaozhuan(){
-          this.$router.push('/home')
+        checkUser() {
+          checkRed(getUserId()).then(res => {
+            this.loading = false;
+            this.text = '提交成功，待审核';
+            this.$refs.toast.show(() => {
+              if (res.result == '0' || res.result == '1' || res.result == '2'
+                || res.result == '3' || res.result == '4') {
+                this.$router.push('/login/reCharge');
+              } else {
+                this.$router.push('/home');
+              }
+            });
+          }).catch(() => this.loading = false);
         },
         /**
          * 选中要操作的图片
@@ -78,9 +96,9 @@ export default {
         choseItem(index) {
             let item = this.photos[index];
             if (!item.ok) {
-            this.text = '图片还未上传完成';
-            this.$refs.toast.show();
-            return;
+                this.text = '图片还未上传完成';
+                this.$refs.toast.show();
+                return;
             }
             this.currentItem = item;
             this.$refs.photoEdit.show();
@@ -214,17 +232,15 @@ export default {
         }
     },
     mounted(){
-        this.accountNumber = this.$route.query.accountNumber
-
-        //查询账户余额
-        queryAmount(this.accountNumber).then(res => {
-            this.account = res.amount
-        })
-
-        //查询七牛token
-        getQiniuToken().then(res => {
-            this.token = res.uploadToken
-        })
+        this.accountNumber = this.$route.query.accountNumber;
+        Promise.all([
+          queryAmount(this.accountNumber),
+          getQiniuToken()
+        ]).then(([res, res1]) => {
+            this.loading = false;
+            this.account = res.amount;
+            this.token = res1.uploadToken
+        }).catch(() => this.loading = false);
     },
     computed: {
         photoCls() {
@@ -244,6 +260,7 @@ export default {
         Qiniu,
         Toast,
         Loading,
+        FullLoading,
         PhotoEdit
     }
 }
