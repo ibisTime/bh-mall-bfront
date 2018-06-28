@@ -33,8 +33,8 @@ app.use(bodyParser.urlencoded({
 
 app.use('/api', function (req, res) {
   // var url = 'http://118.178.124.16:3901/forward-service/api'
-  // var url = 'http://47.96.128.177:4301/forward-service/api'
-  var url = 'http://47.96.161.183:4301/forward-service/api'
+  var url = 'http://47.96.128.177:4301/forward-service/api'
+  // var url = 'http://47.96.161.183:4301/forward-service/api'
   // var url = 'http://47.96.161.183:4302/bh-mall/api'
   var _body = req.body;
   var param = 'code=' + _body.code + '&json=' + encodeURIComponent(_body.json);
