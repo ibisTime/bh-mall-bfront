@@ -11,18 +11,18 @@
               <i class="width">申请取消</i>
           </div>
       </div>
-      <div class="item clearfix" v-for="(item,index) in list">
+      <div class="item clearfix" v-for="(item, index) in list">
             <div class="top clearfix">
                 <span class="user">提交人：{{item.user.realName}}</span>
                 <span class="status">{{status[item.status]}}</span>
             </div>
-            <div :class="['info']" ref="divInfo">
-                <div class="downward" @click="changeHeight($event)">></div>
+            <div class="info" :class="{ height: curIdx === index }" ref="divInfo">
+                <div class="downward" @click="changeHeight(index)">></div>
                 <p>订单编号：{{item.code}}</p>
                 <p>订单类型：{{item.kind}}</p>
                 <p>下单时间：{{item.applyDatetime}}</p>
                 <p>收货人：{{item.signer}}{{item.mobile}}</p>
-                <p>收货地址：<i>{{ item.user.province}}</i><i>{{ item.user.city}}</i><i>{{ item.user.area}}</i><i>{{ item.user.address}}</i></p>
+                <p>收货地址：<i>{{item.user.province}}</i><i>{{item.user.city}}</i><i>{{item.user.area}}</i><i>{{ item.user.address}}</i></p>
             </div>
             <div class="pic">
                 <img :src="item.pic" alt="">
@@ -30,60 +30,39 @@
                     <p>{{ item.productName}}</p>
                     <i>￥{{ item.amount/1000}}</i>
                     <span>{{ item.quantity}}瓶</span>
+                    <span class="kind-tip">{{ item.kind == '2' ? '虚拟订单' : '提货订单' }}</span>
                 </div>
             </div>
             <div class="item clearfix">
             <div class="bottom clearfix">
-                <div @click="changeFlag">云仓发</div>
-                <div @click="changeFlag1">自发</div>
-                <div>作废</div>
+                <div v-if="item.status == '1' || item.status == '2'" @click="sendYc(item.code)">云仓发</div>
+                <div v-if="item.status == '1' || item.status == '2'" @click="sendM(item.code)">自发</div>
+                <div v-if="item.status == '5'" @click="passCancel(item.code)">通过</div>
+                <div v-if="item.status == '5'" @click="unpassCancel(item.code)">不通过</div>
             </div>
-                  <div :class="['mask',flag ? 'show' : '']" @click="changeFlag"></div>
-                  <div :class="['line',flag ? 'show' : '']" ></div>
-                  <div :class="['erweima',flag ? 'show' : '']">
-                      <div class="erweima-top">
-                          <div class="info">
-                            <p>确认发货？</p>
-                            <p>请输入物流编号</p><input v-model='logisticsCode'/>
-                            <p>请输入物流公司</p><input v-model='logisticsCompany'/>
-                            <p>请输入物流单</p><input v-model='pdf'/>
-                          </div>
-                           <div>
-                             <button @click="fahuo(item.code)">确认</button>
-                             <button>返回</button>
-                          </div>
-                      </div>
-                  </div>
-                  <div :class="['mask',flag ? 'show' : '']" @click="changeFlag1"></div>
-                  <div :class="['line',flag ? 'show' : '']" ></div>
-                  <div :class="['erweima',flag ? 'show' : '']">
-                      <div class="erweima-top">
-                          <div class="info1">
-                            <p>确认发货？</p>
-                            <p>请输入物流编号</p><input v-model='logisticsCode'/>
-                            <p>请输入物流公司</p><input v-model='logisticsCompany'/>
-                            <p>请输入物流单</p><input v-model='pdf'/>
-                          </div>
-                           <div>
-                             <button @click="zifafahuo(item.code)">确认</button>
-                             <button>返回</button>
-                          </div>
-                      </div>
-                  </div>
+        </div>
       </div>
-      </div>
-
+      <send-modal ref="sendModal" @confirm="handleConfirm"></send-modal>
+      <toast ref="toast" :text="toastText"></toast>
+      <confirm ref="confirm" text="确认通过吗？" @confirm="handelPass"></confirm>
+      <confirm-input ref="confirmInput" text="取消审核" @confirm="handelUnPass"></confirm-input>
+      <full-loading title="提交中..." v-show="loading"></full-loading>
   </div>
 </template>
 <script>
-import { queryOrderForm1, yunfahuo, noyunfahuo } from "api/baohuo";
-import { formatDate, formatImg } from "common/js/util";
+import { queryOrderForm1, yunfahuo, noyunfahuo, checkCancel } from "api/baohuo";
 import { getUser, getUserById } from "api/user";
-import { MessageBox } from "mint-ui";
-import Vue from "vue";
-Vue.component(MessageBox.name, MessageBox);
+import { formatDate, formatImg } from "common/js/util";
+import SendModal from 'components/send-modal/send-modal';
+import Toast from 'base/toast/toast';
+import ConfirmInput from 'base/confirm-input/confirm-input';
+import Confirm from 'base/confirm/confirm';
+import FullLoading from 'base/full-loading/full-loading';
+
+const YUN_CANG = 0;
+const ZI_FA = 1;
+
 export default {
-  name: "IntentionalAgent",
   data() {
     return {
       flag: false,
@@ -102,73 +81,95 @@ export default {
       ],
       logisticsCode: "",
       logisticsCompany: "",
-      pdf: ""
+      toastText: "",
+      loading: false,
+      curIdx: ''
     };
   },
   methods: {
-    changeFlag() {
-      this.flag = !this.flag;
+    handleConfirm(wlCode, wlCompany) {
+      if (!this.wlCompany || !this.wlCode) {
+        this.showMsg('物流单号和物流公司未填写完整');
+      } else {
+        this.sendType === YUN_CANG ? this.fahuo(wlCode, wlCompany) : this.zifafahuo(wlCode, wlCompany);
+      }
     },
-    changeFlag1() {
-      this.flag = !this.flag;
+    showMsg(msg) {
+      this.toastText = msg;
+      this.$refs.toast.show();
+    },
+    sendYc(code) {
+      this.curCode = code;
+      this.sendType = YUN_CANG;
+      this.$refs.sendModal.show();
+    },
+    sendM(code) {
+      this.curCode = code;
+      this.sendType = ZI_FA;
+      this.$refs.sendModal.show();
+    },
+    passCancel(code) {
+      this.curCode = code;
+      this.$refs.confirm.show();
+    },
+    handelPass() {
+      this.checkCancel(1);
+    },
+    unpassCancel(code) {
+      this.curCode = code;
+      this.$refs.confirmInput.show();
+    },
+    handelUnPass(remark) {
+      this.checkCancel(0, remark);
+    },
+    checkCancel(result, remark) {
+      this.loading = true;
+      checkCancel(this.curCode, result, remark).then(() => {
+        this.loading = false;
+        this.toastText = '操作成功';
+        this.$refs.toast.show();
+        this.check();
+      }).catch(() => this.loading = false);
     },
     changeIndex(index) {
       this.index = index;
       this.check();
     },
-    fahuo(code) {
-      if (
-        this.logisticsCode == "" &&
-        this.logisticsCompany == "" &&
-        this.pdf == ""
-      ) {
-        alert("请填写完整的发货信息！");
-      }
-      let options = {
-        logisticsCode: this.logisticsCode,
-        logisticsCompany: this.logisticsCompany,
-        pdf: this.pdf,
-        code: code
+    fahuo(logisticsCode, logisticsCompany) {
+      let params = {
+        logisticsCode,
+        logisticsCompany,
+        code: this.curCode
       };
-      noyunfahuo(options).then(res => {
+      noyunfahuo(params).then(res => {
         if (res) {
           alert("发货成功！");
         }
       });
     },
-    zifafahuo(code) {
-      if (
-        this.logisticsCode == "" &&
-        this.logisticsCompany == "" &&
-        this.pdf == ""
-      ) {
-        alert("请填写完整的发货信息！");
-      }
-      let options = {
-        logisticsCode: this.logisticsCode,
-        logisticsCompany: this.logisticsCompany,
-        pdf: this.pdf,
-        code: code
+    zifafahuo(logisticsCode, logisticsCompany) {
+      let params = {
+        logisticsCode,
+        logisticsCompany,
+        code: this.curCode
       };
-      yunfahuo(options).then(res => {
+      yunfahuo(params).then(res => {
         if (res) {
           alert("发货成功！");
         }
       });
     },
-    changeHeight(event) {
+    changeHeight(index) {
+      this.curIdx = this.curIdx === index ? '' : index;
     },
     check() {
+      var status = [];
       if (this.index == "2") {
         var status = [1, 2];
+      } else if (this.index == '5') {
+        var status = [5];
       }
-      if (this.index == '1') {
-         var status = [];
-      }
-      queryOrderForm1(status || [this.index]).then(res => {
-        if (res.list.length <= 1) {
-          console.log(this.$refs.divInfo);
-        }
+      queryOrderForm1(status).then(res => {
         res.list.map(function(item) {
           //格式化图片
           item.pic = formatImg(item.pic);
@@ -181,6 +182,13 @@ export default {
   },
   mounted() {
     this.check();
+  },
+  components: {
+    SendModal,
+    Toast,
+    Confirm,
+    ConfirmInput,
+    FullLoading
   }
 };
 </script>
@@ -243,10 +251,11 @@ export default {
       border-bottom: 1px solid #eee;
       background-color: #fff;
       font-size: $font-size-small;
-      // height: 0.9rem;
       position: relative;
+      height: 0.9rem;
+      overflow: hidden;
       &.height {
-        height: 4rem;
+        height: auto;
       }
       p + p {
         margin-top: 0.36rem;
@@ -258,8 +267,9 @@ export default {
       }
       .downward {
         position: absolute;
-        top: 0.3rem;
-        right: 0.3rem;
+        top: 0;
+        right: 0;
+        padding: 0.3rem;
         color: $primary-color;
         transform: rotateZ(90deg);
       }
@@ -298,7 +308,11 @@ export default {
           font-size: $font-size-small;
           border-radius: 0.1rem;
           color: #333;
-          text-align: center;
+          text-align: right;
+
+          &.kind-tip {
+            top: 0.44rem;
+          }
         }
       }
     }
@@ -372,7 +386,6 @@ export default {
       .info1 {
         height: 1rem;
         display: inline-block;
-        // margin-left: 0.2rem;
         h3 {
           font-size: $font-size-medium-xx;
         }
@@ -381,9 +394,7 @@ export default {
           font-size: $font-size-small;
         }
         input {
-        width: 100%;
-        /* font-size: 0.3rem; */
-        /* line-height: 1.2; */
+          width: 100%;
         }
       }
     }

@@ -187,7 +187,8 @@ export function replyAgent(options) {
     introducer: options.introducer,
     payPdf: options.payPdf,
     userReferee: options.userReferee,
-    fromInfo: '微信推荐'
+    fromInfo: '微信推荐',
+    teamName: options.teamName
   });
 }
 
@@ -304,20 +305,22 @@ export function ignoreAgent(userId) {
 }
 
 //审核授权
-export function accredit(userId) {
+export function accredit(userId, result, remark) {
   return fetch(627257, {
-    approver: getUserId(),
-    result: '1',
-    userId: userId,
+    result,
+    userId,
+    remark,
+    approver: getUserId()
   });
 }
 
 //审核升级
-export function upgrade(userId) {
+export function upgrade(userId, result, remark) {
   return fetch(627263, {
-    approver: getUserId(),
-    result: '1',
-    userId: userId,
+    result,
+    userId,
+    remark,
+    approver: getUserId()
   });
 }
 
@@ -332,11 +335,12 @@ export function upgradeApplica(options) {
 }
 
 //审核取消授权
-export function accreditCancel(userId) {
+export function accreditCancel(userId, result, remark) {
   return fetch(627258, {
-    approver: getUserId(),
-    result: '1',
-    userId: userId,
+    userId,
+    result,
+    remark,
+    approver: getUserId()
   });
 }
 
@@ -749,5 +753,14 @@ export function receiveNromalOrder(code) {
 export function receiveNeigouOrder(code) {
   return fetch(627726, {
     code: code
+  });
+}
+// 审核取消
+export function checkCancel(code, result, remark) {
+  return fetch(627647, {
+    code,
+    result,
+    remark,
+    updater: getUserId()
   });
 }

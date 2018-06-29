@@ -12,23 +12,23 @@
         <div>
             <i v-show="errors.has('introducer')" class="error-tip">{{errors.first('introducer')}}</i>
             <span>介绍人手机号</span>
-            <input class="pl2rem" @keyup="introducerChange" v-model="introducer" type="text" name="introducer" placeholder="请输入介绍人">
+            <input class="pl2rem" @keyup="introducerChange" v-model="introducer" type="text" name="introducer" placeholder="可不填，跨级介绍时必填">
         </div>
         <div class="area">
             <i v-show="errors.has('applyLevel')" class="error-tip">{{errors.first('applyLevel')}}</i>
-            <span>等级</span><span class="pl2rem item-input">{{level}}</span><img class="more" src="../../assets/imgs/more@2x.png" alt="">
+            <span>等级</span><div class="pl2rem item-input">{{level}}</div><img class="more" src="../../assets/imgs/more@2x.png" alt="">
             <select v-validate="'required'" v-model="applyLevel" name="applyLevel" @change="chooseLevel">
               <option v-for="item in levelList" :value="item.level">{{item.name}}</option>
             </select>
         </div>
         <div>
             <span>团队名称</span>
-            <span v-if="applyLevel != '1'">{{teamName}}</span>
+            <span class="pl2rem" v-if="applyLevel !== userInfo.toLevel && userInfo.toTeamName">{{teamName}}</span>
             <input v-else v-model="teamName" v-validate="'required'" type="text" name="teamName" placeholder="请输入团队名称">
         </div>
       </div>
       <qiniu ref="qiniu"
-          style="visibility: hidden;position: absolute;"
+          style="visibility: hidden;position: absolute;width: 0;"
           :token="token"
           :multiple="multiple"
           :uploadUrl="uploadUrl"></qiniu>
@@ -52,6 +52,8 @@
 import { supplyInfo, queryAmount, isRealName, getAllLevel } from 'api/baohuo'
 import { getQiniuToken } from 'api/general'
 import { getUser, getUserByMobile } from 'api/user';
+import { setCookie } from "common/js/cookie";
+import { getUserId } from 'common/js/util';
 import BScroll from 'better-scroll';
 import EXIF from 'exif-js';
 import Qiniu from 'base/qiniu/qiniu';
@@ -96,38 +98,41 @@ export default {
         this.uploadUrl = 'http://up-z0.qiniu.com';
     },
     mounted(){
-        this.userId = this.$route.query.userId;
+        this.userId = this.$route.query.userId || getUserId();
+        this.userId && setCookie('userId', this.userId);
         Promise.all([
           getUser(),
           getAllLevel()
         ]).then(([userInfo, levelList]) => {
-          this.loading = false;
-          this.userInfo = userInfo;
-          let list = levelList.list.filter(l => {
-            return l.level != '6';
-          });
-          this.allLevelList = list;
-          if (userInfo.highUser) {
-            this.highUserName = userInfo.highUser.realName;
-            this.teamName = userInfo.highUser.teamName;
-            let level = userInfo.highUser.level || 0;
-            this.levelList = list.filter(l => {
-              return l.level > level;
+            this.loading = false;
+            this.userInfo = userInfo;
+            let list = levelList.list.filter(l => {
+                return l.level != '6';
             });
-            if (!this.levelList.length) {
-              this.levelList = list.filter(l => l.level == level);
+            this.allLevelList = list;
+            if (userInfo.highUser) {
+                this.highUserName = userInfo.highUser.realName;
             }
-            if (this.levelList.length === 1) {
-              this.applyLevel = this.levelList[0].level;
-              this.level = this.levelList[0].name;
+            let level = userInfo.toLevel || 0;
+            this.levelList = list.filter(l => {
+                return l.level >= level;
+            });
+            if (this.levelList.length) {
+                this.applyLevel = this.levelList[0].level;
+                this.level = this.levelList[0].name;
+            } else {
+                this.text = '暂无可选择的等级';
+                this.$refs.toast.show();
+                this.applyLevel = '';
+                this.level = '';
             }
-          } else {
-            this.levelList = list;
-          }
+            if (this.applyLevel !== userInfo.toLevel && userInfo.toTeamName) {
+                this.teamName = userInfo.toTeamName;
+            }
         }).catch(() => this.loading = false);
         //查询七牛token
         getQiniuToken().then(res => {
-          this.token = res.uploadToken
+            this.token = res.uploadToken
         }).catch(() => {});
     },
     methods:{
@@ -139,18 +144,10 @@ export default {
             }
             this.timer = setTimeout(() => {
               getUserByMobile(mobile).then(user => {
-                let leftLevel = this.userInfo.highUser.level || 0;
+                let leftLevel = this.userInfo.toLevel || 0;
                 let rightLevel = user.level;
-                let list = this.allLevelList.filter(l => l.level > leftLevel && l.level < rightLevel);
-                if (!list.length) {
-                  this.text = '暂无可选择的等级';
-                  this.$refs.toast.show();
-                  this.applyLevel = '';
-                } else {
-                  this.levelList = list;
-                  this.applyLevel = list[0].level;
-                  this.teamName = list[0].level == '1' ? '' : this.userInfo.teamName;
-                }
+                let list = this.allLevelList.filter(l => l.level >= leftLevel && l.level < rightLevel);
+                this.getRealParam(list);
               }).catch(() => {
                 this.noLevel();
               });
@@ -160,28 +157,40 @@ export default {
           }
         },
         noLevel() {
-          let leftLevel = this.userInfo.highUser.level || 0;
-          let list = this.allLevelList.filter(l => l.level > leftLevel);
+          let leftLevel = this.userInfo.toLevel || 0;
+          let list = this.allLevelList.filter(l => l.level >= leftLevel);
+          this.getRealParam(list);
+        },
+        getRealParam(list) {
+          this.levelList = list;
           if (!list.length) {
             this.text = '暂无可选择的等级';
             this.$refs.toast.show();
             this.applyLevel = '';
+            this.level = '';
+            this.teamName = '';
           } else {
-            this.levelList = list;
-            this.applyLevel = list[0].level;
-            this.teamName = list[0].level == '1' ? '' : this.userInfo.teamName;
+            if (!list.find(l => l.level == this.applyLevel)) {
+              this.applyLevel = list[0].level;
+              this.level = this.levelList[0].name;
+              if (this.applyLevel !== this.userInfo.toLevel && this.userInfo.toTeamName) {
+                this.teamName = this.userInfo.toTeamName;
+              } else {
+                this.teamName = '';
+              }
+            }
           }
         },
         chooseLevel(e) {
-            let val = e.target.value;
-            let level = this.levelList.find(v => v.level == val);
-            this.level = level.name;
-            this.applyLevel = val;
-            if (val == 1) {
-                this.teamName = '';
-            } else {
-                this.teamName = this.userInfo.highUser && this.userInfo.highUser.teamName || '';
-            }
+          let val = e.target.value;
+          let level = this.levelList.find(v => v.level == val);
+          this.level = level.name;
+          this.applyLevel = val;
+          if (this.applyLevel !== this.userInfo.toLevel && this.userInfo.toTeamName) {
+            this.teamName = this.userInfo.toTeamName;
+          } else {
+            this.teamName = '';
+          }
         },
         submit(){
           this.$validator.validateAll().then((result) => {
@@ -471,83 +480,83 @@ export default {
         font-size: $font-size-large-s;
     }
     .login {
-      width: 100%;
-  font-size: $font-size-large-s;
-  > div {
-    position: relative;
-    display: flex;
-    width: 100%;
-    align-items: center;
-    height: 1rem;
-    padding: 0.3rem;
-    border-bottom: 1px solid #eee;
-    > i {
-      position: absolute;
-      top: 0.4rem;
-      right: 0.6rem;
-      color: $color-red;
-      font-size: $font-size-medium-s;
-    }
-    span {
-      display: inline-block;
-      width: 2.2rem;
-      flex: 0 0 2.2rem;
-    }
-    .more {
-      width: 0.2rem;
-      flex: 0 0 0.2rem;
-    }
-    .rotate {
-      transform: rotateZ(90deg);
-    }
-    input {
-      flex: 1;
-    }
-    &.area {
-      position: relative;
-      .item-input {
-        flex: 1;
-      }
-      ul {
         width: 100%;
-        // background-color: red;
-        position: absolute;
-        top: 1rem;
-        display: none;
-        &.show {
-          display: block;
+        font-size: $font-size-large-s;
+        > div {
+        position: relative;
+        display: flex;
+        width: 100%;
+        align-items: center;
+        height: 1rem;
+        padding: 0 0.3rem;
+        border-bottom: 1px solid #eee;
+        > i {
+            position: absolute;
+            top: 0.4rem;
+            right: 0.6rem;
+            color: $color-red;
+            font-size: $font-size-medium-s;
         }
-        li {
-          width: 100%;
-          line-height: 0.7rem;
-          font-size: $font-size-medium-s;
-          text-align: center;
-          border-bottom: 1px dashed #f7f7f7;
+        span {
+            display: inline-block;
+            width: 2.2rem;
+            flex: 0 0 2.2rem;
         }
-      }
+        .more {
+            width: 0.2rem;
+            flex: 0 0 0.2rem;
+        }
+        .rotate {
+            transform: rotateZ(90deg);
+        }
+        input {
+            flex: 1;
+        }
+        &.area {
+            position: relative;
+            .item-input {
+                flex: 1;
+            }
+            ul {
+                width: 100%;
+                // background-color: red;
+                position: absolute;
+                top: 1rem;
+                display: none;
+                &.show {
+                    display: block;
+                }
+                li {
+                    width: 100%;
+                    line-height: 0.7rem;
+                    font-size: $font-size-medium-s;
+                    text-align: center;
+                    border-bottom: 1px dashed #f7f7f7;
+                }
+            }
+        }
     }
-  }
-  .btn {
-    display: block;
-    width: 90%;
-    line-height: 0.9rem;
-    margin: 4rem auto;
-    font-size: $font-size-large-ss;
-    background-color: $primary-color;
-    color: #fff;
-    text-align: center;
-    border-radius: 0.1rem;
-  }
-  select {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-  }
-  .pl2rem {
-    padding-left: 0.2rem;
-  }
+    .btn {
+        display: block;
+        width: 90%;
+        line-height: 0.9rem;
+        margin: 4rem auto;
+        font-size: $font-size-large-ss;
+        background-color: $primary-color;
+        color: #fff;
+        text-align: center;
+        border-radius: 0.1rem;
+    }
+    select {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+    }
+    .pl2rem {
+        padding-left: 0.2rem;
+    }
 }
 </style>

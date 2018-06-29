@@ -78,7 +78,7 @@
             </div>
             <div class="item">
                 <span>余额:</span>
-                <i>{{amount}}</i>
+                <i>{{formatAmount(amount)}}</i>
             </div>
           </div>
           <div class="model-bottom">
@@ -95,7 +95,7 @@
 <script>
 import {getTrack,getLevel,getStructure,getMySub,getBill} from 'api/baohuo'
 import {setCookie,getCookie} from 'common/js/cookie';
-import {formatDate} from 'common/js/util';
+import {formatDate, formatAmount} from 'common/js/util';
 import {getUser,getUserById} from 'api/user';
 import {status} from 'api/status';
 export default {
@@ -110,6 +110,9 @@ export default {
       }
   },
   methods:{
+      formatAmount(amount) {
+        return formatAmount(amount);
+      },
       changeShow(){
           this.show = !this.show;
       },
@@ -119,12 +122,12 @@ export default {
       showInfo(event){
           this.show = !this.show;
           var userId = event.target.getAttribute('id')
-            getBill(userId).then(res => {
-                this.amount = res[0].amount
-            })
-            getUserById(userId).then(res => {
-                this.userInfo = res
-            })
+          getBill(userId).then(res => {
+              this.amount = res[0].amount
+          })
+          getUserById(userId).then(res => {
+              this.userInfo = res
+          })
       },
   },
   mounted(){

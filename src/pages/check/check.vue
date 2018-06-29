@@ -24,7 +24,6 @@
       <div :class="[index == 8 ? 'show' : '', 'item']" v-for="(item,key) in data3" :key="item.key"   @click="$router.push('/check/checkdispose?index=8&id=' + item.userId);">
           <p>姓名：{{item.realName}} <i class="tip">{{item.applyLevel}}</i></p>
           <p><span>微信号：{{item.wxId}}</span> <i class="tel">手机号：{{item.mobile}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
-          <p><span>门槛：2000</span> <i class="tel">云仓：2000</i></p>
       </div>
   </div>
 </template>

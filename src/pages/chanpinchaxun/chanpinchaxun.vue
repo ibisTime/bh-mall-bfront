@@ -32,7 +32,7 @@ export default {
         item.product.pic = formatImg(item.product.pic);
       });
       this.list = res.list;
-    });
+    }).catch(() => {});
   }
 };
 </script>

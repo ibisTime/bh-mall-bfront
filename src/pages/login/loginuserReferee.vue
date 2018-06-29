@@ -14,7 +14,7 @@
         </div>
         <div>
             <i v-show="errors.has('introducer')" class="error-tip">{{errors.first('introducer')}}</i>
-            <span>介绍人手机号</span> <input @keyup="introducerChange" class="pl2rem" v-model="options.introducer" type="text" name="introducer" placeholder="请输入介绍人手机号">
+            <span>介绍人手机号</span> <input @keyup="introducerChange" class="pl2rem" v-model="options.introducer" type="text" name="introducer" placeholder="可不填，跨级介绍时必填">
         </div>
           <div>
             <i v-show="errors.has('idNo')" class="error-tip">{{errors.first('idNo')}}</i>
@@ -22,20 +22,20 @@
         </div>
               <qiniu
             ref="qiniu"
-            style="visibility: hidden;position: absolute;"
+            style="visibility: hidden;position: absolute;width: 0;"
             :token="token"
             :uploadUrl="uploadUrl"></qiniu>
-      <form ref="form">
-        <div class="img">
-                <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
-                <p>上传手持身份证图片</p>
-                <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(3,$event)" accept="image/*">
-                <div class="item" v-for="(photo,index) in photos3" ref="photoItem" @click="choseItem(index)">
-                    <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
-                    <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
-                </div>
-        </div>
-      </form>
+        <form ref="form">
+          <div class="img">
+                  <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
+                  <p>上传手持身份证图片</p>
+                  <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(3,$event)" accept="image/*">
+                  <div class="item" v-for="(photo,index) in photos3" ref="photoItem" @click="choseItem(index)">
+                      <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
+                      <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
+                  </div>
+          </div>
+        </form>
         <div class="area">
             <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>
             <span>省份、市、区</span>
@@ -53,14 +53,14 @@
         </div>
         <div class="area">
             <i v-show="errors.has('applyLevel')" class="error-tip">{{errors.first('applyLevel')}}</i>
-            <span>等级</span><span class="pl2rem item-input">{{level}}</span><img class="more" src="../../assets/imgs/more@2x.png" alt="">
+            <span>等级</span><div class="pl2rem item-input">{{level}}</div><img class="more" src="../../assets/imgs/more@2x.png" alt="">
             <select v-validate="'required'" name="applyLevel" v-model="options.applyLevel" @change="chooseLevel">
               <option v-for="item in levelList" :value="item.level">{{item.name}}</option>
             </select>
         </div>
         <div>
             <span>团队名称</span>
-            <span class="pl2rem" v-if="options.applyLevel != '1'">{{teamName}}</span>
+            <span class="pl2rem" v-if="options.applyLevel !== userInfo.toLevel && userInfo.toTeamName">{{teamName}}</span>
             <input class="pl2rem" v-else v-model="teamName" v-validate="'required'" type="text" name="teamName" placeholder="请输入团队名称">
         </div>
         <button class="btn" @click="apply">申请代理</button>
@@ -95,7 +95,6 @@ import Toast from "base/toast/toast";
 import Loading from "base/loading/loading";
 import FullLoading from 'base/full-loading/full-loading';
 import PhotoEdit from "components/photo-edit/photo-edit";
-const MAX_LENGTH = 12;
 
 export default {
   data() {
@@ -105,6 +104,7 @@ export default {
       panelLevelShow: false,
       levelList: [],
       level: "",
+      userInfo: {},
       options: {
         address: "",
         district: "",
@@ -142,7 +142,7 @@ export default {
   },
   mounted() {
     this.options.userId = this.$route.query.userId;
-    setCookie("userId", this.options.userId);
+    this.options.userId && setCookie("userId", this.options.userId);
     this.options.userReferee = this.$route.query.userReferee;
     Promise.all([
       getUser(),
@@ -156,20 +156,22 @@ export default {
       this.allLevelList = list;
       if (userInfo.highUser) {
         this.highUserName = userInfo.highUser.realName;
-        this.teamName = userInfo.highUser.teamName;
-        let level = userInfo.highUser.level || 0;
-        this.levelList = list.filter(l => {
-          return l.level > level;
-        });
-        if (!this.levelList.length) {
-          this.levelList = list.filter(l => l.level == level);
-        }
-        if (this.levelList.length === 1) {
-          this.applyLevel = this.levelList[0].level;
-          this.level = this.levelList[0].name;
-        }
+      }
+      let level = userInfo.toLevel || 0;
+      this.levelList = list.filter(l => {
+        return l.level >= level;
+      });
+      if (this.levelList.length) {
+        this.options.applyLevel = this.levelList[0].level;
+        this.level = this.levelList[0].name;
       } else {
-        this.levelList = list;
+        this.text = '暂无可选择的等级';
+        this.$refs.toast.show();
+        this.options.applyLevel = '';
+        this.level = '';
+      }
+      if (this.options.applyLevel !== userInfo.toLevel && userInfo.toTeamName) {
+        this.teamName = userInfo.toTeamName;
       }
     }).catch(() => this.loading = false);
     //查询七牛token
@@ -216,16 +218,8 @@ export default {
           getUserByMobile(mobile).then(user => {
             let leftLevel = this.userInfo.highUser.level || 0;
             let rightLevel = user.level;
-            let list = this.allLevelList.filter(l => l.level > leftLevel && l.level < rightLevel);
-            if (!list.length) {
-              this.text = '暂无可选择的等级';
-              this.$refs.toast.show();
-              this.applyLevel = '';
-            } else {
-              this.levelList = list;
-              this.applyLevel = list[0].level;
-              this.teamName = list[0].level == '1' ? '' : this.userInfo.teamName;
-            }
+            let list = this.allLevelList.filter(l => l.level >= leftLevel && l.level < rightLevel);
+            this.getRealParam(list);
           }).catch(() => {
             this.noLevel();
           });
@@ -235,28 +229,40 @@ export default {
       }
     },
     noLevel() {
-      let leftLevel = this.userInfo.highUser.level || 0;
-      let list = this.allLevelList.filter(l => l.level > leftLevel);
+      let leftLevel = this.userInfo.toLevel || 0;
+      let list = this.allLevelList.filter(l => l.level >= leftLevel);
+      this.getRealParam(list);
+    },
+    getRealParam(list) {
+      this.levelList = list;
       if (!list.length) {
         this.text = '暂无可选择的等级';
         this.$refs.toast.show();
-        this.applyLevel = '';
+        this.options.applyLevel = '';
+        this.level = '';
+        this.teamName = '';
       } else {
-        this.levelList = list;
-        this.applyLevel = list[0].level;
-        this.teamName = list[0].level == '1' ? '' : this.userInfo.teamName;
+        if (!list.find(l => l.level == this.options.applyLevel)) {
+          this.options.applyLevel = list[0].level;
+          this.level = this.levelList[0].name;
+          if (this.options.applyLevel !== this.userInfo.toLevel && this.userInfo.toTeamName) {
+            this.teamName = this.userInfo.toTeamName;
+          } else {
+            this.teamName = '';
+          }
+        }
       }
     },
     chooseLevel(e) {
-        let val = e.target.value;
-        let level = this.levelList.find(v => v.level == val);
-        this.level = level.name;
-        this.options.applyLevel = val;
-        if (val == 1) {
-            this.teamName = '';
-        } else {
-            this.teamName = this.userInfo.highUser && this.userInfo.highUser.teamName || '';
-        }
+      let val = e.target.value;
+      let level = this.levelList.find(v => v.level == val);
+      this.level = level.name;
+      this.options.applyLevel = val;
+      if (this.options.applyLevel !== this.userInfo.toLevel && this.userInfo.toTeamName) {
+        this.teamName = this.userInfo.toTeamName;
+      } else {
+        this.teamName = '';
+      }
     },
     cityChange(prov, city, district) {
       this.options.province = prov;
@@ -415,7 +421,7 @@ export default {
 <style lang="scss" scoped>
 @import "../../common/scss/variable.scss";
 .login {
-  padding: 0 0.3rem;
+  padding: 0 0.2rem;
   width: 100%;
   font-size: $font-size-large-s;
   > div {
@@ -424,7 +430,7 @@ export default {
     width: 100%;
     align-items: center;
     height: 1rem;
-    padding: 0.3rem;
+    padding: 0 0.3rem;
     border-bottom: 1px solid #eee;
     > i {
       position: absolute;

@@ -21,6 +21,7 @@
           <img :src="formatImg(item.product.advPic)" alt="">
             <div class="content">
                 <p>产品名称: {{item.productName}}</p>
+                <p style="padding-top: 0.2rem;">数量: {{item.allQuantity}}</p>
             </div>
         </div>
     </div>

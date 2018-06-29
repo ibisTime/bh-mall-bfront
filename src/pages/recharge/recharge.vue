@@ -61,9 +61,9 @@ export default {
           } else if (res.result == "0") {
             this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
           } else if (res.result == '1') {
-            this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的授权单`, '/woyaochuhuo');
+            this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的授权单`, '/woyaochuhuo');
           } else if (res.result == '2') {
-            this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的升级单`, '/woyaochuhuo');
+            this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的升级单`, '/woyaochuhuo');
           } else if (res.result == '3') {
             this.redirectPage(`您的门槛余额已经高于${formatAmount(res.minAmount)}元，请前去购买云仓`, '/threshold');
           } else {

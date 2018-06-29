@@ -7,17 +7,10 @@
         <div class="content">
             <p>订单编号 <span>{{info.code}}</span></p>
             <p>充值金额 <span>{{info.amount / 1000}}</span></p>
+            <p>打款凭证 <img :src="info.chargePdf | formatImg" /></p>
             <p>申请时间 <span>{{info.applyDatetime}}</span></p>
             <p>状态 <span>{{tips[info.status]}}</span></p>
-            <!-- <div class="showImg">
-                <img src="../../assets/imgs/buyimg.png">
-                <div class="mask-pic" @click="lookOver">
-                    <p>点击</p>
-                    <p>查看大图</p>
-                </div>
-            </div> -->
         </div>
-
         <button :class="['btn',index != 4 ? 'hide' : '']" @click="check">确认收到款项</button>
         <div :class="['mask',show ? 'show' : '']" @click="lookOver"></div>
         <div :class="['img',show ? 'show' : '']">
@@ -28,8 +21,11 @@
 <script>
 import { queryIndentDetail, checkRecharge } from "api/baohuo";
 import { formatDate } from "common/js/util";
+import { commonMixin } from 'common/js/mixin';
+
 export default {
   name: "chongzhichuli",
+  mixins: [commonMixin],
   data() {
     return {
       show: false,
@@ -48,6 +44,9 @@ export default {
     };
   },
   methods: {
+    formatImg(img) {
+      return formatImg(img);
+    },
     changeShow() {
       this.show = !this.show;
     },

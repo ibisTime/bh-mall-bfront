@@ -1,17 +1,17 @@
 <template>
   <div class="buycloud">
-    <div :class="['tip',tipshow ? 'none' : '']">
+    <!-- <div :class="['tip',tipshow ? 'none' : '']">
       <span>支出相关：啊啊啊啊啊啊啊啊啊啊啊啊啊啊</span>
       <i @click="changeTipShow">
         <img src="../../assets/threshold/close.png" alt="">
       </i>
-    </div>
-    <div class="item" v-for="item in list">
+    </div> -->
+    <div class="item" v-for="(item, index) in list">
       <img :src="item.pic" alt="">
-      <div class="content" v-if="item.specsList[0].priceList[0]">
-        <p>产品名称：{{item.name}} <br>单价：{{item.specsList[0].priceList[0].price / 1000}}</p>
-        <i>包装：{{item.specsList[0].name}}</i>
-        <span @click="prodectDetail(item.code)">购买云仓</span>
+      <div class="content" v-if="item.specsList[specsIndex[index]].priceList[0]">
+        <p>产品名称：{{item.name}} <br>单价：{{formatAmount(item.specsList[specsIndex[index]].priceList[0].price)}}</p>
+        <i>包装：{{item.specsList[specsIndex[index]].name}}</i>
+        <span @click="prodectDetail(item.code, index)">购买云仓</span>
       </div>
     </div>
     <div :class="['mask',flag ? 'show' : '']" @click="genghuan"></div>
@@ -36,7 +36,7 @@
         <div class="left" v-if="detail.specsList">
           <i class="text">合计：</i>
           <i class="symbol">￥</i>
-          <i class="sum">{{detail.specsList[0].price.price / 1000 * number}}</i>
+          <i class="sum">{{formatAmount(detail.specsList[specsIndex[curProductIdx]].price.price * number)}}</i>
         </div>
         <div class="right">
           <span class="diamonds right-item" @click="add">+</span>
@@ -54,7 +54,7 @@
 <script>
 import { queryProduct, productDetail, cloudBill } from "api/baohuo";
 import { getUser, getUserById } from "api/user";
-import { formatImg } from "common/js/util";
+import { formatImg, formatAmount } from "common/js/util";
 import toast from "base/toast/toast";
 export default {
   data() {
@@ -68,6 +68,8 @@ export default {
       options: {
         productSpecsCode: ""
       },
+      specsIndex: [],
+      curProductIdx: 0,
       i: 0,
       num: 0,
       number: 1,
@@ -76,6 +78,9 @@ export default {
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     changeTipShow() {
       this.tipshow = !this.tipshow;
     },
@@ -126,6 +131,7 @@ export default {
     //选择规格
     chooseSize(code,index) {
       this.num = index;
+      this.specsIndex[this.curProductIdx] = index;
       this.productSpecsCode = code;
     },
     //选择规格
@@ -133,9 +139,10 @@ export default {
       this.number = index;
     },
     //产品详情查询
-    prodectDetail(code) {
+    prodectDetail(code, index) {
       this.genghuan();
       let self = this;
+      this.curProductIdx = index;
       productDetail(code, this.level).then(res => {
         res.pic = formatImg(res.pic);
         self.detail = res;
@@ -145,7 +152,6 @@ export default {
     buy() {
       this.options.productSpecsCode = this.detail.specsList[this.num].code;
       this.options.quantity = this.number;
-      // alert(JSON.stringify(this.options));
       cloudBill(this.options).then(res => {
         this.text = "提交成功";
         this.$refs.mytoast.show();
@@ -169,8 +175,9 @@ export default {
       };
       //商品列表查询
       queryProduct(res.level,'2').then(res => {
-        res.list.map(function(item) {
+        res.list.map((item) => {
           item.pic = formatImg(item.pic);
+          this.specsIndex.push(0);
         });
         this.list = res.list;
       });
@@ -366,7 +373,8 @@ export default {
         overflow: hidden;
         span {
           float: left;
-          width: 1.18rem;
+          min-width: 1.18rem;
+          padding: 0 0.1rem;
           line-height: 0.64rem;
           border: 1px solid #ccc;
           text-align: center;

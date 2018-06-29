@@ -47,7 +47,7 @@
             <div class="f-right" @click="buy">确认购买</div>
         </div>
         <full-loading :title="title" v-show="loading"></full-loading>
-        <confirm ref="confirm" :text="confirmText" :isAlert="isAlert" @confirm="handleConfirm"></confirm>
+        <confirm ref="confirm" :text="confirmText" :confirmBtnText="confirmBtnText" :isAlert="isAlert" @confirm="handleConfirm"></confirm>
         <toast ref="toast" :text="text"></toast>
     </div>
 </template>
@@ -64,7 +64,7 @@ import {
 import { setCookie, getCookie } from "common/js/cookie.js";
 import { formatImg, getUserId, formatAmount } from "common/js/util";
 import { getUser, getUserById } from "api/user";
-import { checkRed } from 'api/baohuo';
+import { checkRed, getLevel } from 'api/baohuo';
 import Toast from 'base/toast/toast';
 import FullLoading from 'base/full-loading/full-loading';
 import Confirm from 'base/confirm/confirm';
@@ -78,6 +78,7 @@ export default {
       loading: true,
       text: "",
       title: "正在载入...",
+      confirmBtnText: '确定',
       userinfo: {},
       options: {},
       address: {},
@@ -146,15 +147,20 @@ export default {
       this.$router.push(this.url);
     },
     checkUser(userId) {
-      checkRed(userId).then(res => {
+      Promise.all([
+        checkRed(userId),
+        getLevel(getCookie("level"))
+      ]).then(([res, levelInfo]) => {
         if (res.result == '4') {
           this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge');
         } else if (res.result == "0") {
           this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
         } else if (res.result == '1') {
-          this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的授权单`, '/woyaochuhuo');
+          this.confirmBtnText = '我要出货';
+          this.redirectPage(`${levelInfo[0].name}授权单${formatAmount(res.amount)}元`, '/woyaochuhuo');
         } else if (res.result == '2') {
-          this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的升级单`, '/woyaochuhuo');
+          this.confirmBtnText = '我要出货';
+          this.redirectPage(`${levelInfo[0].name}升级单${formatAmount(res.amount)}元`, '/woyaochuhuo');
         } else if (res.result == '3') {
           this.redirectPage(`您的门槛余额已经高于${formatAmount(res.minAmount)}元，请前去购买云仓`, '/threshold');
         } else {

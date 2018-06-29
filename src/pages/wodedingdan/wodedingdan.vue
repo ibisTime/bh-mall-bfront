@@ -19,11 +19,11 @@
       </div>
       <div class="item clearfix" v-for="(item,index) in list">
             <div class="top clearfix">
-                <span class="user">提交人：{{item.user.realName || item.user.nickName}}（12345678901））</span>
+                <span class="user">提交人：{{item.user.realName || item.user.nickName}}（{{item.user.mobile}}）</span>
                 <span class="status">{{status[item.status]}}</span>
             </div>
-            <div :class="['info']" ref="divInfo">
-                <div class="downward" @click="changeHeight($event)">></div>
+            <div class="info" :class="{ active: heightActive === index }" ref="divInfo">
+                <div class="downward" @click="changeHeight(index)">></div>
                 <p>订单编号：{{item.code}}</p>
                 <p>订单类型：{{item.kind}}</p>
                 <p>下单时间：{{item.applyDatetime}}</p>
@@ -31,11 +31,12 @@
                 <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
             </div>
             <div class="pic">
-                <img src="../../assets/imgs/buyimg.png" alt="">
+                <img :src="formatImg(item.pic)" alt="">
                 <div class="content">
                     <p>{{item.productName}}</p>
+                    <p style="padding-top:0.1rem;">{{item.productSpecsName}}</p>
                     <i>￥{{item.price/1000}}</i>
-                    <span>{{item.quantity}}瓶</span>
+                    <span>{{item.quantity}}瓶</span><span class="status">{{item.kind == '2' ? '购买云仓' : '云仓提货'}}</span>
                     <div @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
                 </div>
             </div>
@@ -46,10 +47,9 @@
 <script>
 import Toast from 'base/toast/toast';
 import { queryOrderForm, receiveNromalOrder } from "api/baohuo";
-import { formatDate } from "common/js/util";
+import { formatDate, formatImg } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 export default {
-  name: "IntentionalAgent",
   data() {
     return {
       index: "",
@@ -65,6 +65,7 @@ export default {
         "申请取消",
         "已取消"
       ],
+      heightActive: '',
       toastText: ''
     };
   },
@@ -73,9 +74,11 @@ export default {
       this.index = index;
       this.check();
     },
-    changeHeight(event) {
-      console.log(event.target);
-      // dom = event.target.parent
+    changeHeight(index) {
+      this.heightActive = this.heightActive === index ? '' : index;
+    },
+    formatImg(img) {
+      return formatImg(img);
     },
     check() {
       if (this.index == 2) {
@@ -83,7 +86,7 @@ export default {
           if (res.list.length <= 1) {
             console.log(this.$refs.divInfo);
           }
-          res.list.map(function(item) {
+          res.list.forEach(function(item) {
             //格式化时间
             res.applyDatetime = formatDate(res.applyDatetime);
           });
@@ -115,7 +118,6 @@ export default {
     },
     shouhuo(code) {
       receiveNromalOrder(code).then(res => {
-        console.log(res)
         if(res.isSuccess == true) {
           this.toastText = '收货成功';
           this.$refs.toast.show();
@@ -198,8 +200,8 @@ export default {
       height: 0.9rem;
       overflow: hidden;
       position: relative;
-      &.height {
-        height: 4rem;
+      &.active {
+        height: auto;
       }
       p + p {
         margin-top: 0.36rem;
@@ -211,10 +213,16 @@ export default {
       }
       .downward {
         position: absolute;
-        top: 0.3rem;
-        right: 0.3rem;
+        top: 0;
+        right: 0;
+        padding: 0.3rem;
         color: $primary-color;
         transform: rotateZ(90deg);
+      }
+      .status {
+        float: right;
+        color: #72a52c;
+        font-size: 0.24rem;
       }
     }
     .pic {
@@ -251,7 +259,11 @@ export default {
           font-size: $font-size-small;
           border-radius: 0.1rem;
           color: #333;
-          text-align: center;
+          text-align: right;
+          &.status {
+            top: 0.5rem;
+            color: #72a52c;
+          }
         }
         div {
           font-size: 0.3rem;
@@ -259,8 +271,8 @@ export default {
           top: 1.15rem;
           right: 0.2rem;
           border: 1px solid #333;
-          border-radius: 0.03rem;
-          padding: 0.03rem
+          border-radius: 0.1rem;
+          padding: 0.1rem 0.14rem;
         }
       }
     }

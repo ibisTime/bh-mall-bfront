@@ -316,7 +316,7 @@ export default {
       });
     });
     getBill().then(res => {
-      this.balance = res[0].amount;
+      this.balance = res.length ? res[0].amount : 0;
     });
   }
 };

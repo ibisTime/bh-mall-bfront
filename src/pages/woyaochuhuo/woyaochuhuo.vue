@@ -54,7 +54,7 @@
             </div>
             <div class="right">
               <span class="diamonds right-item" @click="add">+</span>
-              <input class="num right-item" v-model="number"></span>
+              <input class="num right-item" @input="handleChange" type="number" v-model="number"></span>
               <span class="diamonds right-item" @click="sub">-</span>
             </div>
           </div>
@@ -106,6 +106,9 @@ export default {
     };
   },
   methods: {
+    handleChange(e) {
+      this.prodNum[this.curIndex] = this.number;
+    },
     formatAmount(price) {
       return formatAmount(price);
     },
@@ -149,7 +152,7 @@ export default {
         if (res.result == '4') {
           this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge');
         } else if (res.result == "0") {
-          this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
+          this.redirectPage(`您需要再购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
         } else if (res.result == '1') {
           this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的授权单`, '/woyaochuhuo');
         } else if (res.result == '2') {
@@ -185,11 +188,11 @@ export default {
       cloudSend(options).then(res => {
         this.loading = false;
         if (res.isSuccess) {
-          this.text = '下单成功！';
+          this.text = '提货成功！';
           this.$refs.toast.show();
           this.checkUser(getUserId());
         } else {
-          this.text = '下单失败！';
+          this.text = '提货失败！';
           this.$refs.toast.show();
         }
       }).catch(() => this.loading = false);

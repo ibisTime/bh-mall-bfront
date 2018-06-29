@@ -30,7 +30,7 @@
         </div>
         <div class="area">
             <i v-show="errors.has('applyLevel')" class="error-tip">{{errors.first('applyLevel')}}</i>
-            <span>等级</span><span class="pl2rem item-input">{{level}}</span>
+            <span>等级</span><div class="pl2rem item-input">{{level}}</div>
             <select v-validate="'required'" name="applyLevel" v-model="options.applyLevel" @change="chooseLevel">
               <option v-for="item in levelList" :value="item.level" v-if="item.level != 6">{{item.name}}</option>
             </select>
@@ -52,6 +52,7 @@
 <script>
 import { getAppId, getAllLevel, replyAgent, _replyAgent } from "api/baohuo";
 import { getDictList } from 'api/general';
+import { getUser } from 'api/user';
 import { isLogin, setUser, getWxMobAndCapt } from "common/js/util";
 import { setCookie } from "common/js/cookie";
 import CityPicker from "base/city-picker/city-picker";
@@ -64,6 +65,7 @@ export default {
       loading: true,
       title: '正在载入...',
       text: '',
+      userInfo: {},
       panelLevelShow: false,
       levelList: [],
       level: "",
@@ -135,13 +137,24 @@ export default {
   },
   mounted() {
     this.userId = this.$route.query.userId;
-    getAllLevel().then(res => {
+    this.userId && setCookie('userId', this.userId);
+    Promise.all([
+      getUser(),
+      getAllLevel(),
+      getDictList('source')
+    ]).then(([userInfo, res, list]) => {
       this.loading = false;
-      this.levelList = res.list;
-    }).catch(() => this.loading = false);
-    getDictList('source').then(list => {
+      let level = userInfo.toLevel || 0;
+      this.levelList = res.list.filter(l => {
+        return l.level != '6' && l.level >= level;
+      });
+      this.options.applyLevel = this.levelList[0].level;
+      this.level = this.levelList[0].name;
+
       this.fromList = list;
-    });
+      this.options.fromInfo = list[0].dkey;
+      this.fromInfo = list[0].dvalue;
+    }).catch(() => this.loading = false);
   }
 };
 </script>
@@ -156,7 +169,7 @@ export default {
     width: 100%;
     align-items: center;
     height: 1rem;
-    padding: 0.3rem;
+    padding: 0 0.3rem;
     border-bottom: 1px solid #eee;
     > i {
       position: absolute;
@@ -219,7 +232,7 @@ export default {
     display: block;
     width: 90%;
     line-height: 0.9rem;
-    margin: 4rem auto;
+    margin: 2rem auto 1rem;
     font-size: $font-size-large-ss;
     background-color: $primary-color;
     color: #fff;

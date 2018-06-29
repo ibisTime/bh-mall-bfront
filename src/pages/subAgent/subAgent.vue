@@ -28,36 +28,21 @@
               <div class="item-right">
                   <span>微信号：{{item.wxId}}</span>
                   <span>当前等级：{{item.level}}</span>
-                  <span>当前余额：{{item.amount}}</span>
+                  <span>当前余额：{{formatAmount(item.amount)}}</span>
                   <span>授权时间：{{item.approveDatetime}}</span>
               </div>
           </div>
-          <!-- <div class="item">
-              <div class="item-left">
-                  <img src="../../assets/subAgent/head02.png" alt="">
-                  <div class="userinfo">
-                      <p class="username">陈山</p>
-                      <p class="usertel">12345678901</p>
-                  </div>
-              </div>
-              <div class="item-right">
-                  <span>微信号：18888888888</span>
-                  <span>当前等级：联创</span>
-                  <span>当前余额：3467</span>
-                  <span>授权时间：2018-03-24 13:00:00</span>
-              </div>
-          </div> -->
       </div>
   </div>
 </template>
 <script>
-import {getTrack,getLevel,getAllLevel,getLevelSub,getKeywordSub,getBill} from 'api/baohuo'
-import {setCookie,getCookie} from 'common/js/cookie';
-import {formatDate} from 'common/js/util';
-import {getUser,getUserById} from 'api/user';
+import { getTrack, getLevel, getAllLevel, getLevelSub, getKeywordSub, getBill } from 'api/baohuo'
+import { setCookie, getCookie } from 'common/js/cookie';
+import { formatDate, formatAmount } from 'common/js/util';
+import { getUser, getUserById } from 'api/user';
 export default {
-  name:'subAgent',
-  data(){
+  name: 'subAgent',
+  data() {
       return{
           levelShow : false,
           selectText:'请选择等级',
@@ -66,24 +51,23 @@ export default {
           list:[],
       }
   },
-  methods:{
-
+  methods: {
+      formatAmount(amount) {
+          return formatAmount(amount);
+      },
       //变化等级是否显示
-      changeLevelShow(){
+      changeLevelShow() {
           this.levelShow = !this.levelShow
       },
-
       //选择等级
-      changeSelect(event){
+      changeSelect(event) {
           this.selectText = event.target.innerText;
           console.dir(event.target.getAttribute('level'))
           var level = event.target.getAttribute('level')
 
           //根据所选等级查询我的下级
           getLevelSub(level).then(res => {
-
               res.list.map(function(item){
-
                     //格式化时间
                     item.approveDatetime = formatDate(item.approveDatetime)
 
@@ -101,29 +85,23 @@ export default {
               this.list = res.list
           })
       },
-
       //根据我的下级查询我的下级
-      getMysub(){
-            console.log(this.inputText)
-            getKeywordSub(this.inputText).then(res => {
-                res.list.map(function(item){
-
-                    //格式化时间
-                    item.approveDatetime = formatDate(item.approveDatetime)
-
-                    //数字等级转化文字等级
-                    getLevel(item.level).then(res => {
-                        item.level = res[0].name
-                    })
-                    
-                    //查询用户余额
-                    getBill(item.userId).then(res => {
-                        item.amount = res[0].amount
-                    })
-                })
-
-                this.list = res.list
-            })
+      getMysub() {
+          getKeywordSub(this.inputText).then(res => {
+              res.list.map(function(item){
+                  //格式化时间
+                  item.approveDatetime = formatDate(item.approveDatetime)
+                  //数字等级转化文字等级
+                  getLevel(item.level).then(res => {
+                      item.level = res[0].name
+                  });
+                  //查询用户余额
+                  getBill(item.userId).then(res => {
+                      item.amount = res[0].amount
+                  });
+              });
+              this.list = res.list;
+          });
       }
   },
   mounted(){

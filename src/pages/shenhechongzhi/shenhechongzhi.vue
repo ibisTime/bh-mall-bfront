@@ -18,11 +18,6 @@
           <p>充值金额：<span>￥{{item.amount / 1000}}</span><img src="../../assets/imgs/more@2x.png" alt=""></p>
           <p>申请时间：{{item.applyDatetime}}</p>
       </div>
-      <!-- <div class="item" @click="$router.push('/shenhechongzhi/chongzhichuli?code=U20180328101135370654&index=' + index);">
-          <p>订单编号：CZ2017051619474103473<i class="tip">待审核</i></p>
-          <p>充值金额：<span>￥200.00</span><img src="../../assets/imgs/more@2x.png" alt=""></p>
-          <p>申请时间：2018-09-09 11:11:11</p>
-      </div> -->
   </div>
 </template>
 <script>
