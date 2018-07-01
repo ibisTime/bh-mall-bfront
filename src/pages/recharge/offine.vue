@@ -82,7 +82,7 @@ export default {
             this.text = '提交成功，待审核';
             this.$refs.toast.show(() => {
               if (res.result == '0' || res.result == '1' || res.result == '2'
-                || res.result == '3' || res.result == '4') {
+                || res.result == '3' || res.result == '4' || res.result == '6') {
                 this.$router.push('/login/reCharge');
               } else {
                 this.$router.push('/home');

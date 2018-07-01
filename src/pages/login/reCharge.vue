@@ -1,6 +1,6 @@
 <template>
     <div class="replying">
-        <div class="tip">充值审核中，请您耐心等待</div>
+        <div class="tip">充值申请请等待上级审核</div>
     </div>
 </template>
 <script>

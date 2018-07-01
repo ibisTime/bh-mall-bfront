@@ -41,6 +41,8 @@ export default {
       } else {
         this.AppId();
       }
+    } else {
+      this.checkUser(getUserId());
     }
   },
   methods: {

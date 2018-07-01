@@ -60,7 +60,7 @@
         </div>
         <div>
             <span>团队名称</span>
-            <span class="pl2rem" v-if="options.applyLevel !== userInfo.toLevel && userInfo.toTeamName">{{teamName}}</span>
+            <span class="pl2rem" v-if="options.applyLevel != userInfo.toLevel && userInfo.toTeamName">{{teamName}}</span>
             <input class="pl2rem" v-else v-model="teamName" v-validate="'required'" type="text" name="teamName" placeholder="请输入团队名称">
         </div>
         <button class="btn" @click="apply">申请代理</button>
@@ -245,7 +245,7 @@ export default {
         if (!list.find(l => l.level == this.options.applyLevel)) {
           this.options.applyLevel = list[0].level;
           this.level = this.levelList[0].name;
-          if (this.options.applyLevel !== this.userInfo.toLevel && this.userInfo.toTeamName) {
+          if (this.options.applyLevel != this.userInfo.toLevel && this.userInfo.toTeamName) {
             this.teamName = this.userInfo.toTeamName;
           } else {
             this.teamName = '';
@@ -258,7 +258,7 @@ export default {
       let level = this.levelList.find(v => v.level == val);
       this.level = level.name;
       this.options.applyLevel = val;
-      if (this.options.applyLevel !== this.userInfo.toLevel && this.userInfo.toTeamName) {
+      if (this.options.applyLevel != this.userInfo.toLevel && this.userInfo.toTeamName) {
         this.teamName = this.userInfo.toTeamName;
       } else {
         this.teamName = '';

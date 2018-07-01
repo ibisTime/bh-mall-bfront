@@ -19,7 +19,7 @@
             <div class="content">
                 <div>
                   <p>产品名称：{{item.productName}}
-                    <p>规格：{{specsList[index].quantity}}</p>
+                    <p>规格：{{specsList[index].productSpecsName}}</p>
                     <p>数量：{{prodNum[index]}}</p>
                     <p>价格：¥{{formatAmount(specsList[index].price * prodNum[index])}}</p>
                   </p>
