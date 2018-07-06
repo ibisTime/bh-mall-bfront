@@ -56,7 +56,9 @@ export default {
   data() {
     return {
       flag: false,
-      // wxUrl: "http://bh.bfront.hichengdai.com?userReferee=",
+      // 177
+      // wxUrl: "http://mj.bfront.zjqiyu.com?userReferee=",
+      // 183
       wxUrl: "http://front.bhxt.hichengdai.com?userReferee=",
       info: {
         title: "麦记新零售邀请链接",

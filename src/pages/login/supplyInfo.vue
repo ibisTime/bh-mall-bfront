@@ -23,8 +23,9 @@
         </div>
         <div>
             <span>团队名称</span>
-            <span class="pl2rem" v-if="applyLevel != userInfo.toLevel && userInfo.toTeamName">{{teamName}}</span>
-            <input v-else v-model="teamName" v-validate="'required'" type="text" name="teamName" placeholder="请输入团队名称">
+            <!--<span class="pl2rem" v-if="applyLevel != userInfo.toLevel && userInfo.toTeamName">{{teamName}}</span>-->
+          <span class="pl2rem" v-if="applyLevel != '1'">{{teamName}}</span>
+          <input v-else v-model="teamName" v-validate="'required'" type="text" name="teamName" placeholder="请输入团队名称">
         </div>
       </div>
       <qiniu ref="qiniu"

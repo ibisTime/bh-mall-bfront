@@ -67,7 +67,7 @@ import fenxiangshangcheng from '@/pages/fenxiangshangcheng/fenxiangshangcheng'
 import daichulidingdan from '@/pages/daichulidingdan/daichulidingdan'
 import sucaichaxun from '@/pages/sucaichaxun/sucaichaxun'
 
-// 内购商城 
+// 内购商城
 import xuangoushangpin from '@/pages/xuangoushangpin/xuangoushangpin'
 import shangpingoumai from '@/pages/xuangoushangpin/shangpingoumai'
 import tianjiadizhi from '@/pages/tianjiadizhi/tianjiadizhi'
@@ -77,6 +77,8 @@ import neigoudingdan from '@/pages/neigoudingdan/neigoudingdan'
 // import neigoushangcheng from '@/pages/neigoushangcheng/neigoushangcheng'
 // import goumaishangping from '@/pages/neigoushangcheng/goumaishangping'
 
+// 防伪溯源
+import fwsyqrcode from '@/pages/fwsyqrcode/fwsyqrcode'
 
 
 Vue.use(Router)
@@ -411,6 +413,12 @@ export default new Router({
       path: '/neigoudingdan',
       name: 'neigoudingdan',
       component: neigoudingdan
+    },
+    //测试防伪溯源二维码
+    {
+      path: '/fwsyqrcode',
+      name: 'fwsyqrcode',
+      component: fwsyqrcode
     },
   ]
 })
