@@ -92,7 +92,7 @@ export function initShowImage () {
  * }
  */
 function _initShare(data, config, isInitImage) {
-  alert(config.link);
+  // alert(config.link);
   let jsApiList = [
     'onMenuShareTimeline',
     'onMenuShareAppMessage',
@@ -121,7 +121,7 @@ function _initShare(data, config, isInitImage) {
     wx.onMenuShareQZone(config);
   });
   wx.error((err) => {
-    
+
   });
 }
 // 微信支付

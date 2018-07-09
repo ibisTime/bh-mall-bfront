@@ -100,6 +100,7 @@ export default {
       this.loading = true;
       let code = this.$route.query.code;
       let orderCode = this.$route.query.orderCode;
+      // console.log(orderCode);
       let options = {
         address: this.address.address,
         area: this.address.area,
@@ -112,7 +113,8 @@ export default {
         applyNote: this.applyNote,
         toUser: this.$route.query.highUserId
       };
-      this.codeList.push(this.orderCode);
+      this.codeList = orderCode.split(',');
+      // console.log(this.codeList);
       cloudPayment(this.codeList, this.status).then(data => {
         if (this.status === 0) {
           this.success();

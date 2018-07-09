@@ -41,7 +41,15 @@ export default {
       } else {
         this.AppId();
       }
-    } else {
+    } else if(getCookie("status") == 16) {
+      this.goLogin(getUserId(), 16);
+    } else if(getCookie("status") == 18) {
+      try {
+        this.goLogin(getUserId(), 18);
+      }catch (e) {
+        alert(e);
+      }
+    } else{
       this.checkUser(getUserId());
     }
   },

@@ -36,7 +36,7 @@
                     <p>{{item.productName}}</p>
                     <p style="padding-top:0.1rem;">{{item.productSpecsName}}</p>
                     <i>￥{{item.price/1000}}</i>
-                    <span>{{item.quantity}}瓶</span><span class="status">{{item.kind == '2' ? '购买云仓' : '云仓提货'}}</span>
+                    <span>{{item.quantity}}{{item.productSpecsName}}</span><span class="status">{{item.kind == '2' ? '购买云仓' : '云仓提货'}}</span>
                     <div @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
                 </div>
             </div>
@@ -90,6 +90,7 @@ export default {
             //格式化时间
             res.applyDatetime = formatDate(res.applyDatetime);
           });
+
           this.list = res.list;
         });
       }  else if (this.index == ''){
@@ -101,6 +102,7 @@ export default {
             //格式化时间
             res.applyDatetime = formatDate(res.applyDatetime);
           });
+          console.log(res.list);
           this.list = res.list;
         });
       }else {

@@ -3,25 +3,25 @@
       <div class="container" v-if = "this.status == '0' || this.status == '7' || this.status == '12' || this.status == '13' || this.status == '14' ||this.status == '15' ||this.status == '17'">
           <div class="top">
               <div>
-                  <span>成功邀请（人）</span>
-                  <i>12</i>
+                  <!--<span>成功邀请（人）</span>-->
+                  <!--<i>12</i>-->
                   <button @click="share">分享链接</button>
               </div>
               <div>
-                  <span>提成收益（元）</span>
-                  <i>12345</i>
+                  <!--<span>提成收益（元）</span>-->
+                  <!--<i>12345</i>-->
                   <button @click="changeFlag">分享二维码</button>
               </div>
           </div>
-          <div class="bottom">
-              <h3>活动规则</h3>
-              <span></span>
-              <div class="content">
-                  <p>1. 首次邀请五位</p>
-                  <p>2. 再次邀请送20元现金</p>
-                  <p>3. 就是有钱就是有钱就是有钱就是有钱就是有钱就是有钱就是有钱就是有钱就是有钱</p>
-              </div>
-          </div>
+          <!--<div class="bottom">-->
+              <!--<h3>活动规则</h3>-->
+              <!--<span></span>-->
+              <!--<div class="content">-->
+                  <!--<p>1. 首次邀请五位</p>-->
+                  <!--<p>2. 再次邀请送20元现金</p>-->
+                  <!--<p>3. 就是有钱就是有钱就是有钱就是有钱就是有钱就是有钱就是有钱就是有钱就是有钱</p>-->
+              <!--</div>-->
+          <!--</div>-->
       </div>
       <div :class="['mask',flag ? 'show' : '']" @click="changeFlag"></div>
       <div :class="['line',flag ? 'show' : '']" ></div>
@@ -30,7 +30,7 @@
               <img src="../../assets/imgs/touxiangfang@2x.png" alt="">
               <div class="info">
                   <h3>{{ nickname }}</h3>
-                  <p>代理品牌：小艺</p>
+                  <p>代理品牌：麦记</p>
               </div>
           </div>
           <div class="erweima-middle">
@@ -57,9 +57,9 @@ export default {
     return {
       flag: false,
       // 177
-      // wxUrl: "http://mj.bfront.zjqiyu.com?userReferee=",
+      wxUrl: "http://mj.bfront.zjqiyu.com?userReferee=",
       // 183
-      wxUrl: "http://front.bhxt.hichengdai.com?userReferee=",
+      // wxUrl: "http://front.bhxt.hichengdai.com?userReferee=",
       info: {
         title: "麦记新零售邀请链接",
         desc: "邀请链接",
@@ -88,6 +88,7 @@ export default {
   },
   mounted() {
     this.status = getCookie('status');
+    console.log(this.status);
     if (isLogin()) {
       let userReferee = getCookie("userId");
       this.wxUrl += userReferee;
@@ -115,10 +116,10 @@ export default {
 <style lang="scss" scoped>
 @import "../../common/scss/variable.scss";
 .invitation {
-  height: 12rem;
+  height: 11rem;
   background-image: url("../../assets/invitationLink/yaoqinglianjie@2x.png");
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 100% 100%;
   background-color: #f19a02;
   position: relative;
   .container {
@@ -126,14 +127,14 @@ export default {
     font-size: $font-size-small;
     overflow: hidden;
     .top {
-      height: 3.9rem;
-      margin-top: 3.16rem;
+      height: 1.9rem;
+      margin-top: 5.16rem;
       background-image: url("../../assets/invitationLink/juxing3.png");
       background-repeat: no-repeat;
       > div {
         float: left;
         width: 50%;
-        height: 3.9rem;
+        height: 1.9rem;
         position: relative;
         span {
           width: 100%;

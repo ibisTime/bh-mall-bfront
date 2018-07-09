@@ -6,8 +6,8 @@
             :token="token"
             :uploadUrl="uploadUrl"></qiniu>
       <div class="header">
-          <p>充值品牌：悟空</p>
-          <p>充值类型：我空</p>
+          <p>充值品牌：麦记</p>
+          <p>充值类型：门槛款</p>
           <p>当前余额：￥<i class="money">{{account / 1000}}</i></p>
       </div>
       <form ref="form">

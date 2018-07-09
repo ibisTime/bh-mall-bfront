@@ -74,7 +74,7 @@ export default {
       num: 0,
       number: 1,
       text: "",
-      orderCode: ''
+      orderCode: []
     };
   },
   methods: {
@@ -100,7 +100,10 @@ export default {
       cloudBill(this.options).then(res => {
         this.text = "提交成功";
         this.$refs.mytoast.show();
-        this.orderCode = res.code;
+        // this.orderCode.push(res.map((item) => ({ item })));
+        res.map((item) => {
+          this.orderCode.push(item);
+        });
         this.$router.push(
         "/buyCloud/tijiaodingdan?code=" +
           code +
