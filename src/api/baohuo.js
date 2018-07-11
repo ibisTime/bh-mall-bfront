@@ -145,6 +145,16 @@ export function getAllLevel(lowLevel) {
   });
 }
 
+//获取全部等级
+export function getAllLevel1(lowLevel) {
+  return fetch(627005, {
+    start: '1',
+    limit: '100',
+    lowLevel: lowLevel,
+    orderColumn: 'level',
+    orderDir: 'asc'
+  });
+}
 
 //获取APPID
 export function getAppId(ckey) {

@@ -14,7 +14,7 @@
         <input type="number" class="money-num" v-model="moneyNum" placeholder="请输入金额（必填）">
         <div class="img">
                 <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
-                <p>上传打款图片（如有多张，请合并上传）</p>
+                <p>点击上传打款图片（如有多张，请合并上传）</p>
                 <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange" accept="image/*">
                 <div class="item" v-for="(photo,index) in photos" ref="photoItem" @click="choseItem(index)">
                     <loading v-if="!photo.ok" title="" class="photo-loading"></loading>

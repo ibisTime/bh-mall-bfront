@@ -1,14 +1,9 @@
 <template>
   <div class="offine">
       <div class="login">
-        <div v-if="highUserName">
-            <span>上级</span><span class="pl2rem">{{highUserName}}</span>
-        </div>
-        <div>
-            <i v-show="errors.has('idNo')" class="error-tip">{{errors.first('idNo')}}</i>
-            <span>证件号码</span>
-            <input class="pl2rem" v-model="idNo" v-validate="'required'" type="text" name="idNo" placeholder="请输入证件号码">
-        </div>
+        <!--<div v-if="highUserName">-->
+            <!--<span>上级</span><span class="pl2rem">{{highUserName}}</span>-->
+        <!--</div>-->
         <div>
             <i v-show="errors.has('introducer')" class="error-tip">{{errors.first('introducer')}}</i>
             <span>介绍人手机号</span>
@@ -27,13 +22,18 @@
           <span class="pl2rem" v-if="applyLevel != '1'">{{teamName}}</span>
           <input v-else v-model="teamName" v-validate="'required'" type="text" name="teamName" placeholder="请输入团队名称">
         </div>
+        <div v-if="isRealNameShow">
+          <i v-show="errors.has('idNo')" class="error-tip">{{errors.first('idNo')}}</i>
+          <span>证件号码</span>
+          <input class="pl2rem" v-model="idNo" v-validate="'required'" type="text" name="idNo" placeholder="请输入证件号码">
+        </div>
       </div>
       <qiniu ref="qiniu"
           style="visibility: hidden;position: absolute;width: 0;"
           :token="token"
           :multiple="multiple"
           :uploadUrl="uploadUrl"></qiniu>
-      <form ref="form">
+      <form ref="form" v-if="isRealNameShow">
         <div class="img">
             <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
             <p>上传手持身份证图片</p>
@@ -50,7 +50,7 @@
   </div>
 </template>
 <script>
-import { supplyInfo, queryAmount, isRealName, getAllLevel } from 'api/baohuo'
+import { supplyInfo, queryAmount, isRealName, getAllLevel1 } from 'api/baohuo'
 import { getQiniuToken } from 'api/general'
 import { getUser, getUserByMobile } from 'api/user';
 import { setCookie } from "common/js/cookie";
@@ -91,7 +91,8 @@ export default {
             level: '',
             levelList: [],
             applyLevel: '',
-            allLevelList: []
+            allLevelList: [],
+            isRealNameShow: false
         }
     },
     created() {
@@ -103,8 +104,9 @@ export default {
         this.userId && setCookie('userId', this.userId);
         Promise.all([
           getUser(),
-          getAllLevel()
+          getAllLevel1()
         ]).then(([userInfo, levelList]) => {
+            this.isRealNameShow = true;
             this.loading = false;
             this.userInfo = userInfo;
             let list = levelList.list.filter(l => {
@@ -185,6 +187,15 @@ export default {
         chooseLevel(e) {
           let val = e.target.value;
           let level = this.levelList.find(v => v.level == val);
+          this.allLevelList.map((item) => {
+            if(item.level === level.level) {
+              if(item.isRealName === '1') {
+                this.isRealNameShow = true;
+              } else {
+                this.isRealNameShow = false;
+              }
+            }
+          })
           this.level = level.name;
           this.applyLevel = val;
           if (this.applyLevel != this.userInfo.toLevel && this.userInfo.toTeamName) {
@@ -203,17 +214,19 @@ export default {
               }
               this.loading = true;
               this.title = '提交中...';
-              isRealName(this.userId).then(res => {
-                  if(res.isSuccess) {
+              // isRealName(this.userId).then(res => {
+                  console.log(this.isRealNameShow);
+                  if(this.isRealNameShow) {
                       // 需要实名
                       if(this.idNo && this.photos3.length && this.photos3[0].key) {
+                          console.log(this.photos3[0].key);
                           supplyInfo('1', this.idNo, this.introducer,this.photos3[0].key,
                             this.teamName, this.applyLevel, this.userId).then(res => {
                               this.loading = false;
                               if(res.code !== '') {
                                   this.text = '提交成功，待审核'
                                   this.$refs.toast.show(this.tiaozhuan);
-                                  this.photos = []
+                                  this.photos = [];
                                   this.moneyNum = ''
                               } else {
                                   this.text = '请确认信息全部填写完整';
@@ -239,14 +252,14 @@ export default {
                         this.teamName, this.applyLevel, this.userId).then(res => {
                           this.loading = false;
                           if(res.code !== '') {
-                              this.text = '提交成功，待审核'
+                              this.text = '提交成功，待审核';
                               this.$refs.toast.show(this.tiaozhuan);
-                              this.photos = []
+                              this.photos = [];
                               this.moneyNum = ''
                           }
                       }).catch(() => this.loading = false);
                   }
-              });
+              // });
             }
           });
         },

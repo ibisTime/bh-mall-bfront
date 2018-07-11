@@ -174,9 +174,46 @@ export default {
       this.confirmText = text;
       this.$refs.confirm.show();
       this.url = url;
+    },
+    handleFontSize() {
+      // 设置网页字体为默认大小
+      WeixinJSBridge.invoke('setFontSizeCallback', {
+        'fontSize': 0
+      });
+      // 重写设置网页字体大小的事件
+      WeixinJSBridge.on('menu:setfont', function () {
+        WeixinJSBridge.invoke('setFontSizeCallback', {
+          'fontSize': 0
+        });
+      });
     }
+    // resetFontSize() {
+    //   if (typeof WeixinJSBridge === 'object' && typeof WeixinJSBridge.invoke === 'function') {
+    //     alert(1);
+    //     this.handleFontSize();
+    //   } else {
+    //     alert(2);
+    //     if (document.addEventListener) {
+    //       document.addEventListener('WeixinJSBridgeReady', this.handleFontSize, false);
+    //     } else if (document.attachEvent) {
+    //       document.attachEvent('WeixinJSBridgeReady', this.handleFontSize);
+    //       document.attachEvent('onWeixinJSBridgeReady', this.handleFontSize);
+    //     }
+    //   }
+    // },
+    // handleFontSize() {
+    //   WeixinJSBridge.invoke('setFontSizeCallback', {
+    //     'fontSize': 0
+    //   });
+    //   WeixinJSBridge.on('menu:setfont', function () {
+    //     WeixinJSBridge.invoke('setFontSizeCallback', {
+    //       'fontSize': 0
+    //     });
+    //   });
+    // }
   },
   mounted() {
+    // this.resetFontSize();
     //获取用户等级
     let level = getCookie("level");
     let code = this.$route.query.code;

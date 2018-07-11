@@ -12,6 +12,31 @@ export default {
     if (!isLogin()) {
       this.$router.push('/?userReferee=' + this.$route.query.userReferee);
     }
+    this.resetFontSize();
+  },
+  methods: {
+    resetFontSize() {
+      if (typeof WeixinJSBridge === 'object' && typeof WeixinJSBridge.invoke === 'function') {
+        this.handleFontSize();
+      } else {
+        if (document.addEventListener) {
+          document.addEventListener('WeixinJSBridgeReady', this.handleFontSize, false);
+        } else if (document.attachEvent) {
+          document.attachEvent('WeixinJSBridgeReady', this.handleFontSize);
+          document.attachEvent('onWeixinJSBridgeReady', this.handleFontSize);
+        }
+      }
+    },
+    handleFontSize() {
+      WeixinJSBridge.invoke('setFontSizeCallback', {
+        'fontSize': 0
+      });
+      WeixinJSBridge.on('menu:setfont', function () {
+        WeixinJSBridge.invoke('setFontSizeCallback', {
+          'fontSize': 0
+        });
+      });
+    }
   }
 };
 </script>

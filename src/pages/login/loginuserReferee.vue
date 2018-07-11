@@ -16,26 +16,6 @@
             <i v-show="errors.has('introducer')" class="error-tip">{{errors.first('introducer')}}</i>
             <span>介绍人手机号</span> <input @keyup="introducerChange" class="pl2rem" v-model="options.introducer" type="text" name="introducer" placeholder="可不填，跨级介绍时必填">
         </div>
-          <div>
-            <i v-show="errors.has('idNo')" class="error-tip">{{errors.first('idNo')}}</i>
-            <span>证件号</span> <input class="pl2rem" v-model="options.idNo" type="text" name="idNo" placeholder="请输入证件号">
-        </div>
-              <qiniu
-            ref="qiniu"
-            style="visibility: hidden;position: absolute;width: 0;"
-            :token="token"
-            :uploadUrl="uploadUrl"></qiniu>
-        <form ref="form">
-          <div class="img">
-                  <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
-                  <p>上传手持身份证图片</p>
-                  <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(3,$event)" accept="image/*">
-                  <div class="item" v-for="(photo,index) in photos3" ref="photoItem" @click="choseItem(index)">
-                      <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
-                      <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
-                  </div>
-          </div>
-        </form>
         <div class="area">
             <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>
             <span>省份、市、区</span>
@@ -49,7 +29,8 @@
         </div>
         <div>
             <i v-show="errors.has('address')" class="error-tip">{{errors.first('address')}}</i>
-            <span>详细地址</span> <input class="pl2rem" v-model="options.address" v-validate="'required'" type="text" name="address" placeholder="请输入详细地址">
+            <span>详细地址</span>
+          <input class="pl2rem" v-model="options.address" v-validate="'required'" type="text" name="address" placeholder="请输入详细地址">
         </div>
         <div class="area">
             <i v-show="errors.has('applyLevel')" class="error-tip">{{errors.first('applyLevel')}}</i>
@@ -60,10 +41,32 @@
         </div>
         <div>
             <span>团队名称</span>
-            <!--<span class="pl2rem" v-if="options.applyLevel != userInfo.toLevel && userInfo.toTeamName">{{teamName}}</span>-->
+          <i v-show="errors.has('teamName')" class="error-tip">{{errors.first('teamName')}}</i>
+            <!--<span class="pl2rem" v-if="options.applyLevel != userInfo.toLevel && userInfo.toTeamName">{{errors.first('teamName')}}</span>-->
           <span class="pl2rem" v-if="options.applyLevel != '1'">{{teamName}}</span>
           <input class="pl2rem" v-else v-model="teamName" v-validate="'required'" type="text" name="teamName" placeholder="请输入团队名称">
         </div>
+        <div v-if="isRealNameShow">
+          <i v-show="errors.has('idNo')" class="error-tip">{{errors.first('idNo')}}</i>
+          <span>证件号</span>
+          <input class="pl2rem" v-model="options.idNo" v-validate="'required'" type="text" name="idNo" placeholder="请输入证件号">
+        </div>
+        <qiniu
+          ref="qiniu"
+          style="visibility: hidden;position: absolute;width: 0;"
+          :token="token"
+          :uploadUrl="uploadUrl"></qiniu>
+        <form ref="form" v-if="isRealNameShow">
+          <div class="img">
+            <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
+            <p>上传手持身份证图片</p>
+            <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(3,$event)" accept="image/*">
+            <div class="item" v-for="(photo,index) in photos3" ref="photoItem" @click="choseItem(index)">
+              <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
+              <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
+            </div>
+          </div>
+        </form>
         <button class="btn" @click="apply">申请代理</button>
         <full-loading :title="title" v-show="loading"></full-loading>
         <toast ref="toast" :text="text"></toast>
@@ -72,7 +75,7 @@
 <script>
 import {
   getAppId,
-  getAllLevel,
+  getAllLevel1,
   replyAgent,
   supplyInfo,
   queryAmount,
@@ -134,7 +137,8 @@ export default {
       introducer: "",
       moneyNum: "",
       teamName: "",
-      allLevelList: []
+      allLevelList: [],
+      isRealNameShow: false
     };
   },
   created() {
@@ -147,10 +151,11 @@ export default {
     this.options.userReferee = this.$route.query.userReferee;
     Promise.all([
       getUser(),
-      getAllLevel()
+      getAllLevel1()
     ]).then(([userInfo, levelList]) => {
       this.loading = false;
       this.userInfo = userInfo;
+      this.isRealNameShow = true;
       let list = levelList.list.filter(l => {
         return l.level != '6';
       });
@@ -171,7 +176,7 @@ export default {
         this.options.applyLevel = '';
         this.level = '';
       }
-      if (this.options.applyLevel !== userInfo.toLevel && userInfo.toTeamName) {
+      if (this.options.applyLevel !== '1' && userInfo.toTeamName) {
         this.teamName = userInfo.toTeamName;
       }
     }).catch(() => this.loading = false);
@@ -183,6 +188,7 @@ export default {
   methods: {
     apply() {
       this.$validator.validateAll().then((result) => {
+        console.log(result);
         if (result) {
           if (!this.teamName || !this.options.applyLevel) {
             this.text = '等级或团队信息未填写';
@@ -196,7 +202,7 @@ export default {
           }
           this.loading = true;
           this.title = '提交中...';
-          this.options.idHand = this.photos3[0].key;
+          this.options.idHand = (this.photos3[0] && this.photos3[0].key) || '';
           this.options.idNo = this.options.idNo;
           this.options.teamName = this.teamName;
           replyAgent(this.options).then(res => {
@@ -257,6 +263,15 @@ export default {
     chooseLevel(e) {
       let val = e.target.value;
       let level = this.levelList.find(v => v.level == val);
+      this.allLevelList.map((item) => {
+        if(item.level === level.level) {
+          if(item.isRealName === '1') {
+            this.isRealNameShow = true;
+          } else {
+            this.isRealNameShow = false;
+          }
+        }
+      })
       this.level = level.name;
       this.options.applyLevel = val;
       // if (this.options.applyLevel != this.userInfo.toLevel && this.userInfo.toTeamName) {
@@ -264,7 +279,7 @@ export default {
       // } else {
       //   this.teamName = '';
       // }
-      console.log(this.options.applyLevel);
+      // console.log(this.options.applyLevel);
       if (this.options.applyLevel != '1') {
         this.teamName = this.userInfo.toTeamName;
       } else {
