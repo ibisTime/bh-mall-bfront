@@ -50,34 +50,34 @@ export default {
             width: 100%;
         }
         span {
-          font-size: 0.14rem;
+          font-size: 0.35rem;
           z-index: 33;
           position: absolute;
         }
         .code {
-          margin-top: -7.5rem;
+          margin-top: -7.6rem;
           margin-left: 2.7rem;
         }
         .name {
-          margin-top: -7rem;
+          margin-top: -7.1rem;
           margin-left: 3rem;
         }
         .wxId {
-          margin-top: -6.5rem;
+          margin-top: -6.6rem;
           margin-left: 3rem;
         }
         .shouquanfang {
           font-size: 0.02rem;
           margin-top: -2.5rem;
           white-space: nowrap;
-          transform: scale(0.7);
-          margin-left: 3.3rem;
+          transform: scale(0.9);
+          margin-left: 3.4rem;
         }
         .impowerDatetime {
           font-size: 0.02rem;
           margin-top: -2.8rem;
           white-space: nowrap;
-          transform: scale(0.7);
+          transform: scale(0.9);
           margin-left: 3.5rem;
         }
         .level {

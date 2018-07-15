@@ -16,9 +16,10 @@
         </div>
         <div class="item">
             <img :src="thingInfo.pic" alt="">
-            <div class="content" v-if="thingInfo.specsList">
+            <div class="content" v-if="thingInfo.specs">
                 <p>{{thingInfo.name}}</p>
-                <i>￥{{thingInfo.specsList[0].price.price / 1000}}</i>
+                <p>规格：{{thingInfo.specs.name}}</p>
+                <i>￥{{thingInfo.specsPrice.price / 1000}}</i>
                 <span>X{{number}}</span>
             </div>
         </div>
@@ -39,9 +40,9 @@
                 <img :class="['xuanzhong', status == 1 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
             </div>
         </div>
-        <div class="footer" v-if="thingInfo.specsList">
+        <div class="footer" v-if="thingInfo.specs">
             <div class="f-left">
-                <span class="price">￥{{thingInfo.specsList[0].price.price * number / 1000}}</span>
+                <span class="price">￥{{thingInfo.specsPrice.price * number / 1000}}</span>
                 <span class="total">总计：</span>
             </div>
             <div class="f-right" @click="buy">确认购买</div>
@@ -59,7 +60,8 @@ import {
   shopBill,
   cloudPayment,
   productDetail,
-  cloudBill
+  cloudBill,
+  productDetailBySpec
 } from "api/baohuo";
 import { setCookie, getCookie } from "common/js/cookie.js";
 import { formatImg, getUserId, formatAmount } from "common/js/util";
@@ -187,30 +189,6 @@ export default {
         });
       });
     }
-    // resetFontSize() {
-    //   if (typeof WeixinJSBridge === 'object' && typeof WeixinJSBridge.invoke === 'function') {
-    //     alert(1);
-    //     this.handleFontSize();
-    //   } else {
-    //     alert(2);
-    //     if (document.addEventListener) {
-    //       document.addEventListener('WeixinJSBridgeReady', this.handleFontSize, false);
-    //     } else if (document.attachEvent) {
-    //       document.attachEvent('WeixinJSBridgeReady', this.handleFontSize);
-    //       document.attachEvent('onWeixinJSBridgeReady', this.handleFontSize);
-    //     }
-    //   }
-    // },
-    // handleFontSize() {
-    //   WeixinJSBridge.invoke('setFontSizeCallback', {
-    //     'fontSize': 0
-    //   });
-    //   WeixinJSBridge.on('menu:setfont', function () {
-    //     WeixinJSBridge.invoke('setFontSizeCallback', {
-    //       'fontSize': 0
-    //     });
-    //   });
-    // }
   },
   mounted() {
     // this.resetFontSize();
@@ -220,19 +198,27 @@ export default {
     this.orderCode = this.$route.query.orderCode;
     this.code = code;
     let number = this.$route.query.number;
+    let specsCode = this.$route.query.specsCode;
     this.number = number;
     setCookie("yuncangshuliang", this.number);
     setCookie("yuncangcode", this.code);
+    let info = {
+      level: level,
+      specsCode: specsCode
+    }
     Promise.all([
-      productDetail(code, level),
+      productDetailBySpec(info),
       queryDefaultAddress()
     ]).then(([item, res]) => {
+      console.log(res[0]);
       this.loading = false;
       item.pic = formatImg(item.pic);
       this.thingInfo = item;
-      this.productSpecsCode = item.specsList[0].price.productSpecsCode;
+      this.productSpecsCode = item.specs.code;
       this.address = res[0];
+      console.log(this.address);
     }).catch(() => this.loading = false);
+    // console.log(this.address);
   },
   components: {
     Toast,

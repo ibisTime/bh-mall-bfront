@@ -112,7 +112,9 @@ export default {
           "&highUserId=" +
           ref.options.highUserId +
           "&orderCode=" +
-          ref.orderCode
+          ref.orderCode +
+          "&specsCode=" +
+          this.options.productSpecsCode
         );
       });
     },
@@ -174,7 +176,8 @@ export default {
         city: res.city,
         mobile: res.mobile,
         province: res.province,
-        toUser: res.highUserId || ''
+        toUser: res.highUserId || '',
+        specsCode: ''
       };
       //商品列表查询
       queryProduct(res.level,'2').then(res => {
