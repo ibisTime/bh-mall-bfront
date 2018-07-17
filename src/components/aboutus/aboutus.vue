@@ -27,7 +27,7 @@
         telephone: '',
         time: '',
         loadingFlag: true
-        //hh
+        //h
       };
     },
     created() {
