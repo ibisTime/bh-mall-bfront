@@ -388,6 +388,14 @@ export function productDetail(code, level) {
   });
 }
 
+// 根据产品规格查
+export function productDetailBySpec(info) {
+  return fetch(627559, {
+    level: info.level || '',
+    specsCode: info.specsCode || ''
+  });
+}
+
 //获取用户余额
 export function getAccount(userId) {
   return fetch(627814, {

@@ -80,6 +80,9 @@ import neigoudingdan from '@/pages/neigoudingdan/neigoudingdan'
 // 防伪溯源
 import fwsyqrcode from '@/pages/fwsyqrcode/fwsyqrcode'
 
+// 物流信息
+import wuliu from '@/pages/wuliu/wuliu'
+
 
 Vue.use(Router)
 
@@ -419,6 +422,12 @@ export default new Router({
       path: '/fwsyqrcode',
       name: 'fwsyqrcode',
       component: fwsyqrcode
+    },
+    //测物流查看页面
+    {
+      path: '/wuliu',
+      name: 'wuliu',
+      component: wuliu
     },
   ]
 })
