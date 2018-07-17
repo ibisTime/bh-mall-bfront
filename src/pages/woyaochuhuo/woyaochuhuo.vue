@@ -183,7 +183,7 @@ export default {
         mobile: this.address.mobile,
         quantity: this.prodNum[0],
         productSpecsCode: this.specsList[0].productSpecsCode,
-        signer: this.toUser
+        signer: this.address.receiver
       };
       cloudSend(options).then(res => {
         this.loading = false;

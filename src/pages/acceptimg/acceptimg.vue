@@ -71,6 +71,8 @@ export default {
           margin-top: -2.5rem;
           white-space: nowrap;
           transform: scale(0.9);
+          -ms-transform: scale(0.9);
+          -webkit-transform: scale(0.9);
           margin-left: 3.4rem;
         }
         .impowerDatetime {
@@ -78,6 +80,8 @@ export default {
           margin-top: -2.8rem;
           white-space: nowrap;
           transform: scale(0.9);
+          -ms-transform: scale(0.9);
+          -webkit-transform: scale(0.9);
           margin-left: 3.5rem;
         }
         .level {
