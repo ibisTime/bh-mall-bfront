@@ -67,21 +67,21 @@ export default {
           margin-left: 3rem;
         }
         .shouquanfang {
-          font-size: 0.02rem;
+          font-size: 0.01rem;
           margin-top: -2.5rem;
           white-space: nowrap;
-          transform: scale(0.9);
-          -ms-transform: scale(0.9);
-          -webkit-transform: scale(0.9);
+          /*transform: scale(0.9);*/
+          /*-ms-transform: scale(0.9);*/
+          /*-webkit-transform: scale(0.9);*/
           margin-left: 3.4rem;
         }
         .impowerDatetime {
-          font-size: 0.02rem;
+          font-size: 0.01rem;
           margin-top: -2.8rem;
           white-space: nowrap;
-          transform: scale(0.9);
-          -ms-transform: scale(0.9);
-          -webkit-transform: scale(0.9);
+          /*transform: scale(0.9);*/
+          /*-ms-transform: scale(0.9);*/
+          /*-webkit-transform: scale(0.9);*/
           margin-left: 3.5rem;
         }
         .level {

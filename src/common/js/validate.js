@@ -27,7 +27,7 @@ Validator.extend('idCard', {
 });
 Validator.extend('mobile', {
   getMessage: field => '手机号格式错误',
-  validate: value => /^1[3|4|5|7|8]\d{9}$/.test(value)
+  validate: value => /^1[3|4|5|7|8|9]\d{9}$/.test(value)
 });
 Validator.extend('bankcardNum', {
   getMessage: field => '银行卡格式错误',

@@ -42,8 +42,15 @@ export function noyunfahuo(options) {
     logisticsCode: options.logisticsCode,
     logisticsCompany: options.logisticsCompany,
     pdf: options.pdf
+});
+}
+//申请取消
+export function quXiao(code) {
+  return fetch(627646, {
+    code: code
   });
 }
+
 //根据用户编号查询云仓
 export function getCloud(userId) {
   return fetch(627814, {

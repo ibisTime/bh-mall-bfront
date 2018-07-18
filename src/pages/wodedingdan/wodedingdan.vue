@@ -13,7 +13,7 @@
           <div @click="changeIndex('4')" :class="[index == '4' ? 'active' : '']">
               <i>已收货</i>
           </div>
-          <div @click="changeIndex('5')" :class="[index == '5' ? 'active' : '']">
+          <div @click="changeIndex('0','1')" :class="[index == '0' ? 'active' : '']&&[index == '1' ? 'active' : '']">
               <i class="width">申请取消</i>
           </div>
       </div>
@@ -39,6 +39,8 @@
                     <span>{{item.quantity}}{{item.productSpecsName}}</span><span class="status">{{item.kind == '2' ? '购买云仓' : '云仓提货'}}</span>
                     <div class="shouhuo" @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
                     <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3'">物流信息</div>
+                  <div class="quxiao" @click="shenqingquxiao(item.code)" v-if="item.status == '0'">取消</div>
+                  <div class="quxiao" @click="shenqingquxiao(item.code)" v-if="item.status == '1'">取消</div>
                 </div>
             </div>
       </div>
@@ -47,7 +49,7 @@
 </template>
 <script>
 import Toast from 'base/toast/toast';
-import { queryOrderForm, receiveNromalOrder } from "api/baohuo";
+import { queryOrderForm, receiveNromalOrder,quXiao} from "api/baohuo";
 import { formatDate, formatImg } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 export default {
@@ -136,6 +138,15 @@ export default {
       // this.toastText = '物流单号：'+code+'物流公司：'+company;
       // this.$refs.toast.show();
       this.$router.push('/wuliu?code='+code+'&company='+company);
+    },
+    shenqingquxiao(code){
+      quXiao(code).then(res => {
+          if(res.isSuccess == true){
+            this.toastText = '取消成功';
+            this.$refs.toast.show();
+            window.location.reload()
+          }
+      })
     }
   },
   mounted() {
@@ -274,6 +285,15 @@ export default {
           }
         }
         .wuliu {
+          font-size: 0.3rem;
+          position: absolute;
+          top: 1.15rem;
+          right: 1.2rem;
+          border: 1px solid #333;
+          border-radius: 0.1rem;
+          padding: 0.1rem 0.14rem;
+        }
+        .quxiao {
           font-size: 0.3rem;
           position: absolute;
           top: 1.15rem;
