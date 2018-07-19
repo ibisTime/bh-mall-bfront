@@ -68,7 +68,6 @@ export default {
         let url = "https://open.weixin.qq.com/connect/oauth2/authorize";
         let suffix =
           "&response_type=code&scope=snsapi_userinfo#wechat_redirect";
-
         //发送微信网页授权地址，由此获取code
         setTimeout(() => {
           location.replace(
@@ -140,7 +139,9 @@ export default {
             this.userReferee
         );
       } else if (status == 16) {
-        this.$router.push("/login/login?userId=" + userId);
+
+//          this.$router.push("/login/login?userId=" + userId);
+        this.$router.push("/login/loginBtn?userId=" + userId);
       } else if (status == 18) {
         this.$router.push("/login/supplyInfo?userId=" + userId);
       } else if (status == 6 || status == 5 || status == 11) {
@@ -174,6 +175,12 @@ export default {
     text-align: center;
     margin-top: 2rem;
     font-size: $font-size-medium-xx;
+  }
+  .item{
+    width: 100px;
+    height: 30px;
+    text-align: center;
+    margin: 0 auto;
   }
 }
 </style>

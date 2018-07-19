@@ -3,6 +3,7 @@ import Router from 'vue-router'
 
 //登录页面
 import login from '@/pages/login/login'
+import loginBtn from '@/pages/login/loginBtn'//新增
 import loginAwait from '@/pages/login/loginAwait'
 import replying from '@/pages/login/replying'
 import loginuserReferee from '@/pages/login/loginuserReferee'
@@ -120,6 +121,11 @@ export default new Router({
       path: '/login/login',
       name: 'login',
       component: login
+    },
+    {
+      path: '/login/loginBtn',
+      name: 'loginBtn',
+      component: loginBtn
     },
     {
       path: '/login/supplyInfo',

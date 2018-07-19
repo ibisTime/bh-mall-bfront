@@ -30,7 +30,7 @@
                     <p>{{ item.productName}}</p>
                     <i>￥{{ item.amount/1000}}</i>
                     <span>{{ item.quantity}}瓶</span>
-                    <span class="kind-tip">{{ item.kind == '2' ? '虚拟订单' : '提货订单' }}</span>
+                    <span class="kind-tip">{{ item.kind == '2' ? '云仓订单' : '提货订单' }}</span>
                 </div>
             </div>
             <div class="item clearfix">

@@ -123,11 +123,11 @@ export default {
     },
     shouhuo(code) {
       receiveNromalOrder(code).then(res => {
-        if(res.isSuccess == true) {
+        if (res.isSuccess == true) {
           this.toastText = '收货成功';
           this.$refs.toast.show();
           this.list.map(item => {
-            if(item.code == code) {
+            if (item.code == code) {
               item.status = '4'
             }
           })

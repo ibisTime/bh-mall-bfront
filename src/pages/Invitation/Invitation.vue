@@ -1,6 +1,6 @@
 <template>
   <div class="invitation">
-      <div class="container" v-if = "this.status == '0' || this.status == '7' || this.status == '12' || this.status == '13' || this.status == '14' ||this.status == '15' ||this.status == '17'">
+      <div class="container" v-if = "this.status == '0' || this.status == '7'|| this.status == '12' || this.status == '13' || this.status == '14' ||this.status == '15' ||this.status == '17'">
           <div class="top">
               <div>
                   <!--<span>成功邀请（人）</span>-->
@@ -57,16 +57,17 @@ export default {
     return {
       flag: false,
       // 177
-      wxUrl: "http://mj.bfront.zjqiyu.com?userReferee=",
+//      wxUrl: "http://mj.bfront.zjqiyu.com?userReferee=",
       // 183
-      // wxUrl: "http://front.bhxt.hichengdai.com?userReferee=",
+       wxUrl: "http://front.bhxt.hichengdai.com?userReferee=",
       info: {
         title: "麦记新零售邀请链接",
         desc: "邀请链接",
         link: location.href.split('#')[0],
         imgUrl: "http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg"
       },
-      nickname: ""
+      nickname: "",
+      status:''
     };
   },
   methods: {
@@ -91,6 +92,7 @@ export default {
     console.log(this.status);
     if (isLogin()) {
       let userReferee = getCookie("userId");
+
       this.wxUrl += userReferee;
       //用插件生成二维码
       const container = document.getElementById("qrcode");
