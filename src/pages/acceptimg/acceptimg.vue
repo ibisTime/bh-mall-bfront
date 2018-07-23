@@ -6,8 +6,8 @@
         <span class="name">{{name}}</span>
         <span class="wxId">{{wxId}}</span>
         <span class="level">{{level}}</span>
-        <span class="impowerDatetime">{{impowerDatetime}}</span>
-        <span class="shouquanfang">{{shouquanfang}}</span>
+        <span class="impowerDatetime">{{impowerDatetime.time}}</span>
+        <span class="shouquanfang">{{shouquanfang.quanfang}}</span>
       </div>
     </div>
 </template>
@@ -21,22 +21,26 @@ export default {
             urlImg:'',
             name: '',
             wxId: '',
-            impowerDatetime: '',
-            shouquanfang: '',
+            impowerDatetime: {
+                time: ''
+            },
+            shouquanfang: {
+                quanfang: ''
+            },
             level: '',
             code: ''
         }
     },
     mounted(){
         getAcceptImg('impower_pdf').then(res => {
-            // this.urlImg = res.cvalue
+            // this.urlImg = res.cvalue     //formatDateDate(data.impowerDatetime, 'yyyy/MM/dd');
             this.urlImg = formatImg(res.cvalue);
             getUserById(sessionStorage.getItem('userId')).then((data) => {
               this.code = data.userId;
               this.name = data.realName;
               this.wxId = data.wxId;
-              this.impowerDatetime = formatDateDate(data.impowerDatetime, 'yyyy/MM/dd');
-              this.shouquanfang = '杭州麦记科技有限公司';
+              this.$set(this.impowerDatetime, 'time', formatDateDate(data.impowerDatetime, 'yyyy/MM/dd'));
+              this.$set(this.shouquanfang, 'quanfang', '杭州麦记科技有限公司');
               this.level = data.levelName;
             })
         })
@@ -79,9 +83,9 @@ export default {
           font-size: 0.01rem;
           margin-top: -2.8rem;
           white-space: nowrap;
-          /*transform: scale(0.9);*/
-          /*-ms-transform: scale(0.9);*/
-          /*-webkit-transform: scale(0.9);*/
+          transform: scale(0.8);
+          -ms-transform: scale(0.8);
+          -webkit-transform: scale(0.8);
           margin-left: 3.5rem;
         }
         .level {
