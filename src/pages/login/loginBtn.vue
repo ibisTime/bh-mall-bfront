@@ -1,6 +1,7 @@
 <template>
   <div class="login">
     <img src="../../assets/imgs/loginBtn.png" alt="">
+    <div>抱歉~您还未授权通过！</div>
     <button class="aa" @click="queren()">马上申请成为代理</button>
   </div>
   </template>

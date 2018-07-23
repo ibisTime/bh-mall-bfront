@@ -24,13 +24,13 @@
         <div class="img">
             <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
             <p>上传打款图片（如有多张，请合并上传）</p>
-            <input type="file" class="file" :multiple="multiple" ref="fileInput" @change="fileChange(1,$event)" accept="image/*">
+            <input type="file" class="file" ref="fileInput" @change="fileChange(1,$event)" accept="image/*">
             <div class="item" v-for="(photo,index) in photos" ref="photoItem" @click="choseItem(index)">
                 <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
                 <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
             </div>
         </div>
-        
+
       </div>
       <div class="footer">
         <span @click="upgradeApplica1">提交申请</span>
