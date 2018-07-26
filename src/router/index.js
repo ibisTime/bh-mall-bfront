@@ -5,6 +5,7 @@ import Router from 'vue-router'
 import login from '@/pages/login/login'
 import loginBtn from '@/pages/login/loginBtn'//新增
 import loginAwait from '@/pages/login/loginAwait'
+import toApply from '@/pages/login/toApply'
 import replying from '@/pages/login/replying'
 import loginuserReferee from '@/pages/login/loginuserReferee'
 import reCharge from '@/pages/login/reCharge'
@@ -84,6 +85,8 @@ import fwsyqrcode from '@/pages/fwsyqrcode/fwsyqrcode'
 // 物流信息
 import wuliu from '@/pages/wuliu/wuliu'
 
+//防伪源码
+import antiCounter from '@/pages/anti-counter/antiCounter'
 
 Vue.use(Router)
 
@@ -131,6 +134,11 @@ export default new Router({
       path: '/login/supplyInfo',
       name: 'supplyInfo',
       component: supplyInfo
+    },
+    {
+      path: '/login/toApply',
+      name: 'toApply',
+      component: toApply
     },
     //主页面
     {
@@ -435,5 +443,11 @@ export default new Router({
       name: 'wuliu',
       component: wuliu
     },
+    // 防伪源码页面
+    {
+      path: '/antiCounter',
+      name: 'antiCounter',
+      component: antiCounter
+    }
   ]
 })

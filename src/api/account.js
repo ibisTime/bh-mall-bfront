@@ -130,4 +130,16 @@ export function getSignIntegral(accountNumber, bizType) {
   });
 }
 
-//
+// 防伪码查询
+export function fwAnitCounter(securityCode) {
+  return fetch(627880, {
+    securityCode
+  });
+}
+
+// 溯源码查询
+export function syAnitCounter(traceCode) {
+  return fetch(627881, {
+    traceCode
+  });
+}

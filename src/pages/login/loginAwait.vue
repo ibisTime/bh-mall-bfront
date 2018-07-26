@@ -26,6 +26,13 @@ export default {
       loading: true
     };
   },
+  beforeRouteEnter (to, from, next){
+    if(!getUserId()){
+      next('/login/toApply');
+    }else{
+      next();
+    }
+  },
   mounted() {
     if (!isLogin()) {
       if (/userReferee=([^&]+)&code=([^&]+)&state=/.exec(location.href)) {
@@ -139,8 +146,6 @@ export default {
             this.userReferee
         );
       } else if (status == 16) {
-
-//          this.$router.push("/login/login?userId=" + userId);
         this.$router.push("/login/loginBtn?userId=" + userId);
       } else if (status == 18) {
         this.$router.push("/login/supplyInfo?userId=" + userId);
