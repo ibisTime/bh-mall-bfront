@@ -26,13 +26,18 @@ export default {
       loading: true
     };
   },
-  beforeRouteEnter (to, from, next){
-    if(!getUserId()){
-      next('/login/toApply');
-    }else{
+  /*beforeRouteEnter (to, from, next){
+    if(getUserId()){
       next();
+    }else{
+      let fromPath = from.path.substring(0, 12);
+      if(fromPath === '/antiCounter'){
+        next(from.path);
+      }else{
+        next('/login/toApply');
+      }
     }
-  },
+  },*/
   mounted() {
     if (!isLogin()) {
       if (/userReferee=([^&]+)&code=([^&]+)&state=/.exec(location.href)) {
@@ -56,6 +61,12 @@ export default {
       }catch (e) {
         alert(e);
       }
+    } else if(getCookie("status") == 19) {
+      try {
+        this.goLogin(getUserId(), 19);
+      }catch (e) {
+        alert(e);
+      }
     } else{
       this.checkUser(getUserId());
     }
@@ -75,6 +86,7 @@ export default {
         let url = "https://open.weixin.qq.com/connect/oauth2/authorize";
         let suffix =
           "&response_type=code&scope=snsapi_userinfo#wechat_redirect";
+        /*alert(`${url}?appid=${appId}&redirect_uri=${redirectUri}${suffix}`);*/
         //发送微信网页授权地址，由此获取code
         setTimeout(() => {
           location.replace(

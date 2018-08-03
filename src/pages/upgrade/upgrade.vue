@@ -18,8 +18,19 @@
         <div class="area">
             <span>升级等级</span> <button  @click="chooseLevel" :value='level'>{{level || btntext}}</button>
             <ul :class="[panelLevelShow ? 'show' : 'hidden']" @click="selectLevel($event)">
-                <li v-for="item in levelList" v-if="item.level != 6" :level="item.level" @click="chooseLevel">{{item.name}}</li>
+                <li v-for="item in levelList" v-if="item.level != 6" :level="item.level" @click="chooseLevel(item.isRealName)">{{item.name}}</li>
             </ul>
+        </div>
+        <p v-show="isTeam">团队名称：<input type="text" v-model="myteamName"></p>
+        <p v-show="isIdentity">身份证号：<input type="text" v-model="identity"></p>
+        <div class="img" v-show="isIdentity">
+            <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
+            <p>上传手持身份证照片</p>
+            <input type="file" class="file" ref="fileInput" @change="identityFile(1,$event)" accept="image/*">
+            <div class="item" v-for="(photo,index) in identityPhotos">
+                <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
+                <img class="picture" ref="myIdentityImg" id="myIdentityImg" :src="getIdentitySrc(photo)">
+            </div>
         </div>
         <div class="img">
             <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
@@ -54,7 +65,7 @@ import Loading from "base/loading/loading";
 import { getImgData, formatImg } from "common/js/util";
 import PhotoEdit from "components/photo-edit/photo-edit";
 import { getQiniuToken } from "api/general";
-import EXIF from "exif-js";
+import EXIF from "exif-js";   // Exif.js 提供了 JavaScript 读取图像的原始数据的功能扩展
 const MAX_LENGTH = 12;
 export default {
   name: "upgrade",
@@ -83,11 +94,18 @@ export default {
       currentItem: null,
       text: "",
       photos: [],
+      identityPhotos: [],
       token: "",
       message: "",
       accountNumber: "",
       btntext: "选择你要升级的等级",
-      photos: []
+      mylevel: '',
+      isTeam: false,
+      myteamName: '',
+      isIdentity: false,
+      identity: '',
+      myRealName: -1,
+      realName: false
     };
   },
   created() {
@@ -96,29 +114,50 @@ export default {
   },
   methods: {
     selectLevel(event) {
-      console.log(this.panelLevelShow);
       this.changLevelShow();
       this.panelLevelShow = !this.panelLevelShow;
       this.options.applyLevel = event.target.getAttribute("level");
-      console.log(this.options.applyLevel);
+      if(this.options.applyLevel == 1){
+        this.isTeam = true;
+      }else{
+        this.isTeam = false;
+      }
+      if(this.realName && this.myRealName == 0){
+        this.isIdentity = true;
+      }else{
+        this.isIdentity = false;
+      }
       this.level = event.target.innerHTML;
     },
     changLevelShow() {
       this.panelLevelShow = !this.panelLevelShow;
     },
-    chooseLevel() {
+    chooseLevel(isRealName) {
+      if(this.mylevel == 1){
+        return;
+      }
       this.panelLevelShow = !this.panelLevelShow;
+      if(isRealName == 1){
+        this.realName = true;
+      }else{
+        this.realName = false;
+      }
     },
     btnClick() {
       this.panelLevelShow = !this.panelLevelShow;
       this.btntext1 = this.level;
     },
     upgradeApplica1() {
-      // console.log(this.pdf);
+      if(this.photos.length === 0){
+        return;
+      }
       let options = {};
+      options.teamName = this.myteamName;
       options.highLevel = this.options.applyLevel;
       options.padAmount = this.padAmount * 1000;
       options.payPdf = this.photos[0].key;
+      options.idNo = this.identity;
+      options.inHand = this.identityPhotos[0].key;
       upgradeApplica(options).then(res => {
         if (res.isSuccess) {
           alert("申请成功！");
@@ -182,6 +221,51 @@ export default {
     /**
      * 从相册中选择图片
      * */
+    identityFile(index, e){
+      let files;
+      if (e.dataTransfer) {
+        files = e.dataTransfer.files;
+      } else if (e.target) {
+        files = e.target.files;
+      }
+      let self = this;
+      let len = files.length;
+      let file = files[0];
+      let orientation;
+      console.log(self);
+      EXIF.getData(file, function() {
+        orientation = EXIF.getTag(this, "Orientation");
+      });
+      let reader = new FileReader();
+      reader.onload = function(e) {
+        getImgData(file.type, this.result, orientation, function(data) {
+          let _url = URL.createObjectURL(file);
+          let item = {
+            preview: data,
+            ok: false,
+            type: file.type,
+            key: _url.split("/").pop() + "." + file.name.split(".").pop()
+          };
+          self.identityPhotos.push(item);
+          self
+            .uploadPhoto(data, item.key)
+            .then(() => {
+              item = {
+                ...item,
+                ok: true
+              };
+              self.upIdentityPhotos(item);
+            })
+            .catch(err => {
+              self.onUploadError(err);
+            });
+          if (len === 1) {
+            self.$refs.fileInput.value = null;
+          }
+        });
+      };
+      reader.readAsDataURL(file);
+    },
     fileChange(index, e) {
       let files;
       if (e.dataTransfer) {
@@ -246,6 +330,10 @@ export default {
           break;
         }
       }
+      console.log(this.photos)
+    },
+    upIdentityPhotos(item){
+      this.identityPhotos.push(item);
     },
     deletePhoto(index) {
       this.photos.splice(index, 1);
@@ -265,6 +353,11 @@ export default {
       this.$refs.toast.show();
     },
     getSrc(photo) {
+      let url = photo.preview || formatImg(photo.key);
+      this.pdf = url;
+      return url;
+    },
+    getIdentitySrc(photo){
       let url = photo.preview || formatImg(photo.key);
       this.pdf = url;
       return url;
@@ -292,17 +385,21 @@ export default {
   },
   mounted() {
     getUser().then(res => {
+      this.mylevel = res.level;
       getLevel(res.level).then(info => {
+        this.myRealName = info[0].isRealName;
         res.level = info[0].name;
         this.userInfo = res;
+        getAllLevel().then(res => {
+          this.levelList = res.list.filter(item => {
+            return item.level < this.mylevel;
+          });
+          this.levelList = this.levelList;
+        });
       });
     });
     getAccount().then(res => {
       this.account = res.amount;
-    });
-    getAllLevel().then(res => {
-      this.levelList = res.list;
-      this.levelList = this.levelList;
     });
     getQiniuToken().then(res => {
       this.token = res.uploadToken;
@@ -339,8 +436,9 @@ export default {
     overflow: hidden;
     border-bottom: 1px solid #eee;
     input {
-      border: 0.001rem solid  rgb(145, 135, 135);
-      height: 0.5rem;
+      border: 0.01rem solid  rgb(145, 135, 135);
+      padding: 0.08rem 0.15rem;
+      border-radius: 0.05rem;
     }
     .img {
       margin-top: 0.4rem;
@@ -390,7 +488,7 @@ export default {
       }
       button {
         width: 3rem;
-        height: 0.8rem;
+        height: 0.7rem;
         border-radius: 0.1rem;
         margin-left: 1.5rem;
         font-size: 0.2rem;
@@ -402,7 +500,7 @@ export default {
         background-color: #333;
         position: absolute;
         color: #eee;
-        top: 1rem;
+        top: 0.75rem;
         z-index: 5;
         display: none;
         &.show {

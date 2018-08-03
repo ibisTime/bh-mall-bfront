@@ -6,11 +6,12 @@
   </div>
   </template>
 <script>
-    import { getAppId } from "api/baohuo";
+    import { getAppId, usergo1, usergo2 } from "api/baohuo";
   export default {
     data(){
       return{
-    userId:''
+        userId:'',
+        code: ''
       }
     },
     methods:{
@@ -23,9 +24,6 @@
             getAppId("wx_h5_access_key").then(res => {
                 var appId = res.cvalue;
                 let redirect_uri = `${location.origin}?${location.hash}`;
-                if (this.userReferee) {
-                  redirect_uri += `&userReferee=${this.userReferee}`;
-                }
                 // 获取当前地址
                 let redirectUri = encodeURIComponent(redirect_uri);
                 let url = "https://open.weixin.qq.com/connect/oauth2/authorize";

@@ -67,7 +67,7 @@
             </div>
           </div>
         </form>
-        <button class="btn" @click="apply">申请代理</button>
+        <button class="btn" @click="apply" v-show="!loading">申请代理</button>
         <full-loading :title="title" v-show="loading"></full-loading>
         <toast ref="toast" :text="text"></toast>
     </div>

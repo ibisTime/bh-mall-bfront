@@ -65,16 +65,22 @@ export default {
     methods:{
         sendMoney(){
             this.loading = true;
-            sendMoney(this.accountNumber,this.moneyNum * 1000, this.photos[0].key).then(res => {
-                if (res.code !== '') {
-                    this.photos = [];
-                    this.moneyNum = '';
-                    this.checkUser();
-                } else {
-                    this.text = '提交失败';
-                    this.$refs.toast.show();
-                }
-            }).catch(() => this.loading = false);
+            if(this.photos.length > 0){
+                sendMoney(this.accountNumber,this.moneyNum * 1000, this.photos[0].key).then(res => {
+                    if (res.code !== '') {
+                        this.photos = [];
+                        this.moneyNum = '';
+                        this.checkUser();
+                    } else {
+                        this.text = '提交失败';
+                        this.$refs.toast.show();
+                    }
+                }).catch(() => this.loading = false);
+            }else{
+                this.loading = false
+                this.text = '请上传图片';
+                this.$refs.toast.show();
+            }
         },
         checkUser() {
           checkRed(getUserId()).then(res => {
@@ -204,6 +210,7 @@ export default {
          * 图片上传完成后更新photos
          * */
         updatePhotos(item) {
+            console.log('item:', item);
             for (let i = 0; i < this.photos.length; i++) {
             if (this.photos[i].key === item.key) {
                 this.photos.splice(i, 1, item);

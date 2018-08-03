@@ -57,7 +57,7 @@ export default {
     return {
       flag: false,
       // 177
-//      wxUrl: "http://mj.bfront.zjqiyu.com?userReferee=",
+     // wxUrl: "http://mj.bfront.zjqiyu.com?userReferee=",
       // 183
        wxUrl: "http://front.bhxt.hichengdai.com?userReferee=",
       info: {
@@ -89,7 +89,6 @@ export default {
   },
   mounted() {
     this.status = getCookie('status');
-    console.log(this.status);
     if (isLogin()) {
       let userReferee = getCookie("userId");
 
