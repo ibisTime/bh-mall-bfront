@@ -81,7 +81,7 @@ export default {
       // 判断引入收入支出图片
       img:function(){
           this.list.map(function(item){
-              item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') 
+              item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png')
           })
       }
   }
@@ -90,86 +90,87 @@ export default {
 <style lang="scss" scoped>
 @import "../../common/scss/variable.scss";
     .threshold {
-        .fl{
-            float: left;
+      .fl{
+          float: left;
+      }
+      .header{
+        height: 3.4rem;
+        background: url('../../assets/imgs/background@2x.png');
+        text-align: center;
+        color: #fff;
+        .header-top{
+          height: 2.5rem;
+          padding-top: 0.6rem;
+          .now-balance{
+            font-size: $font-size-small;
+          }
+          .money-balance{
+            font-size: $font-size-large-xxxxx;
+            margin-top: 0.42rem;
+          }
         }
-        .header{
-            height: 3.4rem;
-            background: url('../../assets/imgs/background@2x.png');
+        .header-bottom{
+          height: 0.9rem;
+          background-color: rgba(0, 0, 0, 0.04);
+          font-size: $font-size-medium-x;
+          >div{
+            width: 50%;
+            line-height: 0.9rem;
+            img{
+              width: 0.3rem;
+              margin-right: 0.18rem;
+              vertical-align: text-top;
+            }
+            .line{
+              float: right;
+              width: 1px;
+              height: 0.3rem;
+              background-color: #fff;
+              margin-top: 0.3rem;
+            }
+          }
+        }
+      }
+      .item{
+        height: 1.4rem;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        .center{
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          .item-time{
+            display: inline-block;
+            width: 1.23rem;
+            margin-left: 0.3rem;
             text-align: center;
-            color: #fff;
-            .header-top{
-                height: 2.5rem;
-                padding-top: 0.6rem;
-                .now-balance{
-                    font-size: $font-size-small;
-                }
-                .money-balance{
-                    font-size: $font-size-large-xxxxx;
-                    margin-top: 0.42rem;
-                }
+            .day{
+                font-size: $font-size-medium-xx;
+                color: #333;
             }
-            .header-bottom{
-                height: 0.9rem;
-                background-color: rgba(0, 0, 0, 0.04);
-                font-size: $font-size-medium-x;
-                >div{
-                    width: 50%;
-                    line-height: 0.9rem;
-                    img{
-                        width: 0.3rem;
-                        margin-right: 0.18rem;
-                        vertical-align: text-top;
-                    }
-                    .line{
-                        float: right;
-                        width: 1px;
-                        height: 0.3rem;
-                        background-color: #fff;
-                        margin-top: 0.3rem;
-                    }
-                }
+            .minute{
+                font-size: $font-size-small;
+                color: #999;
+                margin-top: 0.16rem;
             }
+          }
+          img{
+            width: 0.72rem;
+          }
+          .detail{
+            display: inline-block;
+            width: 3.9rem;
+            .datail-money{
+                font-size: $font-size-large-s;
+                color: #fe8472;
+            }
+            .detail-text{
+                margin-top: 0.22rem;
+                font-size: $font-size-small;
+                color: #333;
+            }
+          }
         }
-        .item{
-            height: 1.4rem;
-            border-bottom: 1px solid #eee;
-            position: relative;
-            .center{
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                .item-time{
-                    display: inline-block;
-                    width: 1.23rem;
-                    margin-left: 0.3rem;
-                    text-align: center;
-                    .day{
-                        font-size: $font-size-medium-xx;
-                        color: #333;
-                    }
-                    .minute{
-                        font-size: $font-size-small;
-                        color: #999;
-                        margin-top: 0.16rem;
-                    }
-                }
-                img{
-                    width: 0.72rem;
-                }
-                .detail{
-                    display: inline-block;
-                    .datail-money{
-                        font-size: $font-size-large-s;
-                        color: #fe8472;
-                    }
-                    .detail-text{
-                        margin-top: 0.22rem;
-                        font-size: $font-size-small;
-                        color: #333;
-                    }
-                }
-            }
-        }
+      }
     }
 </style>

@@ -92,7 +92,6 @@ import { getCookie, setCookie } from "common/js/cookie";
 import CityPicker from "base/city-picker/city-picker";
 import { getQiniuToken } from "api/general";
 import { getUser, getUserByMobile } from 'api/user';
-import BScroll from "better-scroll";
 import EXIF from "exif-js";
 import Qiniu from "base/qiniu/qiniu";
 import Toast from "base/toast/toast";
@@ -119,8 +118,8 @@ export default {
         realName: "",
         wxId: "",
         idNo: "",
-        idBehind: '',
-        idFront: '',
+        // idBehind: '',
+        // idFront: '',
         idHand: '',
         introducer: ''
       },
@@ -148,7 +147,7 @@ export default {
   mounted() {
     this.options.userId = this.$route.query.userId;
     this.options.userId && setCookie("userId", this.options.userId);
-    this.options.userReferee = this.$route.query.userReferee;
+    // this.options.userReferee = this.$route.query.userReferee;
     Promise.all([
       getUser(),
       getAllLevel1()

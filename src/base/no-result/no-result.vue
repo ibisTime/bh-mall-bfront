@@ -1,5 +1,5 @@
 <template>
-  <div class="no-result">
+  <div class="no-result full-screen-wrapper">
     <div class="no-result-icon" :style="getImg()"></div>
     <p class="no-result-text">{{title}}</p>
     <slot></slot>

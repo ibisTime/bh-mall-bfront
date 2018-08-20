@@ -50,8 +50,8 @@ import {
   acceptAgent,
   ignoreAgent,
   getLevel,
-  getMySub,
-  queryManager
+  getMySub
+  // queryManager
 } from "api/baohuo";
 import { getUserById } from "api/user";
 import toast from "base/toast/toast";
@@ -66,7 +66,7 @@ export default {
       options: {
         userId: "",
         toUserId: "",
-        manager: ""
+        // manager: ""
       },
       maskShow: false,
       panelLevelShow: false,
@@ -147,9 +147,9 @@ export default {
     });
 
     //查询管理员
-    queryManager().then(res => {
-      this.options.manager = res.list[0].code;
-    });
+    // queryManager().then(res => {
+    //   this.options.manager = res.list[0].code;
+    // });
   },
   components: {
     toast

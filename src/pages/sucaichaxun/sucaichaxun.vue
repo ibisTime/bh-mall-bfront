@@ -48,7 +48,7 @@ export default {
         },
         check(){
             queryFodder(this.num).then(res => {
-                console.log(res)
+                // console.log(res)
                 res.list.map(function(item){
                     item.pic = formatImg(item.pic)
                 })

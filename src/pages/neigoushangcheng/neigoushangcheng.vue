@@ -34,7 +34,7 @@ export default {
   },
   mounted(){
       let level = getCookie('level')
-      queryProduct(level).then(res => {
+      queryProduct({level: level}).then(res => {
           res.list.map(function(item){
               item.pic = formatImg(item.pic)
           })

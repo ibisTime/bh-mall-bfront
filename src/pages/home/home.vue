@@ -198,6 +198,11 @@ export default {
           text: "介绍奖励",
           src: require("../../assets/imgs/jieshaojiangli@2x.png"),
           to: "/jieshaojiangli"
+        },
+        {
+          text: "微店账户",
+          src: require("../../assets/imgs/weidianzhanghu.png"),
+          to: "/weidianzhanghu"
         }
       ],
 
@@ -219,9 +224,20 @@ export default {
           to: "/woyaochuhuo"
         },
         {
-          text: "我的订单",
+          // text: "我的订单",
+          text: "云仓订单",
           src: require("../../assets/imgs/wodedingdan@2x.png"),
           to: "/wodedingdan"
+        },
+        {
+          text: "出货订单",
+          src: require("../../assets/imgs/daichulidingdan@2x.png"),
+          to: "/chuhuodingdan"
+        },
+        {
+          text: "购物车",
+          src: require("../../assets/imgs/cart.png"),
+          to: "/cart"
         }
       ],
 
@@ -237,11 +253,11 @@ export default {
           src: require("../../assets/imgs/sucaichaxun@2x.png"),
           to: "/sucaichaxun"
         },
-        {
-          text: "待处理订单",
-          src: require("../../assets/imgs/daichulidingdan@2x.png"),
-          to: "/daichulidingdan"
-        }
+        // {
+        //   text: "待处理订单",
+        //   src: require("../../assets/imgs/daichulidingdan@2x.png"),
+        //   to: "/daichulidingdan"
+        // }
       ],
 
       //内购商城
@@ -268,22 +284,22 @@ export default {
         {
           text: "我的介绍",
           src: require("../../assets/imgs/wodejieshao@2x.png"),
-          to: "/my-templet"
+          to: "/my-introduction"
         },
         {
           text: "我的推荐",
           src: require("../../assets/imgs/wodetuijian@2x.png"),
-          to: "/home/contact-business"
+          to: "/my-recommend"
         },
         {
           text: "我的出货",
           src: require("../../assets/imgs/wodechuhuo@2x.png"),
-          to: "/home/contact-business"
+          to: "/my-chuhuo"
         },
         {
           text: "差价利润",
           src: require("../../assets/imgs/chajialirun@2x.png"),
-          to: "/home/contact-business"
+          to: "/profit"
         }
       ],
       userinfo: "",
@@ -310,13 +326,11 @@ export default {
     }
     getUser1(userId).then(res => {
       this.userinfo = res;
+      this.balance = res.wareAmount;
       setCookie("level", res.level);
       getLevel(res.level).then(item => {
         res.level = item[0].name;
       });
-    });
-    getBill().then(res => {
-      this.balance = res.length ? res[0].amount : 0;
     });
   }
 };

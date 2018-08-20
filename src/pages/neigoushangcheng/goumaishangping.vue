@@ -42,7 +42,10 @@ export default {
       })
       let level = getCookie('level')
       let code = this.$route.query.code
-      productDetail(code,level).then(res => {
+      productDetail({
+        level: level,
+        code: code
+      }).then(res => {
       })
   },
 }

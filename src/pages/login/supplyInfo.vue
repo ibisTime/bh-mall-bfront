@@ -215,13 +215,20 @@ export default {
               this.loading = true;
               this.title = '提交中...';
               // isRealName(this.userId).then(res => {
-                  console.log(this.isRealNameShow);
+              //     console.log(this.isRealNameShow);
                   if(this.isRealNameShow) {
                       // 需要实名
                       if(this.idNo && this.photos3.length && this.photos3[0].key) {
-                          console.log(this.photos3[0].key);
-                          supplyInfo('1', this.idNo, this.introducer,this.photos3[0].key,
-                            this.teamName, this.applyLevel, this.userId).then(res => {
+                          // console.log(this.photos3[0].key);
+                          supplyInfo({
+                            idKind: '1',
+                            idNo: this.idNo,
+                            introducer: this.introducer,
+                            idHand: this.photos3[0].key,
+                            teamName: this.teamName,
+                            applyLevel: this.applyLevel,
+                            userId: this.userId
+                          }).then(res => {
                               this.loading = false;
                               if(res.code !== '') {
                                   this.text = '提交成功，待审核'
@@ -248,8 +255,15 @@ export default {
                       if(!this.introducer) {
                           this.introducer = ''
                       }
-                      supplyInfo('1', this.idNo, this.introducer, this.photos333,
-                        this.teamName, this.applyLevel, this.userId).then(res => {
+                      supplyInfo({
+                        idKind: '1',
+                        idNo: this.idNo,
+                        introducer: this.introducer,
+                        idHand: this.photos333,
+                        teamName: this.teamName,
+                        applyLevel: this.applyLevel,
+                        userId: this.userId
+                      }).then(res => {
                           this.loading = false;
                           if(res.code !== '') {
                               this.text = '提交成功，待审核';

@@ -13,6 +13,9 @@
     userId:''
       }
     },
+    mounted() {
+      alert(999);
+    },
     methods:{
      queren:function () {
        this.userId = this.$route.query.userId;//获取userId

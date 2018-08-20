@@ -4,14 +4,14 @@
             <img src="../../assets/imgs/more@2x.png" class="right">
             <img src="../../assets/imgs/shouhuodizhi@2x.png" class="left">
             <p class="name-mobile">
-                <span>姓名：{{address.receiver}}</span>
-                <i>电话：{{address.mobile}}</i>
+                <span>姓名：{{address ? address.receiver : ''}}</span>
+                <i>电话：{{address ? address.mobile : ''}}</i>
             </p>
             <p class="address">
                 收货地址：
-                <i>{{address.province}}</i>
-                <i>{{address.city}}</i>
-                <i>{{address.area}}</i> {{address.address}}
+                <i>{{address ? address.province : ''}}</i>
+                <i>{{address ? address.city : ''}}</i>
+                <i>{{address ? address.area : ''}}</i> {{address ? address.address : ''}}
             </p>
         </div>
         <div class="item" v-for="(item, index) in list">

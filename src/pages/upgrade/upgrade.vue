@@ -76,7 +76,7 @@ export default {
       levelList: [],
       level: "",
       userInfo: {},
-      text: "",
+      text: '',
       account: 0,
       options: {
         address: "",
@@ -133,6 +133,7 @@ export default {
       this.panelLevelShow = !this.panelLevelShow;
     },
     chooseLevel(isRealName) {
+      console.log(isRealName);
       if(this.mylevel == 1){
         return;
       }
@@ -157,10 +158,18 @@ export default {
       options.padAmount = this.padAmount * 1000;
       options.payPdf = this.photos[0].key;
       options.idNo = this.identity;
-      options.inHand = this.identityPhotos[0].key;
+      console.log(this.isIdentity);
+      // if(this.isIdentity) {
+      //   options.inHand = this.identityPhotos[0].key;
+      // }
+      options.idHand = this.identityPhotos[0].key;
       upgradeApplica(options).then(res => {
         if (res.isSuccess) {
-          alert("申请成功！");
+          this.text = '申请成功，待上级审核';
+          this.$refs.mytoast.show();
+          setTimeout(() => {
+            this.$router.push('/home');
+          }, 500);
         }
         res.isReset && alert(res.isReset);
       });
@@ -386,9 +395,15 @@ export default {
   mounted() {
     getUser().then(res => {
       this.mylevel = res.level;
-      getLevel(res.level).then(info => {
-        this.myRealName = info[0].isRealName;
-        res.level = info[0].name;
+      getLevel().then(info => {
+        info.map((item) => {
+          if(res.level === item.level) {
+            this.myRealName = item.isRealName;
+            res.level = item.name;
+          }
+        });
+        // this.myRealName = info[0].isRealName;
+        // res.level = info[0].name;
         this.userInfo = res;
         getAllLevel().then(res => {
           this.levelList = res.list.filter(item => {

@@ -70,7 +70,9 @@ export default {
         if(res.code) {
           this.text = "操作成功";
           this.$refs.mytoast.show();
-          this.$router.push('/yejizhanghu');
+          setTimeout(() => {
+            this.$router.back();
+          }, 500)
         }
       });
     },

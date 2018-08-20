@@ -1,6 +1,6 @@
 <template>
   <div class="invitation">
-      <div class="container" v-if = "this.status == '0' || this.status == '7'|| this.status == '12' || this.status == '13' || this.status == '14' ||this.status == '15' ||this.status == '17'">
+      <div class="container" >
           <div class="top">
               <div>
                   <!--<span>成功邀请（人）</span>-->
@@ -47,7 +47,7 @@
 //二维码插件引入
 import { inquireConfig } from "api/baohuo";
 import { initShare } from "common/js/weixin";
-import { getCookie } from "common/js/cookie.js";
+import { getCookie } from "common/js/cookie";
 import { isLogin } from "common/js/util";
 import { getUser } from "api/user";
 const QRCode = require("js-qrcode");
@@ -89,6 +89,7 @@ export default {
   },
   mounted() {
     this.status = getCookie('status');
+    console.log(this.status);
     if (isLogin()) {
       let userReferee = getCookie("userId");
 

@@ -34,10 +34,10 @@ export default {
     loginOut(){
       userExit().then(res => {
         if(res.isSuccess){
-          this.text = '申请成功'
+          this.text = '申请成功';
           this.$refs.mytoast.show()
         }else{
-          this.text = '申请失败'
+          this.text = '申请失败';
           this.$refs.mytoast.show()
         }
       })

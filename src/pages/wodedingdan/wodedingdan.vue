@@ -4,22 +4,19 @@
           <div @click="changeIndex('')" :class="[index == '' ? 'active' : '']">
               <i>全部</i>
           </div>
-          <div @click="changeIndex('2')" :class="[index == '2' ? 'active' : '']">
-              <i>待发货</i>
+          <div @click="changeIndex('0')" :class="[index == '0' ? 'active' : '']">
+              <i>待支付</i>
           </div>
-          <div @click="changeIndex('3')" :class="[index == '3' ? 'active' : '']">
-              <i>已发货</i>
-          </div>
-          <div @click="changeIndex('4')" :class="[index == '4' ? 'active' : '']">
+          <div @click="changeIndex('1')" :class="[index == '1' ? 'active' : '']">
               <i>已收货</i>
           </div>
-          <div @click="changeIndex('0','1')" :class="[index == '0' ? 'active' : '']&&[index == '1' ? 'active' : '']">
+          <div @click="changeIndex('2')" :class="[index == '2' ? 'active' : '']">
               <i class="width">申请取消</i>
           </div>
       </div>
       <div class="item clearfix" v-for="(item,index) in list">
             <div class="top clearfix">
-                <span class="user">提交人：{{item.user.realName || item.user.nickName}}（{{item.user.mobile}}）</span>
+                <span class="user">提交人：{{item.realName || item.nickName}}（{{item.agent.mobile}}）</span>
                 <span class="status">{{status[item.status]}}</span>
             </div>
             <div class="info" :class="{ active: heightActive === index }" ref="divInfo">
@@ -40,7 +37,7 @@
                     <div class="shouhuo" @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
                     <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3'">物流信息</div>
                   <div class="quxiao" @click="shenqingquxiao(item.code)" v-if="item.status == '0'">取消</div>
-                  <div class="quxiao" @click="shenqingquxiao(item.code)" v-if="item.status == '1'">取消</div>
+                  <!--<div class="quxiao" @click="shenqingquxiao(item.code)" v-if="item.status == '1'">取消</div>-->
                 </div>
             </div>
       </div>
@@ -49,9 +46,10 @@
 </template>
 <script>
 import Toast from 'base/toast/toast';
-import { queryOrderForm, receiveNromalOrder,quXiao} from "api/baohuo";
+import { queryYunOrder, receiveNromalOrder, cencelCloudOrder} from "api/baohuo";
 import { formatDate, formatImg } from "common/js/util";
 import { getUser, getUserById } from "api/user";
+import { getDictList } from 'api/general';
 export default {
   data() {
     return {
@@ -59,15 +57,7 @@ export default {
       list: [],
       hightShow: false,
       num: "",
-      status: [
-        "待支付",
-        "已支付待审核",
-        "已审单待发货",
-        "待收货",
-        "已收货",
-        "申请取消",
-        "已取消"
-      ],
+      status: {},
       heightActive: '',
       toastText: ''
     };
@@ -84,42 +74,25 @@ export default {
       return formatImg(img);
     },
     check() {
-      if (this.index == 2) {
-        queryOrderForm([1, 2]).then(res => {
-          if (res.list.length <= 1) {
-            console.log(this.$refs.divInfo);
-          }
-          res.list.forEach(function(item) {
-            //格式化时间
-            res.applyDatetime = formatDate(res.applyDatetime);
-          });
-
-          this.list = res.list;
-        });
-      }  else if (this.index == ''){
-        queryOrderForm([]).then(res => {
-          if (res.list.length <= 1) {
-            console.log(this.$refs.divInfo);
-          }
-          res.list.map(function(item) {
-            //格式化时间
-            res.applyDatetime = formatDate(res.applyDatetime);
-          });
-          console.log(res.list);
-          this.list = res.list;
-        });
-      }else {
-        queryOrderForm([this.index]).then(res => {
-          if (res.list.length <= 1) {
-            console.log(this.$refs.divInfo);
-          }
-          res.list.map(function(item) {
-            //格式化时间
-            res.applyDatetime = formatDate(res.applyDatetime);
-          });
-          this.list = res.list;
-        });
+      let params;
+      if(this.index == '') {
+        params = '';
+      } else {
+        params = this.index;
       }
+      queryYunOrder(params).then(res => {
+        if (res.list.length <= 1) {
+        }
+        res.list.map(function () {
+          res.applyDatetime = formatDate(res.applyDatetime);
+        });
+        this.list = res.list;
+      });
+      getDictList('in_order_status').then((res) => {
+        res.map((item) => {
+          this.status[item.dkey] = item.dvalue;
+        });
+      })
     },
     shouhuo(code) {
       receiveNromalOrder(code).then(res => {
@@ -140,7 +113,7 @@ export default {
       this.$router.push('/wuliu?code='+code+'&company='+company);
     },
     shenqingquxiao(code){
-      quXiao(code).then(res => {
+      cencelCloudOrder(code).then(res => {
           if(res.isSuccess == true){
             this.toastText = '取消成功';
             this.$refs.toast.show();
@@ -170,7 +143,7 @@ export default {
     background-color: #fff;
     > div {
       float: left;
-      width: 20%;
+      width: 25%;
       height: 0.9rem;
       position: relative;
       i {

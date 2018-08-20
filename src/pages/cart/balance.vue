@@ -1,26 +1,12 @@
 <template>
     <div class="goumaishangping">
-        <!-- <div class="top" @click="$router.push('/dizhi?address=' + 2)">
-            <img src="../../assets/imgs/more@2x.png" class="right">
-            <img src="../../assets/imgs/shouhuodizhi@2x.png" class="left">
-            <p class="name-mobile">
-                <span>姓名：{{address.receiver ? address.receiver : ''}}</span>
-                <i>电话：{{address.mobile ? address.mobile : ''}}</i>
-            </p>
-            <p class="address">
-                收货地址：
-                <i>{{address.province ? address.province : ''}}</i>
-                <i>{{address.city ? address.city : ''}}</i>
-                <i>{{address.area ? address.area : ''}}</i> {{address.address ? address.address : ''}}
-            </p>
-        </div> -->
-        <div class="item">
-            <img :src="thingInfo.pic" alt="">
-            <div class="content" v-if="thingInfo.specs">
-                <p>{{thingInfo.name}}</p>
-                <p>规格：{{thingInfo.specs.name}}</p>
-                <i>￥{{thingInfo.specsPrice.price / 1000}}</i>
-                <span>X{{number}}</span>
+        <div class="item" v-for="item in list">
+            <img :src="formatImg(item.pic)" alt="">
+            <div class="content">
+                <p>{{item.name}}</p>
+                <p>规格：{{item.specsName}}</p>
+                <i>￥{{item.price / 1000}}</i>
+                <span>X{{item.quantity}}</span>
             </div>
         </div>
         <div class="word">
@@ -40,9 +26,9 @@
                 <img :class="['xuanzhong', status == 1 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
             </div>
         </div>
-        <div class="footer" v-if="thingInfo.specs">
+        <div class="footer">
             <div class="f-left">
-                <span class="price">￥{{thingInfo.specsPrice.price * number / 1000}}</span>
+                <span class="price">￥{{formatAmount(totalAmount)}}</span>
                 <span class="total">总计：</span>
             </div>
             <div class="f-right" @click="buy">确认购买</div>
@@ -54,14 +40,13 @@
 </template>
 <script>
 import {
-  queryAddressDetail,
-  queryDefaultAddress,
   palceOrder,
   shopBill,
   cloudPayment,
   productDetail,
   cloudBill,
-  productDetailBySpec
+  productDetailBySpec,
+  orderDetail
 } from "api/baohuo";
 import { setCookie, getCookie } from "common/js/cookie.js";
 import { formatImg, getUserId, formatAmount } from "common/js/util";
@@ -83,38 +68,31 @@ export default {
       confirmBtnText: '确定',
       userinfo: {},
       options: {},
-      address: {},
       code: "",
       thingInfo: [],
       number: "",
       productSpecsCode: "",
       status: 0,
       orderCode: '',
-      codeList: []
+      codeList: [],
+      list: [],
+      totalAmount: 0
     };
   },
   methods: {
+    formatImg(img) {
+      return formatImg(img);
+    },
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     changeStatus(status) {
       this.status = status;
     },
     buy() {
       this.title = "提交中...";
       this.loading = true;
-      let code = this.$route.query.code;
-      let options = {
-        address: this.address.address,
-        area: this.address.area,
-        city: this.address.city,
-        mobile: this.address.mobile,
-        province: this.address.province,
-        signer: this.address.code,
-        productSpecsCode: this.productSpecsCode,
-        quantity: this.number,
-        applyNote: this.applyNote,
-        toUser: this.$route.query.highUserId
-      };
-      this.codeList = this.orderCode.split(',');
-      cloudPayment(this.codeList, this.status).then(data => {
+      cloudPayment(this.orderCode, this.status).then(data => {
         if (this.status === 0) {
           this.success();
         } else if (this.status === 1) {
@@ -188,31 +166,45 @@ export default {
     }
   },
   mounted() {
+    this.orderCode = this.$route.query.orderCode.split(',');
+    console.log(this.orderCode);
+    this.orderCode.map((item) => {
+      orderDetail({code: item}).then((res) => {
+        console.log(res);
+        this.list.push({
+          pic: res.product.advPic,
+          productName: res.productName,
+          specsName: res.specsName,
+          quantity: res.quantity,
+          price: res.price
+        })
+        this.totalAmount += res.quantity * res.price;
+      })
+    });
+    // console.log(list[0]);
     //获取用户等级
-    let level = getCookie("level");
-    let code = this.$route.query.code;
-    this.orderCode = this.$route.query.orderCode;
-    this.code = code;
-    let number = this.$route.query.number;
-    let specsCode = this.$route.query.specsCode;
-    this.number = number;
-    setCookie("yuncangshuliang", this.number);
-    setCookie("yuncangcode", this.code);
-    let info = {
-      level: level,
-      specsCode: specsCode
-    };
-    this.loading = true;
-    Promise.all([
-      productDetailBySpec(info),
-      queryDefaultAddress()
-    ]).then(([item, res]) => {
-      this.loading = false;
-      item.pic = formatImg(item.pic);
-      this.thingInfo = item;
-      this.productSpecsCode = item.specs.code;
-      this.address = res.length ? res[0] : {};
-    }).catch(() => this.loading = false);
+    // let level = getCookie("level");
+    // let code = this.$route.query.code;
+    //
+    // this.code = code;
+    // let number = this.$route.query.number;
+    // let specsCode = this.$route.query.specsCode;
+    // this.number = number;
+    // setCookie("yuncangshuliang", this.number);
+    // setCookie("yuncangcode", this.code);
+    // let info = {
+    //   level: level,
+    //   specsCode: specsCode
+    // };
+    // this.loading = true;
+    // Promise.all([
+    //   productDetailBySpec(info),
+    // ]).then((item) => {
+    //   this.loading = false;
+    //   item.pic = formatImg(item.pic);
+    //   this.thingInfo = item;
+    //   this.productSpecsCode = item.specs.code;
+    // }).catch(() => this.loading = false);
   },
   components: {
     Toast,
@@ -255,11 +247,6 @@ export default {
     p {
       font-size: $font-size-medium;
       color: #333;
-      &.address {
-        margin-top: 0.24rem;
-        font-size: $font-size-small;
-        line-height: 0.4rem;
-      }
     }
   }
   .item {

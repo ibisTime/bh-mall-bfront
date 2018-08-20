@@ -28,7 +28,7 @@ export default {
         recharge(){
             transfer({
               amount: this.moneyNum * 1000,
-              fromAccount: 'TX_CNY',
+              fromAccount: 'C_CNY',
               toAccount: 'MK_CNY'
             }).then(res => {
                 console.log(this.moneyNum)

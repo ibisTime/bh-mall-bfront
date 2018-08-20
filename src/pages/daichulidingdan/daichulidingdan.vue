@@ -13,7 +13,7 @@
       </div>
       <div class="item clearfix" v-for="(item, index) in list">
             <div class="top clearfix">
-                <span class="user">提交人：{{item.user.realName}}</span>
+                <span class="user">提交人：{{item.realName}}</span>
                 <span class="status">{{status[item.status]}}</span>
             </div>
             <div class="info" :class="{ height: curIdx === index }" ref="divInfo">
@@ -22,7 +22,7 @@
                 <p>订单类型：{{item.kind}}</p>
                 <p>下单时间：{{item.applyDatetime}}</p>
                 <p>收货人：{{item.signer}}{{item.mobile}}</p>
-                <p>收货地址：<i>{{item.user.province}}</i><i>{{item.user.city}}</i><i>{{item.user.area}}</i><i>{{ item.user.address}}</i></p>
+                <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{ item.address}}</i></p>
             </div>
             <div class="pic">
                 <img :src="item.pic" alt="">
@@ -163,11 +163,11 @@ export default {
       this.curIdx = this.curIdx === index ? '' : index;
     },
     check() {
-      var status = [];
-      if (this.index == "2") {
-        var status = [1, 2];
-      } else if (this.index == '5') {
-        var status = [5];
+      let status = [];
+      if (this.index === "2") {
+        status = [1, 2];
+      } else if (this.index ==='5') {
+        status = [5];
       }
       queryOrderForm1(status).then(res => {
         res.list.map(function(item) {
@@ -176,6 +176,7 @@ export default {
           //格式化时间
           item.applyDatetime = formatDate(item.applyDatetime);
         });
+        console.log(res.list);
         this.list = res.list;
       });
     }

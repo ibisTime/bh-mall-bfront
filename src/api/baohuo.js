@@ -22,6 +22,13 @@ export function getPerformance(userId) {
         currency: 'TX_CNY'
     });
 }
+//获取C端账户
+export function getCaccount(info) {
+  return fetch(627453, {
+    userId: getUserId(),
+    currency: info.currency
+  });
+}
 //待处理订单发货
 export function yunfahuo(options) {
     return fetch(627645, {
@@ -44,11 +51,17 @@ export function noyunfahuo(options) {
         pdf: options.pdf
     });
 }
-//申请取消
-export function quXiao(code) {
-    return fetch(627646, {
+//申请取消云仓订单
+export function cencelCloudOrder(code) {
+    return fetch(627903, {
         code: code
     });
+}
+//申请取消出货订单
+export function cencelChuHuoOrder(code) {
+  return fetch(627646, {
+    code: code
+  });
 }
 
 //根据用户编号查询云仓
@@ -83,9 +96,9 @@ export function queryBill(accountNumber) {
     });
 }
 
-// 获取代理轨迹
+// 获取代理轨迹（627358）
 export function getTrack() {
-    return fetch(627358, {
+    return fetch(627365, {
         limit: '100',
         start: '1',
         userId: getUserId()
@@ -110,7 +123,7 @@ export function getStructure(userId) {
 
 //我的下级
 export function getMySub() {
-    return fetch(627350, {
+    return fetch(627320, {
         limit: '100',
         start: '0',
         userId: getUserId(),
@@ -118,14 +131,14 @@ export function getMySub() {
 }
 
 export function getUserStatu(userId) {
-    return fetch(627357, {
+    return fetch(627327, {
         userId: userId
     })
 }
 
 //我的下级==按照等级
 export function getLevelSub(level) {
-    return fetch(627350, {
+    return fetch(627320, {
         limit: '100',
         start: '0',
         userId: getUserId(),
@@ -135,7 +148,7 @@ export function getLevelSub(level) {
 
 //我的下级==按照关键字
 export function getKeywordSub(level, keyword) {
-    return fetch(627350, {
+    return fetch(627320, {
         limit: '100',
         start: '0',
         userId: getUserId(),
@@ -184,28 +197,29 @@ export function getPercent(ckey) {
     });
 }
 
-//申请代理  传入一个对象（包含推荐人）
+//申请代理  传入一个对象（包含推荐人）（627251）
 export function replyAgent(options) {
-    return fetch(627251, {
-        address: options.address,
-        area: options.district,
-        city: options.city,
-        applyLevel: options.applyLevel,
-        mobile: options.mobile,
-        province: options.province,
-        realName: options.realName,
-        wxId: options.wxId,
-        userId: options.userId,
-        idBehind: options.idBehind,
-        idFront: options.idFront,
-        idHand: options.idHand,
-        idNo: options.idNo,
-        idKind: '1',
-        introducer: options.introducer,
-        payPdf: options.payPdf,
-        userReferee: options.userReferee,
-        fromInfo: '微信推荐',
-        teamName: options.teamName
+    return fetch(627270, {
+      address: options.address,
+      applyLevel: options.applyLevel,
+      area: options.district,
+      city: options.city,
+      // fromInfo: '微信推荐',
+      idHand: options.idHand,
+      idKind: '1',
+      idNo: options.idNo,
+      introducer: options.introducer,
+      mobile: options.mobile,
+      province: options.province,
+      realName: options.realName,
+
+      wxId: options.wxId,
+      userId: options.userId,
+      // idBehind: options.idBehind,
+      // idFront: options.idFront,
+      // payPdf: options.payPdf,
+      // userReferee: options.userReferee,
+      teamName: options.teamName
     });
 }
 
@@ -234,27 +248,18 @@ export function userLogin(loginName, loginPwd) {
     });
 }
 
-//用户注册
-export function userRegister(loginName, loginPwd) {
-    return fetch(627301, {
-        loginName: loginName,
-        loginPwd: loginPwd,
-        kind: 'P'
-    });
-}
-
-//代理查询（意向代理，审核代理）
+//代理查询（意向代理，审核代理）（627353）
 export function intentional(status) {
-    return fetch(627353, {
+    return fetch(627325, {
         status: status,
         userId: getUserId(),
         start: 1,
         limit: 100,
     });
 }
-
+// 分页查待审核代理（627361）
 export function agent(status) {
-    return fetch(627361, {
+    return fetch(627285, {
         status: status,
         userId: getUserId(),
         start: 1,
@@ -263,7 +268,7 @@ export function agent(status) {
 }
 //登录
 export function usergo1(code) {
-    return fetch(627301, {
+    return fetch(627310, {
         code: code
     });
 }
@@ -274,7 +279,7 @@ export function checkRed(userId) {
     })
 }
 export function usergo2(code, userReferee) {
-    return fetch(627301, {
+    return fetch(627310, {
         code: code,
         userReferee: userReferee
     });
@@ -282,7 +287,7 @@ export function usergo2(code, userReferee) {
 
 //申请退出
 export function userExit(code) {
-    return fetch(627256, {
+    return fetch(627274, {
         userId: getUserId(),
     });
 }
@@ -291,7 +296,7 @@ export function userExit(code) {
 export function allotAgent(options) {
     return fetch(627252, {
         approver: getUserId(),
-        manager: options.manager,
+        // manager: options.manager,
         userId: options.userId,
         toUserId: options.toUserId
     });
@@ -307,7 +312,7 @@ export function queryManager() {
 
 //接受
 export function acceptAgent(userId) {
-    return fetch(627253, {
+    return fetch(627254, {
         approver: getUserId(),
         userId: userId,
     });
@@ -315,15 +320,15 @@ export function acceptAgent(userId) {
 
 //忽略
 export function ignoreAgent(userId) {
-    return fetch(627254, {
+    return fetch(627256, {
         approver: getUserId(),
         userId: userId,
     });
 }
 
-//审核授权
+//审核授权(627257)
 export function accredit(userId, result, remark) {
-    return fetch(627257, {
+    return fetch(627273, {
         result,
         userId,
         remark,
@@ -333,7 +338,7 @@ export function accredit(userId, result, remark) {
 
 //审核升级
 export function upgrade(userId, result, remark) {
-    return fetch(627263, {
+    return fetch(627292, {
         result,
         userId,
         remark,
@@ -343,20 +348,20 @@ export function upgrade(userId, result, remark) {
 
 //升级申请
 export function upgradeApplica(options) {
-    return fetch(627262, {
-        teamName: options.teamName,
-        highLevel: options.highLevel,
-        padAmount: options.padAmount,
-        payPdf: options.payPdf,
-        idNo: options.idNo,
-        inHand: options.inHand,
-        userId: getUserId()
+    return fetch(627290, {
+      highLevel: options.highLevel,
+      idNo: options.idNo || '',
+      idHand: options.idHand || '',
+      padAmount: options.padAmount,
+      payPdf: options.payPdf,
+      teamName: options.teamName || '',
+      userId: getUserId()
     })
 }
 
-//审核取消授权
+//审核取消授权（627258）
 export function accreditCancel(userId, result, remark) {
-    return fetch(627258, {
+    return fetch(627276, {
         userId,
         result,
         remark,
@@ -365,12 +370,13 @@ export function accreditCancel(userId, result, remark) {
 }
 
 //分页查询产品
-export function queryProduct(level, status) {
+export function queryProduct(info) {
     return fetch(627555, {
-        start: 0,
-        limit: 100,
-        level: level,
-        status: status || ''
+      level: info.level,
+      limit: 100,
+      name: info.name || '',
+      start: 1,
+      status: info.status || ''
     });
 }
 
@@ -391,10 +397,10 @@ export function neigouProductDetail(code) {
 }
 
 //查询产品详情
-export function productDetail(code, level) {
+export function productDetail(info) {
     return fetch(627558, {
-        code: code,
-        level: level,
+      code: info.code,
+      level: info.level,
     });
 }
 
@@ -450,7 +456,7 @@ export function payment(code, payType) {
 }
 //云仓支付
 export function cloudPayment(codeList, payType) {
-    return fetch(627642, {
+    return fetch(627902, {
         codeList: codeList,
         payType: payType
     })
@@ -474,19 +480,11 @@ export function cloudSend(options) {
 
 //云仓下单
 export function cloudBill(options) {
-    return fetch(627641, {
-        address: options.address,
-        applyUser: getUserId(),
-        area: options.area,
-        city: options.city,
-        mobile: options.mobile,
-        province: options.province,
-        productSpecsCode: options.productSpecsCode,
-        quantity: options.quantity,
-        isSendHome: 0,
-        signer: getUserId(),
-        toUser: options.toUser,
-        applyNote: options.applyNote
+    return fetch(627900, {
+      applyUser: getUserId(),
+      quantity: options.quantity,
+      specsCode: options.specsCode,
+      applyNote: options.applyNote || ''
     });
 }
 
@@ -525,10 +523,12 @@ export function palceOrder(options) {
 }
 
 //业绩账户转门槛账户
-export function transfer(amount) {
+export function transfer(info) {
     return fetch(627440, {
-        amount: amount,
-        userId: getUserId(),
+      amount: info.amount,
+      fromAccount: info.fromAccount,
+      toAccount: info.toAccount,
+      userId: getUserId(),
     });
 }
 
@@ -632,7 +632,7 @@ export function queryProductDetail(productCode) {
     });
 }
 
-//分页查询待处理订单
+//分页查询出货订单
 export function queryOrderForm(statusList) {
     return fetch(627665, {
         start: 1,
@@ -649,12 +649,20 @@ export function queryOrderForm1(statusList) {
         toUserId: getUserId()
     });
 }
+// 分页查云仓订单
+export function queryYunOrder(status) {
+  return fetch(627915, {
+    start: 1,
+    limit: 100,
+    status: status || ''
+  });
+}
 //分页查询内购商城理订单
 export function queryShopForm(status) {
     return fetch(627731, {
         start: 1,
         limit: 100,
-        toUserId: getUserId(),
+        // toUserId: getUserId(),
         status: status,
     });
 }
@@ -750,15 +758,16 @@ export function queryFodderName() {
 }
 
 //补充信息
-export function supplyInfo(idKind, idNo, introducer, idHand, teamName, applyLevel, userId) {
+export function supplyInfo(info) {
     return fetch(627362, {
-        idKind,
-        idNo,
-        introducer,
-        idHand,
-        teamName,
-        applyLevel,
-        userId
+      applyLevel: info.applyLevel || '',
+      idHand: info.idHand || '',
+      idKind: info.idKind || '',
+      idNo: info.idNo || '',
+      introducer: info.introducer || '',
+      mobile: info.mobile || '',
+      teamName: info.teamName || '',
+      userId: info.userId || ''
     });
 
 }
@@ -791,4 +800,89 @@ export function checkCancel(code, result, remark) {
         remark,
         updater: getUserId()
     });
+}
+// 前端查统计信息
+export function getStatistics(info) {
+  return fetch(627852, {
+    start: 1,
+    limit: 1000,
+    userId: getUserId(),
+    introducer: info.introducer || '',
+    referrer: info.referrer || '',
+    keyword: info.keyword || '',
+    level: info.level || ''
+  });
+}
+// 分页查流水
+export function liushuiList(info) {
+  return fetch(627490, {
+    start: 1,
+    limit: 1000,
+    userId: getUserId(),
+    bizType: info.bizType || ''
+  });
+}
+// 统计分析-我的出货接口
+export function myChuHuo(statusList) {
+  return fetch(627854, {
+    start: 1,
+    limit: 100,
+    statusList: statusList,
+    applyUser: getUserId()
+  });
+}
+// 统计分析-差价利润接口
+export function profit(info) {
+  return fetch(627855, {
+    start: 1,
+    limit: 1000,
+    userId: getUserId(),
+    bizType: info.bizType || ''
+  });
+}
+// 分页查购物车
+export function getCartList() {
+  return fetch(627630, {
+    start: 1,
+    limit: 1000,
+    userId: getUserId()
+  });
+}
+// 添加购物车
+export function toCart(info) {
+  return fetch(627620, {
+    productSpecsCode: info.productSpecsCode,
+    quantity: info.quantity,
+    level: info.level,
+    userId: getUserId()
+  });
+}
+// 修改产品数量
+export function editCart(info) {
+  return fetch(627621, {
+    code: info.code,
+    quantity: info.quantity
+  });
+}
+
+// 删除购物车产品
+export function deleteCart(info) {
+  return fetch(627622, {
+    codeList: info.codeList
+  });
+}
+// 购物车提交订单
+export function placeOrderCart(info) {
+  return fetch(627901, {
+    codeList: info.codeList,
+    applyNote: info.applyNote || '',
+    applyUser: getUserId()
+  });
+}
+
+// 详情查订单
+export function orderDetail(info) {
+  return fetch(627917, {
+    code: info.code
+  });
 }

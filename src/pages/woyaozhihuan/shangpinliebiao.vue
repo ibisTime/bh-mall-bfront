@@ -42,10 +42,13 @@ export default {
     },
     methods:{
         choose(code,index){
-            this.code = code
-            this.num = index
+            this.code = code;
+            this.num = index;
             if(this.flag == 1) {
-                productDetail(this.code,this.level).then(res => {
+                productDetail({
+                  level: this.level,
+                  code: this,code
+                }).then(res => {
                     setCookie('myDetail',JSON.stringify(res))
                 })
             }else if(this.flag == 2) {
@@ -65,22 +68,23 @@ export default {
         this.flag = this.$route.query.flag
         this.level = getCookie('level')
         let self = this;
-        console.log(this.flag)
-        console.log(typeof this.flag)
+        // console.log(this.flag)
+        // console.log(typeof this.flag)
         if(this.flag == '1') {
-
-            
             //查询我的商品
-            queryProduct(this.level, '2').then(res =>{
+            queryProduct({
+              level: this.level,
+              status: '2'
+            }).then(res =>{
                 res.list.map(function(item){
                     item.pic = formatImg(item.pic)
-                })
+                });
                 this.list = res.list
             })
         }else if(this.flag == '2') {
 
             //获取云仓商品
-            getCloudList().then(res => {    
+            getCloudList().then(res => {
                 //遍历格式化图片
                 res.list.map(function(item){
                     item.product.advPic = formatImg(item.product.advPic)

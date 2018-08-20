@@ -37,13 +37,13 @@ export function login(loginName, loginPwd) {
  * 获取用户详情
  */
 export function getUser() {
-  return fetch(627357, {
+  return fetch(627327, {
     userId: getUserId()
   });
 }
 
 export function getUser1(userId) {
-  return fetch(627357, {
+  return fetch(627327, {
     userId: userId
   });
 }
@@ -53,7 +53,7 @@ export function getUser1(userId) {
  * @param {string} userId
  */
 export function getUserById(userId) {
-  return fetch(627357, { userId });
+  return fetch(627327, { userId });
 }
 
 /**
@@ -214,5 +214,5 @@ export function operationHelp() {
  * @param mobile
  */
 export function getUserByMobile(mobile) {
-  return fetch(627364, { mobile });
+  return fetch(627322, { mobile });
 }

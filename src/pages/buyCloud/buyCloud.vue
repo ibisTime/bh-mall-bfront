@@ -1,18 +1,21 @@
 <template>
   <div class="buycloud">
-    <!-- <div :class="['tip',tipshow ? 'none' : '']">
-      <span>支出相关：啊啊啊啊啊啊啊啊啊啊啊啊啊啊</span>
-      <i @click="changeTipShow">
-        <img src="../../assets/threshold/close.png" alt="">
-      </i>
-    </div> -->
-    <div class="item" v-for="(item, index) in list">
+    <!--<div :class="['tip',tipshow ? 'none' : '']">-->
+      <!--<span>支出相关：啊啊啊啊啊啊啊啊啊啊啊啊啊啊</span>-->
+      <!--<i @click="changeTipShow">-->
+        <!--<img src="../../assets/threshold/close.png" alt="">-->
+      <!--</i>-->
+    <!--</div>-->
+    <div class="item" v-for="(item, index) in list" v-show="list.length">
       <img :src="item.pic" alt="">
       <div class="content" v-if="item.specsList[specsIndex[index]].priceList[0]">
         <p>产品名称：{{item.name}} <br>单价：{{formatAmount(item.specsList[specsIndex[index]].priceList[0].price)}}</p>
         <i>包装：{{item.specsList[specsIndex[index]].name}}</i>
         <span @click="prodectDetail(item.code, index)">购买云仓</span>
       </div>
+    </div>
+    <div v-show="!list.length">
+      <no-result title="抱歉，暂无内容"></no-result>
     </div>
     <div :class="['mask',flag ? 'show' : '']" @click="genghuan"></div>
     <div :class="['buypart',buypartFlag ? 'show' : '']">
@@ -40,22 +43,25 @@
         </div>
         <div class="right">
           <span class="diamonds right-item" @click="add">+</span>
-          <input class="num right-item" v-model="number"></span>
+          <input class="num right-item" v-model="number">
           <span class="diamonds right-item" @click="sub">-</span>
         </div>
       </div>
-      <div class="buypart-bottom" @click="confirm(detail.code)">
-        提交订单
+      <div class="buypart-bottom">
+        <div class="toCart" @click="toCart(detail.code)">加入购物车</div>
+        <div class="confirm" @click="confirm(detail.code)">提交订单</div>
+
       </div>
     </div>
     <toast ref="mytoast" :text="text"></toast>
   </div>
 </template>
 <script>
-import { queryProduct, productDetail, cloudBill } from "api/baohuo";
+import { queryProduct, productDetail, cloudBill, toCart } from "api/baohuo";
 import { getUser, getUserById } from "api/user";
 import { formatImg, formatAmount } from "common/js/util";
 import toast from "base/toast/toast";
+import NoResult from 'base/no-result/no-result';
 export default {
   data() {
     return {
@@ -95,15 +101,12 @@ export default {
     //确认商品
     confirm(code) {
       let ref = this;
-      this.options.productSpecsCode = this.detail.specsList[this.num].code;
+      this.options.specsCode = this.detail.specsList[this.num].code;
       this.options.quantity = this.number;
       cloudBill(this.options).then(res => {
         this.text = "提交成功";
         this.$refs.mytoast.show();
-        // this.orderCode.push(res.map((item) => ({ item })));
-        res.map((item) => {
-          this.orderCode.push(item);
-        });
+        this.orderCode.push(res.code);
         this.$router.push(
         "/buyCloud/tijiaodingdan?code=" +
           code +
@@ -112,9 +115,9 @@ export default {
           "&highUserId=" +
           ref.options.highUserId +
           "&orderCode=" +
-          ref.orderCode +
+          this.orderCode +
           "&specsCode=" +
-          this.options.productSpecsCode
+          this.options.specsCode
         );
       });
     },
@@ -148,39 +151,39 @@ export default {
       this.genghuan();
       let self = this;
       this.curProductIdx = index;
-      productDetail(code, this.level).then(res => {
+      productDetail({
+        level: this.level,
+        code: code
+      }).then(res => {
         res.pic = formatImg(res.pic);
         self.detail = res;
       });
     },
-    //产品购买
-    buy() {
-      this.options.productSpecsCode = this.detail.specsList[this.num].code;
-      this.options.quantity = this.number;
-      cloudBill(this.options).then(res => {
-        this.text = "提交成功";
-        this.$refs.mytoast.show();
-        this.orderCode = res.code;
-      });
-    },
     tiaozhuan() {
       this.$router.push("/home");
+    },
+    toCart() {
+      this.options.productSpecsCode = this.detail.specsList[this.num].code;
+      this.options.quantity = this.number;
+      this.options.level = this.level;
+      toCart(this.options).then((res) => {
+        if(res.code) {
+          this.text = "添加成功";
+          this.$refs.mytoast.show();
+          this.changeFlag();
+          this.changebuypartFlag();
+        }
+      })
     }
   },
   mounted() {
     getUser().then(res => {
       this.level = res.level;
-      this.options = {
-        address: res.address,
-        area: res.area,
-        city: res.city,
-        mobile: res.mobile,
-        province: res.province,
-        toUser: res.highUserId || '',
-        specsCode: ''
-      };
       //商品列表查询
-      queryProduct(res.level,'2').then(res => {
+      queryProduct({
+        level: res.level,
+        status: '2'
+      }).then(res => {
         res.list.map((item) => {
           item.pic = formatImg(item.pic);
           this.specsIndex.push(0);
@@ -190,7 +193,8 @@ export default {
     });
   },
   components: {
-    toast
+    toast,
+    NoResult
   }
 };
 </script>
@@ -448,10 +452,21 @@ export default {
     .buypart-bottom {
       height: 0.9rem;
       line-height: 0.9rem;
-      background-color: $primary-color;
       color: #fff;
-      text-align: center;
+      text-align: left;
       font-size: $font-size-medium-xx;
+      white-space: nowrap;
+      div {
+        display: inline-block;
+        width: 50%;
+        text-align: center;
+      }
+      .toCart {
+        background-color: $primary-color;
+      }
+      .confirm {
+        color: $primary-color;
+      }
     }
   }
 }
