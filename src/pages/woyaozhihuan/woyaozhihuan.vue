@@ -17,7 +17,7 @@
                         <!--
                         <span>{{cloudDetail.specsList[count].number}}{{cloudDetail.specsList[count].name}}</span>
                         -->
-                        <span>{{initNum}}{{cloudDetail.specsList[count].productSpecsName}}</span>
+                        <span>{{initNum}}{{cloudDetail.specsList[count].specsName}}</span>
                     </div>
                     <button class="huan" @click="_genghuan">更换规格</button>
                 </div>
@@ -88,7 +88,7 @@
                     <img :src="cloudDetailPic">
                 </div>
                 <div class="title-right">
-                    <p>{{cloudDetail.name}}</p>
+                    <p>{{cloudDetail.productName}}</p>
                     <span>请选择</span>
                     <i @click="_genghuan">X</i>
                 </div>
@@ -101,7 +101,7 @@
                       :code="item.code"
                       @click="_chooseSize(item, index)"
                       :class="[count === index ? 'active' : '']"
-                      >{{item.productSpecsName}}</span>
+                      >{{item.specsName}}</span>
                 </div>
             </div>
             <div class="total-money">
@@ -114,7 +114,7 @@
                 <div class="right">
                     <span class="diamonds right-item" @click="_add">+</span>
                     <!--<input class="num right-item" v-model="cloudDetail.specsList[count].number"></span>-->
-                    <input class="num right-item" v-model="initNum"></span>
+                    <input class="num right-item" v-model="initNum">
                     <span class="diamonds right-item" @click="_sub">-</span>
                 </div>
             </div>
@@ -147,10 +147,10 @@ export default {
       detail: {
         name: '产品名称',
         specsList: [
-          { 
+          {
             price: {
               price: '0'
-            } 
+            }
           },
           { name: '0' }
         ]
@@ -167,7 +167,7 @@ export default {
         },
         specsList: [
           { price: '0' },
-          { productSpecsName: '规格名称' }
+          { specsCode: '规格名称' }
         ]
       },
       num: 0,
@@ -186,14 +186,14 @@ export default {
   methods: {
     //提交置换
     requestNode() {
-      console.log(this.changeSpecsCode);
-      console.log(this.productSpecsCode);
+      // console.log(this.changeSpecsCode);
+      // console.log(this.productSpecsCode);
       console.log(this.cloudDetail);
       console.log(this.detail);
       let options = {
-        changeSpecsCode: this.changeSpecsCode || this.detail.specsList[0].price.productSpecsCode,
+        changeSpecsCode: this.changeSpecsCode || this.detail.specsList[0].price.specsCode,
         // productSpecsCode: this.cloudDetail.productSpecsCode,
-        productSpecsCode: this.productSpecsCode || this.cloudDetail.specsList[0].productSpecsCode,
+        productSpecsCode: this.productSpecsCode || this.cloudDetail.specsList[0].specsCode,
         // quantity: this.cloudDetail.specsList[this.count].number
         quantity: this.initNum
       };
@@ -207,12 +207,11 @@ export default {
     },
     //查询置换价格
     queryMoney(index) {
+      console.log(this.changeSpecsCode);
       if (this.cloudDetail.name !== "") {
         let options = {
-          // changeSpecsCode: this.changeSpecsCode,
-          // productSpecsCode: this.cloudDetail.specsList[0].productSpecsCode,
           changeSpecsCode: this.changeSpecsCode,
-          productSpecsCode: this.cloudDetail.specsList[this.count].productSpecsCode,
+          productSpecsCode: this.cloudDetail.specsList[this.count].specsCode,
           // quantity: this.cloudDetail.specsList[this.count].number
           quantity: this.initNum
         };
@@ -243,7 +242,7 @@ export default {
       this.changeFlag();
       this.changebuypartFlag();
       if(!this.changeSpecsCode) {
-        this.changeSpecsCode = this.detail.specsList[0].price.productSpecsCode;
+        this.changeSpecsCode = this.detail.specsList[0].price.specsCode;
         setCookie("myDetail", JSON.stringify(this.detail));
       }
       this.queryMoney(this.num);
@@ -292,7 +291,7 @@ export default {
     //选择规格
     _chooseSize(item, index) {
       this.count = index;
-      this.productSpecsCode = item.productSpecsCode;
+      this.productSpecsCode = item.specsCode;
     },
     // _choose_Size(index) {
     //   this.number2 = index;

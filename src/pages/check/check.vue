@@ -7,7 +7,7 @@
           <div @click="changeIndex(12)" :class="[index == 12 ? 'active' : '']">
               <i>审核升级</i>
           </div>
-          <div @click="changeIndex(8)" :class="[index == 8 ? 'active' : '']">
+          <div @click="changeIndex(10)" :class="[index == 10 ? 'active' : '']">
               <i>审核退出</i>
           </div>
       </div>
@@ -19,16 +19,16 @@
       <div :class="[index == 12 ? 'show' : '', 'item']" v-for="(item,key) in data2" :key="item.key"   @click="$router.push('/check/checkdispose?index=12&id=' + item.userId);">
           <p>姓名：{{item.realName}}</p>
           <p><i>{{item.level}}</i> <img class="shengji" src="../../assets/imgs/shengji@2x.png" alt=""> <i>{{item.applyLevel}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
-          <p><span>微信号：{{item.wxId}}</span> <i class="tel">手机号：{{item.mobile}}</i> </p>
+          <p><span>微信号：{{item.user ? item.user.wxId : ''}}</span> <i class="tel">手机号：{{item.user ? item.user.mobile : ''}}</i> </p>
       </div>
-      <div :class="[index == 8 ? 'show' : '', 'item']" v-for="(item,key) in data3" :key="item.key"   @click="$router.push('/check/checkdispose?index=8&id=' + item.userId);">
+      <div :class="[index == 10 ? 'show' : '', 'item']" v-for="(item,key) in data3" :key="item.key"   @click="$router.push('/check/checkdispose?index=8&id=' + item.userId);">
           <p>姓名：{{item.realName}} <i class="tip">{{item.applyLevel}}</i></p>
           <p><span>微信号：{{item.wxId}}</span> <i class="tel">手机号：{{item.mobile}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
       </div>
   </div>
 </template>
 <script>
-import { getLevel, agent } from "api/baohuo";
+import { getLevel, agent, upgradeList } from "api/baohuo";
 export default {
   name: "check",
   data() {
@@ -42,23 +42,36 @@ export default {
   methods: {
     changeIndex(index) {
       this.index = index;
-      agent(index).then(res => {
-        res.list.map(function(item) {
-          getLevel(item.applyLevel).then(res => {
-            item.applyLevel = res[0].name;
+      if(index === 12) {
+        upgradeList(index).then((res) => {
+          res.list.map(function(item) {
+            getLevel(item.applyLevel).then(res => {
+              item.applyLevel = res[0].name;
+            });
+            getLevel(item.level).then(info => {
+              item.level = info[0].name;
+            });
           });
-          getLevel(item.level).then(info => {
-            item.level = info[0].name;
-          });
-        }); 
-        if (index === 6) {
-          this.data1 = res.list;
-        } else if (index === 12) {
           this.data2 = res.list;
-        } else if (index === 8) {
-          this.data3 = res.list;
-        }
-      });
+        })
+      } else {
+        agent(index).then(res => {
+          res.list.map(function(item) {
+            getLevel(item.applyLevel).then(res => {
+              item.applyLevel = res[0].name;
+            });
+            getLevel(item.level).then(info => {
+              item.level = info[0].name;
+            });
+          });
+          console.log(res.list);
+          if (index === 6) {
+            this.data1 = res.list;
+          } else if (index === 10) {
+            this.data3 = res.list;
+          }
+        });
+      }
     }
   },
   mounted() {

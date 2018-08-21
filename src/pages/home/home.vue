@@ -235,6 +235,11 @@ export default {
           to: "/chuhuodingdan"
         },
         {
+          text: "待处理订单",
+          src: require("../../assets/imgs/daichulidingdan@2x.png"),
+          to: "/waitOrder"
+        },
+        {
           text: "购物车",
           src: require("../../assets/imgs/cart.png"),
           to: "/cart"
@@ -271,11 +276,6 @@ export default {
           text: "我的订单",
           src: require("../../assets/imgs/wodedingdan@2x.png"),
           to: "/neigoudingdan"
-        },
-        {
-          text: "我要出货",
-          src: require("../../assets/imgs/jisongdaojia@2x.png"),
-          to: "/neigouchuhuo"
         }
       ],
 

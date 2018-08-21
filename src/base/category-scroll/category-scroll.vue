@@ -142,6 +142,8 @@
         text-align: center;
         font-size: $font-size-medium;
         padding: 0 0.3rem;
+        height: 0.8rem;
+        line-height: 0.8rem;
 
         &.active {
           color: $primary-color;

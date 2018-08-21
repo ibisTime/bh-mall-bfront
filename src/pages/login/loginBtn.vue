@@ -13,9 +13,6 @@
     userId:''
       }
     },
-    mounted() {
-      alert(999);
-    },
     methods:{
      queren:function () {
        this.userId = this.$route.query.userId;//获取userId
@@ -29,21 +26,21 @@
   @import "../../common/scss/variable.scss";
   .login{
     font-size: $font-size-large-s;
-    width: 100%{}
+    width: 100%;
+    text-align: center;
     img{
-      width: 100%;
+      width: 40%;
       height: auto;
-    margin: 0 auto;
+      margin-top: 3rem;
+      margin-bottom: 0.5rem;
     }
     .aa{
-      color:$color-background;
-      width: 50%;
-      height: 30px;
-      margin-left: 25%;
+      color: #ffffff;
       border-radius: 5px;
-      background-color:$primary-color ;
-      font-size: $font-size-small;
-
+      background-color: #72a52c;
+      font-size: 0.24rem;
+      padding: 0.2rem 0.3rem;
+      margin-top: 0.2rem;
     }
   }
 

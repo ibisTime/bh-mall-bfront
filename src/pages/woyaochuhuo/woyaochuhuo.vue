@@ -19,7 +19,7 @@
             <div class="content">
                 <div>
                   <p>产品名称：{{item.productName}}
-                    <p>规格：{{specsList[index].productSpecsName}}</p>
+                    <p>规格：{{item.specsName}}</p>
                     <p>数量：{{prodNum[index]}}</p>
                     <p>价格：¥{{formatAmount(specsList[index].price * prodNum[index])}}</p>
                   </p>
@@ -43,7 +43,7 @@
           <div class="packaging">
             <p>规格</p>
             <div class="select">
-              <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(index)" :class="[num === index ? 'active' : '']">{{item.productSpecsName}}</span>
+              <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(index)" :class="[num === index ? 'active' : '']">{{item.specsName}}</span>
             </div>
           </div>
           <div class="total-money">

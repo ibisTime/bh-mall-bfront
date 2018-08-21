@@ -5,21 +5,18 @@
                 <i class="tip" @click="$router.push('/journal?id=' + userinfo.userId + '&name=' + userinfo.realName);">流转日志</i>
             </p>
             <p>
-                <span>上级：{{userinfo.highUserName}}</span>
-            </p>
-            <p>
                 <span>微信号：{{userinfo.wxId}}</span>
             </p>
             <p>
                 <span>手机号：{{userinfo.mobile}}</span>
             </p>
-            <p>
+            <p v-show="userinfo.idNo">
                 <span>身份证号：{{userinfo.idNo}}</span>
             </p>
-            <p>
+            <p v-show="userinfo.idHand">
                 <span>身份证照片：</span>
             </p>
-            <p style="padding: 0 0.3rem;"><img style="max-width: 100%;float:none;" :src="formatImg(userinfo.idHand)"/><p>
+            <p style="padding: 0 0.3rem;" v-show="userinfo.idHand"><img style="max-width: 100%;float:none;" :src="formatImg(userinfo.idHand)"/><p>
             <p>区域：
                 <i>{{userinfo.province}}</i>
                 <i>{{userinfo.city}}</i>
@@ -29,12 +26,12 @@
         <div class="checkdispose-bottom">
             <p>意向等级：<i>{{userinfo.applyLevel}}</i></p>
             <p>该等级政策：</p>
-            <p>1.首次授权发货金额：{{formatAmount(levelInfo.amount)}}</p>
-            <p>2.本等级最低充值金额：{{formatAmount(levelInfo.minChargeAmount)}}</p>
+            <p>1.授权单金额：{{formatAmount(levelInfo.amount)}}</p>
+            <p>2.门槛费：{{formatAmount(levelInfo.minCharge)}}</p>
             <p>3.红线金额：{{formatAmount(levelInfo.redAmount)}}</p>
             <p>4.门槛可有余额：{{formatAmount(levelInfo.minSurplus)}}</p>
             <p>5.授权单是否允许自发：{{getBool(levelInfo.isSend)}}</p>
-            <p>6.是否启用云仓：{{getBool(levelInfo.isWareHouse)}}</p>
+            <p>6.是否启用云仓：{{getBool(levelInfo.isWare)}}</p>
         </div>
         <div class="checkdispose-bottom">
             <textarea placeholder="审核说明" :value="approveNote" style="width: 100%;" rows="3"></textarea>
@@ -46,11 +43,10 @@
         <toast ref="mytoast" :text="text"></toast>
         <confirm ref="confirm" :text="confirmText" @confirm="handleConfirm"></confirm>
     </div>
-    
+
 </template>
 <script>
-import { accredit, upgrade, accreditCancel, getLevel } from 'api/baohuo';
-import { getUserById } from 'api/user';
+import { accredit, upgrade, accreditCancel, getLevel, shouquandanDetail } from 'api/baohuo';
 import { formatImg, formatAmount } from 'common/js/util';
 import Toast from 'base/toast/toast';
 import Confirm from 'base/confirm/confirm';
@@ -59,12 +55,13 @@ export default {
   name:'checkdispose',
   data(){
       return{
-          index: '',
-          userinfo: {},
-          levelInfo: {},
-          text: '',
-          confirmText: '',
-          approveNote: ''
+        index: '',
+        userinfo: {},
+        levelInfo: {},
+        text: '',
+        confirmText: '',
+        approveNote: '',
+        status: []
       }
   },
   methods:{
@@ -131,13 +128,24 @@ export default {
   mounted(){
       this.userId = this.$route.query.id;
       this.index = this.$route.query.index;
-      getUserById(this.userId).then(res => {
-          this.userinfo = res;
-          this.userinfo.highUserName = this.userinfo.highUser.realName || '';
-          getLevel(res.applyLevel).then(info => {
-              this.levelInfo = info[0];
-              this.userinfo.applyLevel = info[0].name;
+      shouquandanDetail({
+        userId: this.userId
+      }).then(res => {
+        this.userinfo = res;
+        getLevel().then(info => {
+          let levelArr = [];
+          info.map((item) => {
+            if(res.applyLevel === item.level) {
+              this.levelInfo = item;
+              this.userinfo.applyLevel = item.name;
+            }
+            levelArr.push({
+              level: item.level,
+              name: item.name
+            });
           });
+          this.levelArr = levelArr;
+        });
       });
   },
   components: {
@@ -206,7 +214,7 @@ export default {
           background-color: $primary-color;
       }
       .footer-back{
-          
+
       }
   }
 }

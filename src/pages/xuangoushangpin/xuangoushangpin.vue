@@ -1,19 +1,22 @@
 <template>
   <div class="buycloud">
-    <div :class="['tip',tipshow ? 'none' : '']">
-      <span>支出相关：啊啊啊啊啊啊啊啊啊啊啊啊啊啊</span>
-      <i @click="changeTipShow">
-        <img src="../../assets/threshold/close.png" alt="">
-      </i>
-    </div>
-    <div class="item" v-for="item in list">
+    <!--<div :class="['tip',tipshow ? 'none' : '']">-->
+      <!--<span>支出相关：啊啊啊啊啊啊啊啊啊啊啊啊啊啊</span>-->
+      <!--<i @click="changeTipShow">-->
+        <!--<img src="../../assets/threshold/close.png" alt="">-->
+      <!--</i>-->
+    <!--</div>-->
+    <div class="item" v-for="item in list" v-show="list.length">
       <img :src="item.pic" alt="">
       <div class="content">
         <p>{{item.name}}</p>
-        <p>价格：{{item.price / 100}}</p>
+        <p>价格：{{formatAmount(item.price)}}</p>
         <p>数量：{{item.quantity}}</p>
         <span @click="prodectDetail(item.code)">购买</span>
       </div>
+    </div>
+    <div v-show="!list.length">
+      <no-result title="抱歉，暂无内容"></no-result>
     </div>
     <div :class="['mask',flag ? 'show' : '']" @click="genghuan"></div>
     <div :class="['buypart',buypartFlag ? 'show' : '']">
@@ -27,16 +30,22 @@
           <i @click="genghuan">X</i>
         </div>
       </div>
+      <div class="packaging">
+        <p>规格</p>
+        <div class="select">
+          <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(item.productSpecsCode,index,$event)" :class="[num === index ? 'active' : '']">{{item.name}}</span>
+        </div>
+      </div>
       <div class="total-money">
         <div class="left">
           <i class="text">合计：</i>
           <i class="symbol">￥</i>
-          <i class="sum">{{detail.price / 1000 * number}}</i>
+          <i class="sum">{{formatAmount(detail.price) * number}}</i>
         </div>
         <div class="right">
-          <span class="diamonds" @click="add">+</span>
-          <span class="num">{{number}}</span>
-          <span class="diamonds" @click="sub">-</span>
+          <span class="diamonds right-item" @click="add">+</span>
+          <input class="num right-item" v-model="number">
+          <span class="diamonds right-item" @click="sub">-</span>
         </div>
       </div>
       <div class="buypart-bottom" @click="confirm(detail.code)">
@@ -54,9 +63,10 @@ import {
   neigouProduct
 } from "api/baohuo";
 import { getUser, getUserById } from "api/user";
-formatImg;
-import { formatImg } from "common/js/util";
-import { setCookie, getCookie } from "common/js/cookie.js";
+import { formatImg, formatAmount } from "common/js/util";
+import { setCookie, getCookie } from "common/js/cookie";
+import NoResult from 'base/no-result/no-result';
+
 export default {
   data() {
     return {
@@ -73,6 +83,9 @@ export default {
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     changeTipShow() {
       this.tipshow = !this.tipshow;
     },
@@ -124,16 +137,21 @@ export default {
       neigouProductDetail(code).then(res => {
         res.pic = formatImg(res.pic);
         self.detail = res;
-        console.log(self.detail);
       });
     },
     //确认商品
     confirm(code) {
+      this.specsCode = this.detail.specsList[this.num].code;
       this.$router.push(
         "/xuangoushangpin/shangpingoumai?code=" +
           code +
+          "&specsCode=" +
+          this.specsCode +
           "&number=" +
-          this.number
+          this.number +
+        "&num=" +
+        this.num
+        // num传过去好知道是哪个规格
       );
     }
   },
@@ -145,6 +163,9 @@ export default {
       });
       this.list = res.list;
     });
+  },
+  components: {
+    NoResult
   }
 };
 </script>
@@ -260,7 +281,7 @@ export default {
   }
   .buypart {
     width: 100%;
-    height: 8rem;
+    height: 6rem;
     position: fixed;
     bottom: 0;
     background-color: #fff;
@@ -378,7 +399,7 @@ export default {
         }
       }
       .right {
-        span {
+        .right-item {
           margin-top: 0.4rem;
           float: right;
           text-align: center;

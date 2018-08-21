@@ -64,6 +64,7 @@ import chanpinchaxun from '@/pages/chanpinchaxun/chanpinchaxun'
 import woyaochuhuo from '@/pages/woyaochuhuo/woyaochuhuo'
 import wodedingdan from '@/pages/wodedingdan/wodedingdan'
 import chuhuodingdan from '@/pages/chuhuodingdan/chuhuodingdan'
+import waitOrder from '@/pages/waitOrder/waitOrder'
 import weidianzhanghu from '@/pages/weidianzhanghu/weidianzhanghu'
 import cart from '@/pages/cart/cart'
 import balance from '@/pages/cart/balance'
@@ -410,6 +411,12 @@ export default new Router({
         path: '/chuhuodingdan',
         name: 'chuhuodingdan',
         component: chuhuodingdan
+      },
+      //待处理订单
+      {
+        path: '/waitOrder',
+        name: 'waitOrder',
+        component: waitOrder
       },
       //分享商城
       {

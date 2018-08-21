@@ -11,10 +11,10 @@
               <i>已否决</i>
           </div>
       </div>
-      <div class="item" v-for="item in list" v-if="item.user.level"  @click="$router.push('/shenhechongzhi/chongzhichuli?code=' + item.code + '&index=' + index);">
+      <div class="item" v-for="item in list" v-if="item.level"  @click="$router.push('/shenhechongzhi/chongzhichuli?code=' + item.code + '&index=' + index);">
           <p>订单编号：{{item.code}}<i class="tip">{{tips[item.status]}}</i></p>
           <p>申请人姓名：{{item.accountName}}  </p>
-          <p>等级：{{item.user.level}}</p>
+          <p>等级：{{item.level}}</p>
           <p>充值金额：<span>￥{{item.amount / 1000}}</span><img src="../../assets/imgs/more@2x.png" alt=""></p>
           <p>申请时间：{{item.applyDatetime}}</p>
       </div>
@@ -49,8 +49,8 @@ export default {
           item.applyDatetime = formatDate(item.applyDatetime);
         });
         res.list.map(function(item) {
-          getLevel(item.user.level).then(res => {
-            item.user.level = res[0].name;
+          getLevel(item.level).then(res => {
+            item.level = res[0].name;
           });
         });
         this.list = res.list;
@@ -64,8 +64,8 @@ export default {
         item.applyDatetime = formatDate(item.applyDatetime);
       });
       res.list.map(function(item) {
-        getLevel(item.user.level).then(res => {
-          item.user.level = res[0].name;
+        getLevel(item.level).then(res => {
+          item.level = res[0].name;
         });
       });
       this.list = res.list;

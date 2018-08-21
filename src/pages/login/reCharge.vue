@@ -1,5 +1,5 @@
 <template>
-    <div class="replying">
+    <div class="replying full-screen-wrapper">
         <div class="tip">充值申请请等待上级审核</div>
     </div>
 </template>

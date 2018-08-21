@@ -53,17 +53,9 @@ export default {
       } else {
         this.AppId();
       }
-    } else if(getCookie("status") == 16) {
-      this.goLogin(getUserId(), 16);
-    } else if(getCookie("status") == 18) {
+    } else if(getCookie("status")) {
       try {
-        this.goLogin(getUserId(), 18);
-      }catch (e) {
-        alert(e);
-      }
-    } else if(getCookie("status") == 19) {
-      try {
-        this.goLogin(getUserId(), 19);
+        this.goLogin(getUserId(), getCookie("status"));
       }catch (e) {
         alert(e);
       }
@@ -118,6 +110,7 @@ export default {
     },
     checkUser(userId) {
       checkRed(userId).then(res => {
+        console.log(res);
         setCookie('level', res.level);
         if (res.result == '4') {
           this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge');
@@ -147,24 +140,21 @@ export default {
     goLogin(userId, status) {
       setCookie("status", status);
       //1,2禁止登陆
-      if (status == 1 || status == 2) {
-        this.text = '对不起，你被禁登录';
-        this.$refs.toast.show();
-      } else if (status == 19) {
+      if (status == 4) {
         this.$router.push(
           "/login/loginuserReferee?userId=" +
             userId +
             "&userReferee=" +
             this.userReferee
         );
-      } else if (status == 16) {
+      } else if (status == 0) {
         this.$router.push("/login/loginBtn?userId=" + userId);
-      } else if (status == 18) {
+      } else if (status == 5) {
         this.$router.push("/login/supplyInfo?userId=" + userId);
-      } else if (status == 6 || status == 5 || status == 11) {
+      } else if (status == 6 || status == 7) {
         this.$router.push("/login/replying");
         //10没通过
-      } else if (status == 3 || status == 4 || status == 9 || status == 10) {
+      } else if (status == 2 || status == 9) {
         this.text = '对不起,您没有被授权！';
         this.$refs.toast.show();
       } else {

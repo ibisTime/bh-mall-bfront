@@ -18,7 +18,7 @@
             <img :src="thingInfo.pic" alt="">
             <div class="content">
                 <p>{{thingInfo.name}}</p>
-                <!-- <div class="guige">包装：{{options.baozhuan}}   规格：{{options.guige}}g</div> -->
+                 <div class="guige">包装：{{guige}}</div>
                 <i>￥{{thingInfo.price / 1000}}</i>
                 <span>X{{number}}</span>
             </div>
@@ -47,6 +47,7 @@
             </div>
             <div class="f-right" @click="buy">确认购买</div>
         </div>
+      <toast ref="mytoast" :text="text"></toast>
     </div>
 </template>
 <script>
@@ -63,6 +64,7 @@ import { queryConfig, queryAmount, thingDrtail } from "api/baohuo";
 import { formatImg } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 import { initPay } from "common/js/weixin";
+import toast from "base/toast/toast";
 export default {
   data() {
     return {
@@ -72,7 +74,9 @@ export default {
       code: "",
       thingInfo: [],
       number: "",
-      status: 0
+      status: 0,
+      text: '',
+      guige: ''
     };
   },
   methods: {
@@ -87,25 +91,28 @@ export default {
         mobile: this.address.mobile,
         province: this.address.province,
         signer: this.address.code,
-        productCode: getCookie("shangpincode"),
+        // productCode: getCookie("shangpincode"),
+        specsCode: this.specsCode,
         quantity: this.number,
         applyNote: this.applyNote
       };
       palceOrder(options).then(res => {
         let code = res.code;
         payment(code, this.status).then(res => {
-          let data = res;
-          console.log(data);
-          if (this.status === 0) {
-            alert("支付成功！");
+          if (res.isSuccess && this.status === 0) {
+            this.text = '支付成功';
+            this.$refs.mytoast.show();
+            setTimeout(() => {
+              this.$router.back();
+            }, 500);
           } else if (this.status === 1) {
             let wxConfig = {
-              appId: data.appId, // 公众号名称，由商户传入
-              timeStamp: data.timeStamp, // 时间戳，自1970年以来的秒数
-              nonceStr: data.nonceStr, // 随机串
-              wechatPackage: data.wechatPackage,
-              signType: data.signType, // 微信签名方式：
-              paySign: data.paySign // 微信签名
+              appId: res.appId, // 公众号名称，由商户传入
+              timeStamp: res.timeStamp, // 时间戳，自1970年以来的秒数
+              nonceStr: res.nonceStr, // 随机串
+              wechatPackage: res.wechatPackage,
+              signType: res.signType, // 微信签名方式：
+              paySign: res.paySign // 微信签名
             };
             initPay(wxConfig, this.success, this.error, this.cancel);
           }
@@ -115,7 +122,7 @@ export default {
   },
   mounted() {
     //获取用户等级
-    let level = getCookie("level");
+    // let level = getCookie("level");
 
     //获取用户订单详情
     // this.options = JSON.parse(getCookie('options'))
@@ -123,41 +130,57 @@ export default {
 
     //查询详情地址
 
-    if (!this.$route.query.number && this.$route.query.code) {
-      this.number = getCookie("neigoushuliang");
-      neigouProductDetail(getCookie("shangpincode")).then(item => {
-        item.pic = formatImg(item.pic);
-        this.thingInfo = item;
-      });
-      queryDefaultAddress().then(res => {
-        this.address = res[0];
-      });
-    } else if (this.$route.query.pay === "1") {
-      let code = this.$route.query.code;
-
-      thingDrtail(code).then(item => {
-        item.pic = formatImg(item.pic);
-        this.thingInfo = item;
-      });
-      queryDefaultAddress().then(res => {
-        this.address = res[0];
-      });
-    } else {
-      let code = this.$route.query.code;
-      this.code = code;
-
-      let number = this.$route.query.number;
-      this.number = number;
-      setCookie("neigoushuliang", this.number);
-      setCookie("shangpincode", this.code);
-      neigouProductDetail(code).then(item => {
-        item.pic = formatImg(item.pic);
-        this.thingInfo = item;
-      });
-      queryDefaultAddress().then(res => {
-        this.address = res[0];
-      });
-    }
+    // if (!this.$route.query.number && this.$route.query.code) {
+    //   this.number = getCookie("neigoushuliang");
+    //   neigouProductDetail(getCookie("shangpincode")).then(item => {
+    //     item.pic = formatImg(item.pic);
+    //     this.thingInfo = item;
+    //   });
+    //   queryDefaultAddress().then(res => {
+    //     this.address = res[0];
+    //   });
+    // } else if (this.$route.query.pay === "1") {
+    //   let code = this.$route.query.code;
+    //
+    //   thingDrtail(code).then(item => {
+    //     item.pic = formatImg(item.pic);
+    //     this.thingInfo = item;
+    //   });
+    //   queryDefaultAddress().then(res => {
+    //     this.address = res[0];
+    //   });
+    // } else {
+    //   let code = this.$route.query.code;
+    //   this.code = code;
+    //
+    //   let number = this.$route.query.number;
+    //   this.number = number;
+    //   setCookie("neigoushuliang", this.number);
+    //   setCookie("shangpincode", this.code);
+    //   neigouProductDetail(code).then(item => {
+    //     item.pic = formatImg(item.pic);
+    //     this.thingInfo = item;
+    //   });
+    //   queryDefaultAddress().then(res => {
+    //     this.address = res[0];
+    //   });
+    // }
+    let code = this.$route.query.code;
+    this.specsCode = this.$route.query.specsCode;
+    this.number = this.$route.query.number;
+    let num = this.$route.query.num;   // 规格索引
+    neigouProductDetail(code).then(item => {
+      item.pic = formatImg(item.pic);
+      this.thingInfo = item;
+      console.log(this.thingInfo.specsList);
+      this.guige = this.thingInfo.specsList[num].name;
+    });
+    queryDefaultAddress().then(res => {
+      this.address = res[0];
+    });
+  },
+  components: {
+    toast
   }
 };
 </script>

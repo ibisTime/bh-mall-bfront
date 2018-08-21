@@ -116,29 +116,8 @@ export default {
     > p + p {
       margin-top: 0.42rem;
     }
-    .showImg {
-      margin-top: 0.46rem;
-      position: relative;
-      height: 1.36rem;
-      img {
-        width: 1.36rem;
-        position: absolute;
-      }
-      .mask-pic {
-        padding: 0.3rem 0;
-        width: 1.36rem;
-        height: 1.36rem;
-        background-color: rgba(0, 0, 0, 0.6);
-        position: absolute;
-        z-index: 3;
-        p {
-          text-align: center;
-          color: #fff;
-        }
-        p + p {
-          margin-top: 0.3rem;
-        }
-      }
+    img {
+      width: 100%;
     }
   }
   .btn {

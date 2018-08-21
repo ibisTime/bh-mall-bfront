@@ -1,7 +1,9 @@
 <template>
   <div class="no-result full-screen-wrapper">
-    <div class="no-result-icon" :style="getImg()"></div>
-    <p class="no-result-text">{{title}}</p>
+    <div class="content">
+      <div class="no-result-icon" :style="getImg()"></div>
+      <p class="no-result-text">{{title}}</p>
+    </div>
     <slot></slot>
   </div>
 </template>
@@ -35,19 +37,21 @@
 
   .no-result {
     text-align: center;
-
-    .no-result-icon {
-      width: 2.4rem;
-      height: 2.4rem;
-      background-repeat: no-repeat;
-      margin: 0 auto;
-      background-size: contain;
-      background-position: center;
-    }
-    .no-result-text {
-      margin-top: 0.3rem;
-      font-size: $font-size-medium-x;
-      color: $color-text-d;
+    .content {
+      margin-top: 4rem;
+      .no-result-icon {
+        width: 2.4rem;
+        height: 2.4rem;
+        background-repeat: no-repeat;
+        margin: 0 auto;
+        background-size: contain;
+        background-position: center;
+      }
+      .no-result-text {
+        margin-top: 0.3rem;
+        font-size: $font-size-medium-x;
+        color: $color-text-d;
+      }
     }
   }
 </style>

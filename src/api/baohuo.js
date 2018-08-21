@@ -98,7 +98,7 @@ export function queryBill(accountNumber) {
 
 // 获取代理轨迹（627358）
 export function getTrack() {
-    return fetch(627365, {
+    return fetch(627328, {
         limit: '100',
         start: '1',
         userId: getUserId()
@@ -265,6 +265,15 @@ export function agent(status) {
         start: 1,
         limit: 100,
     });
+}
+// 分页查升级单
+export function upgradeList(status) {
+  return fetch(627305, {
+    status: status,
+    userId: getUserId(),
+    start: 1,
+    limit: 100,
+  });
 }
 //登录
 export function usergo1(code) {
@@ -515,7 +524,7 @@ export function palceOrder(options) {
         mobile: options.mobile,
         province: options.province,
         signer: options.signer,
-        productCode: options.productCode,
+        specsCode: options.specsCode,
         quantity: options.quantity,
         toUser: getUserId(),
         applyNote: options.applyNote,
@@ -658,12 +667,12 @@ export function queryYunOrder(status) {
   });
 }
 //分页查询内购商城理订单
-export function queryShopForm(status) {
+export function queryShopForm(statusList) {
     return fetch(627731, {
         start: 1,
         limit: 100,
         // toUserId: getUserId(),
-        status: status,
+        statusList: statusList,
     });
 }
 //获取内购商品详情
@@ -759,7 +768,7 @@ export function queryFodderName() {
 
 //补充信息
 export function supplyInfo(info) {
-    return fetch(627362, {
+    return fetch(627271, {
       applyLevel: info.applyLevel || '',
       idHand: info.idHand || '',
       idKind: info.idKind || '',
@@ -884,5 +893,12 @@ export function placeOrderCart(info) {
 export function orderDetail(info) {
   return fetch(627917, {
     code: info.code
+  });
+}
+
+// 详情查授权单
+export function shouquandanDetail(info) {
+  return fetch(627287, {
+    userId: info.userId
   });
 }

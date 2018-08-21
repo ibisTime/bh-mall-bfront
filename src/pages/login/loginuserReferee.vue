@@ -159,9 +159,6 @@ export default {
         return l.level != '6';
       });
       this.allLevelList = list;
-      if (userInfo.highUser) {
-        this.highUserName = userInfo.highUser.realName;
-      }
       let level = userInfo.toLevel || 0;
       this.levelList = list.filter(l => {
         return l.level >= level;

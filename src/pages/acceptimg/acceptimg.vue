@@ -12,7 +12,7 @@
     </div>
 </template>
 <script>
-import { getAcceptImg } from 'api/baohuo'
+import { getAcceptImg, getLevel } from 'api/baohuo'
 import { getUserById } from 'api/user'
 import { formatImg, formatDateDate } from 'common/js/util'
 export default {
@@ -32,18 +32,24 @@ export default {
         }
     },
     mounted(){
-        getAcceptImg('impower_pdf').then(res => {
-            // this.urlImg = res.cvalue     //formatDateDate(data.impowerDatetime, 'yyyy/MM/dd');
-            this.urlImg = formatImg(res.cvalue);
-            getUserById(sessionStorage.getItem('userId')).then((data) => {
-              this.code = data.userId;
-              this.name = data.realName;
-              this.wxId = data.wxId;
-              this.$set(this.impowerDatetime, 'time', formatDateDate(data.impowerDatetime, 'yyyy/MM/dd'));
-              this.$set(this.shouquanfang, 'quanfang', '杭州麦记科技有限公司');
-              this.level = data.levelName;
-            })
-        })
+      Promise.all([
+        getAcceptImg('impower_pdf'),
+        getUserById(sessionStorage.getItem('userId')),
+        getLevel()
+      ]).then(([data1, data2, data3]) => {
+        this.urlImg = formatImg(data1.cvalue);
+        this.code = data2.userId;
+        this.name = data2.realName;
+        this.wxId = data2.wxId;
+        this.$set(this.impowerDatetime, 'time', formatDateDate(data2.impowerDatetime, 'yyyy/MM/dd'));
+        this.$set(this.shouquanfang, 'quanfang', '杭州麦记科技有限公司');
+        data3.map((item) => {
+          if(item.level === data2.level) {
+            this.level = item.name;
+          }
+        });
+        this.loadingFlag = false;
+      }).catch(() => {});
     }
 }
 </script>

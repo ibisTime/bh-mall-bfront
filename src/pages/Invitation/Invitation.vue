@@ -89,7 +89,6 @@ export default {
   },
   mounted() {
     this.status = getCookie('status');
-    console.log(this.status);
     if (isLogin()) {
       let userReferee = getCookie("userId");
 

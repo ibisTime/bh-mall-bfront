@@ -63,7 +63,7 @@ import {
   cloudBill,
   productDetailBySpec
 } from "api/baohuo";
-import { setCookie, getCookie } from "common/js/cookie.js";
+import { setCookie, getCookie } from "common/js/cookie";
 import { formatImg, getUserId, formatAmount } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 import { checkRed, getLevel } from 'api/baohuo';

@@ -3,7 +3,7 @@
     <div class="header-first">
       <div class="header-top">
         <p class="now-balance">总利润</p>
-        <p class="money-balance">{{account / 1000}}</p>
+        <p class="money-balance">{{formatAmount(amount)}}</p>
       </div>
     </div>
     <div class="content">
@@ -26,22 +26,26 @@
 <script>
   import { getPerformance, queryBill, profit } from "api/baohuo";
   import { setCookie, getCookie } from "common/js/cookie";
-  import { formatDate } from "common/js/util";
+  import { formatDate, formatAmount } from "common/js/util";
   export default {
     name: "yejizhanghu",
     data() {
       return {
         list: [],
-        account: 0,
-        accountNumber: ""
+        amount: 0
       };
     },
-    methods: {},
+    methods: {
+      formatAmount(amount) {
+        return formatAmount(amount);
+      }
+    },
     mounted() {
       //查询业绩账户流水
       profit({
         bizType: 'AJ_CELR'
       }).then(res => {
+        this.amount = res.amount;
         res.list.map(function(item) {
           //格式化日期时间
           let date = new Date(item.createDatetime);

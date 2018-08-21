@@ -1,22 +1,8 @@
 <template>
   <div class="intentionalAgent">
-    <div class="header clearfix">
-      <div @click="changeIndex('')" :class="[index == '' ? 'active' : '']">
-        <i>全部</i>
-      </div>
-      <div @click="changeIndex('0')" :class="[index == '0' ? 'active' : '']">
-        <i>待支付</i>
-      </div>
-      <div @click="changeIndex('3')" :class="[index == '3' ? 'active' : '']">
-        <i>待收货</i>
-      </div>
-      <div @click="changeIndex('4')" :class="[index == '4' ? 'active' : '']">
-        <i>已收货</i>
-      </div>
-      <div @click="changeIndex('5')" :class="[index == '5' ? 'active' : '']">
-        <i class="width">申请取消</i>
-      </div>
-    </div>
+    <category-scroll :currentIndex="currentIndex"
+                     :categorys="categorys"
+                     @select="selectCategory"></category-scroll>
     <div class="item clearfix" v-for="(item,index) in list">
       <div class="top clearfix">
         <span class="user">提交人：{{item.realName || item.nickName}}（{{item.agent.mobile}}）</span>
@@ -49,6 +35,7 @@
 </template>
 <script>
   import Toast from 'base/toast/toast';
+  import CategoryScroll from 'base/category-scroll/category-scroll';
   import { queryOrderForm, receiveNromalOrder,cencelChuHuoOrder} from "api/baohuo";
   import { formatDate, formatImg } from "common/js/util";
   import { getUser, getUserById } from "api/user";
@@ -56,20 +43,28 @@
   export default {
     data() {
       return {
-        index: "",
+        index: 0,
         list: [],
         hightShow: false,
         num: "",
         status: {},
         heightActive: '',
-        toastText: ''
+        toastText: '',
+        currentIndex: +this.$route.query.index || 0,
+        categorys: [
+          {value: '全部',key: 'all'},
+          {value: '待支付', key: '0'},
+          {value: '待发货', key: '1||2'},
+          {value: '待收货', key: '3'},
+          {value: '已收货', key: '4'},
+          {value: '申请取消', key: '5'}]
       };
     },
     methods: {
-      changeIndex(index) {
-        this.index = index;
-        this.check();
-      },
+      // changeIndex(index) {
+      //   this.index = index;
+      //   this.check();
+      // },
       changeHeight(index) {
         this.heightActive = this.heightActive === index ? '' : index;
       },
@@ -77,16 +72,18 @@
         return formatImg(img);
       },
       check() {
-        let params;
-        if(this.index == 2) {
-          params = [1, 2];
-        } else if(this.index == '') {
-          params = [];
-        } else {
-          params = [this.index];
-        }
+        // let params;
+        // if(this.index == 2) {
+        //   params = [1, 2];
+        // } else if(this.index == '') {
+        //   params = [];
+        // } else {
+        //   params = [this.index];
+        // }
+        let key = this.categorys[this.index].key;
+        let index = key === 'all' ? [] : key.split('||');
         // 请求订单
-        queryOrderForm(params).then(res => {
+        queryOrderForm(index).then(res => {
           if (res.list.length <= 1) {
           }
           res.list.forEach(function () {
@@ -126,13 +123,20 @@
             window.location.reload()
           }
         })
-      }
+      },
+      selectCategory(index) {
+        this.index = index;
+        console.log(index);
+        this.currentIndex = index;
+        this.check();
+      },
     },
     mounted() {
       this.check();
     },
     components: {
-      Toast
+      Toast,
+      CategoryScroll
     }
   };
 </script>

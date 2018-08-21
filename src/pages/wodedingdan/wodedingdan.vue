@@ -23,7 +23,7 @@
                 <div class="downward" @click="changeHeight(index)">></div>
                 <p>订单编号：{{item.code}}</p>
                 <p>订单类型：{{item.kind}}</p>
-                <p>下单时间：{{item.applyDatetime}}</p>
+                <p>下单时间：{{formatDate(item.applyDatetime)}}</p>
                 <p>收货人：{{item.signer}}（{{item.mobile}}）</p>
                 <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
             </div>
@@ -63,6 +63,9 @@ export default {
     };
   },
   methods: {
+    formatDate(date) {
+      return formatDate(date);
+    },
     changeIndex(index) {
       this.index = index;
       this.check();

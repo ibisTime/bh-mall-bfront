@@ -158,11 +158,12 @@ export default {
       options.padAmount = this.padAmount * 1000;
       options.payPdf = this.photos[0].key;
       options.idNo = this.identity;
-      console.log(this.isIdentity);
-      // if(this.isIdentity) {
-      //   options.inHand = this.identityPhotos[0].key;
-      // }
-      options.idHand = this.identityPhotos[0].key;
+      console.log(this.identityPhotos[0].key);
+      if(this.isIdentity) {
+        debugger;
+        options.idHand = this.identityPhotos[0].key;
+      }
+      // options.idHand = this.identityPhotos[0].key || '';
       upgradeApplica(options).then(res => {
         if (res.isSuccess) {
           this.text = '申请成功，待上级审核';

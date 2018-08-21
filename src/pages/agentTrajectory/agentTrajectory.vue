@@ -3,7 +3,7 @@
         <div class="header">
             <p><span>微信：</span> <i>{{info.wxId}}</i></p>
             <p><span>当前等级：</span> <i>{{level}}</i></p>
-            <p><span>当前上级：</span> <i>{{highUserId}}</i></p>
+            <p><span>当前上级：</span> <i>{{highUserName}}</i></p>
             <p><span>推荐人：</span> <i>{{realName}}</i></p>
         </div>
         <div class="blank"></div>
@@ -61,20 +61,18 @@ export default {
 
     },
     mounted(){
-        // console.log(status)
-        this.status = status
+        this.status = status;
         //当前用户以及轨迹
         getTrack().then(res => {
-            console.log(res.highUserId);
-            this.info = res
-            this.logList = res.logList
-            this.userId = res.userId
-            this.highUserId = res.logList[0].highUserId
-            this.realName = res.realName
+            this.info = res;
+            this.logList = res.logList;
+            this.userId = res.userId;
+            this.highUserName = res.highUserName;
+            this.realName = res.realName;
             //当前等级
             getLevel(this.info.level).then(res =>{
                 this.level = res[0].name;
-            })
+            });
 
             //遍历轨迹 重新生成轨迹数组
 
