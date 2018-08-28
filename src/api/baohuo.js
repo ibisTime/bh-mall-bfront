@@ -926,7 +926,7 @@ export function orderDetail(info) {
 
 // 详情查授权单
 export function shouquandanDetail(info) {
-  return fetch(627287, {
+  return fetch(627307, {
     userId: info.userId
   });
 }
