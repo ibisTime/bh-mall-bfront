@@ -8,51 +8,41 @@
             <div class="center">
                 <div class="erweimaPic" id="qrcode"></div>
             </div>
-            <div class="bottom" @click="share">分享商城</div>
+            <div class="bottom" @click="showMask">分享商城</div>
         </div>
+        <share-mask ref="shareMask"></share-mask>
     </div>
 </template>
 <script>
-const QRCode = require("js-qrcode");
-import {getCookie} from 'common/js/cookie.js';
-import {getUser,getUserById} from 'api/user';
-import {initShare} from 'common/js/weixin'
+import QRCode from 'js-qrcode';
+import ShareMask from 'components/share-mask/share-mask';
+import { initShare } from 'common/js/weixin';
+import { getCookie } from 'common/js/cookie.js';
+import { getUserById } from 'api/user';
+import Logo from './logo.png';
+
 export default {
-    data(){
-        return{
+    data() {
+        return {
             wxUrl:'http://front.bhxt.hichengdai.com/xcx/?userId=',
             userId:'',
-            nickname:'',
-            // info:{
-            //     title:'qqqqqqqqqqq',
-            //     desc:'qqqqqqqqqqq',
-            //     link:this.wxUrl,
-            //     imgUrl:'http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg'
-            // },
-        }
-    },
-    methods:{
-        share(){
-          let info = {
-              title:'qqqqqqqqqqq',
-              desc:'qqqqqqqqqqq',
-              link:location.origin+'/xcx/?userId='+this.userId,
-              imgUrl:'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg'
-          };
-          initShare(info,this.success);
-        },
+            nickname:''
+        };
     },
     mounted(){
-      this.userId = getCookie('userId') || this.$route.query.userId;
-      this.wxUrl += this.userId;
-      console.log(this.wxUrl);
-      getUserById(this.userId).then(res =>{
-            this.nickname = res.nickname
+      this.makeCode();
+    },
+    methods: {
+      // 生成二维码
+      makeCode() {
+        this.userId = this.$route.query.userReferee || getCookie('userId');
+        this.wxUrl += this.userId;
+        getUserById(this.userId).then(res =>{
+            this.nickname = res.nickname;
+            this.initShare();
         });
-
         //用插件生成二维码
         const container = document.getElementById("qrcode");
-
         //设置转换二维码图片的参数
         const qr = new QRCode(container, {
             width: 275,
@@ -63,47 +53,66 @@ export default {
             foreground: "#000000"
         });
         qr.make(this.wxUrl);
-
+      },
+      // 初始化分享
+      initShare() {
+        initShare({
+          title: this.nickname + '的商城',
+          desc: '扫一扫，进入' + this.nickname + '的商城',
+          link: location.href,
+          imgUrl: Logo
+        });
+      },
+      showMask() {
+        this.$refs.shareMask.show();
+      }
+    },
+    components: {
+      ShareMask
     }
 }
 </script>
 <style lang="scss" scoped>
 @import '../../common/scss/variable.scss';
-    .fenxiangshangcheng{
+    .fenxiangshangcheng {
+        position: fixed;
+        width: 100%;
         height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background-image: url('../../assets/imgs/bg@2x.png');
-        padding: 1.33rem 0.56rem;
-        .container{
-            height: 100%;
+
+        .container {
+            padding: 0.82rem;
             background-color: #fff;
             border-radius: 0.1rem;
-            .top{
-                height: 1.88rem;
+
+            .top {
                 overflow: hidden;
-                color: rgb(51, 51, 51);
-                font-size: 0.4rem;
                 text-align: center;
-                .saoyisao{
-                    margin-top: 0.82rem;
-                }
-                .title{
+                font-size: 0.4rem;
+                color: rgb(51, 51, 51);
+
+                .title {
                     margin-top: 0.28rem;
                 }
             }
-            .center{
-                margin:0.87rem auto 0 auto;
+            .center {
+                margin: 0.87rem auto 0 auto;
                 padding: 0.27rem;
                 width: 3.6rem;
                 height: 3.6rem;
                 border: 1px solid rgb(153, 153, 153);
                 border-radius: 0.2rem;
-                .erweimaPic{
+
+                .erweimaPic {
                     width: 100%;
                     height: 100%;
                 }
             }
-            .bottom{
-                margin: 1rem auto;
+            .bottom {
+                margin: 0.87rem auto 0;
                 background-color: $primary-color;
                 font-size: $font-size-medium-xx;
                 line-height: 0.9rem;
