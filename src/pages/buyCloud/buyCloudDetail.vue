@@ -16,13 +16,14 @@
     </div>
     <div class="footer">
       <div class="link">
-        <div class="service">
+        <a class="service" :href="'tel:' + telephone">
           <img class="img" src="../../assets/imgs/kefu@2x.png">
           <p class="text">客服</p>
-        </div>
+        </a>
         <div class="car" @click="$router.push('/cart')">
           <img class="img" src="../../assets/imgs/gouwuche@2x.png">
           <p class="text">购物车</p>
+          <i>{{total}}</i>
         </div>
       </div>
       <div class="shopCar" @click="productDetail(0)">加入购物车</div>
@@ -69,7 +70,7 @@
   </div>
 </template>
 <script>
-import { queryProduct, productDetail, cloudBill, toCart } from "api/baohuo";
+import { queryProduct, productDetail, cloudBill, toCart, getPercent, getCartList } from "api/baohuo";
 import { getUser, getUserById } from "api/user";
 import { formatImg, formatAmount } from "common/js/util";
 import { getCookie } from "common/js/cookie";
@@ -102,7 +103,8 @@ export default {
       loop: false,
       total: 0,
       buyNow: false,
-      price: 0
+      price: 0,
+      telephone: null
     };
   },
   methods: {
@@ -211,8 +213,14 @@ export default {
   mounted() {
     this.code = this.$route.query.code;
     this.loading = true;
-    getUser().then((res) => {
-      this.level = res.level;
+    Promise.all([
+      getPercent('telephone'),
+      getUser(),
+      getCartList()
+    ]).then(([res1, res2, res3]) => {
+      this.telephone = res1.cvalue;
+      this.level = res2.level;
+      this.total = res3.totalCount;
       productDetail({
         code: this.code,
         level: this.level
@@ -229,7 +237,7 @@ export default {
         this.detail = data;
         this.price = this.specsList[0].price.price;
       })
-    });
+    })
   },
   components: {
     toast,
@@ -344,7 +352,7 @@ export default {
     width: 2.9rem;
     overflow: hidden;
   }
-  .footer .link>div{
+  .footer .link>div,.footer .link>a{
     float: left;
     width: 50%;
     text-align: center;
@@ -362,7 +370,18 @@ export default {
     margin-top: 0.1rem;
   }
   .footer .link .car{
+    position: relative;
     border-left: 1px solid #eee;
+    i {
+      display: inline-block;
+      border: 1px solid orange;
+      width: 0.3rem;
+      border-radius: 50%;
+      color: white;
+      background: orange;
+      position: absolute;
+      top: 0.1rem;
+    }
   }
   .footer .shopCar,.buy{
     width: 2.3rem;

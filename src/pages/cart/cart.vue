@@ -242,20 +242,19 @@ export default {
     this.getPageCart();
   },
   computed:{
-      proList:function(){
+    proList:function(){
+      //格式化时间
+      this.list.map(function(item) {
+          item.approveDatetime = formatDate(item.approveDatetime)
+      })
 
-          //格式化时间
-          this.list.map(function(item) {
-              item.approveDatetime = formatDate(item.approveDatetime)
+      //数字等级转化文字等级
+      this.list.map(function(item) {
+          item.level = getLevel(item.level).then(res => {
+              item.level = res[0].name
           })
-
-          //数字等级转化文字等级
-          this.list.map(function(item) {
-              item.level = getLevel(item.level).then(res => {
-                  item.level = res[0].name
-              })
-          })
-      },
+      })
+    },
   },
   components: {
     FullLoading,

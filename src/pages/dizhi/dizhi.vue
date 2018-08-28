@@ -1,7 +1,7 @@
 <template>
   <div class="dizhi">
     <div class="address">
-      <div class="item" v-for="item in list" @click="setDefault(item.code)">
+      <div class="item" v-for="item in list" @click="setDefault(item.code, item.isDefault)">
         <img src="../../assets/imgs/shouhuodizhi@2x.png"  class="left">
         <p class="name-mobile">
           <span>姓名：{{item.receiver}}</span>
@@ -10,6 +10,7 @@
         <p class="address">
           收货地址：<i>{{item.province}}</i> <i>{{item.city}}</i> <i>{{item.area}}</i> {{item.address}}
         </p>
+        <p v-show="item.isDefault === '1'" class="default">[默认地址]</p>
       </div>
     </div>
     <div class="footer" @click="$router.push('/tianjiadizhi?address=' + address)">添加地址</div>
@@ -27,8 +28,8 @@ export default {
     };
   },
   methods: {
-    setDefault(code) {
-      if(this.list.length == '1') {
+    setDefault(code, isDefault) {
+      if(this.list.length == '1' || isDefault === '1') {
         this.$router.back();
       } else {
         setDefultAddress(code).then(res => {
@@ -45,6 +46,8 @@ export default {
               this.$router.back();
             }
           }
+        }).catch(() => {
+          this.$router.back();
         });
       }
     }
@@ -65,7 +68,6 @@ export default {
 @import "../../common/scss/variable.scss";
 .dizhi {
   .address {
-    margin-bottom: 1rem;
   }
   .item {
     height: 1.8rem;
@@ -73,6 +75,9 @@ export default {
     background-color: #fff;
     position: relative;
     border-bottom: 1px solid #eee;
+    .default {
+      color: orange;
+    }
     img {
       width: 0.3rem;
       position: absolute;

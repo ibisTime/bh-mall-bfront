@@ -13,7 +13,7 @@
         <p>姓名：{{userInfo.realName}}</p>
         <p>微信号：{{userInfo.wxId}}</p>
         <p>手机号：{{userInfo.mobile}}</p>
-        <p v-show="!free">打款金额：<input type="text" v-model="padAmount"></p>
+        <p v-show="!free">打款金额：<input type="text" v-model="padAmount" :placeholder="plh"></p>
         <p>等级：{{userInfo.level}}</p>
         <div class="area">
             <span>升级等级</span> <button  @click="chooseLevel" :value='level'>{{level || btntext}}</button>
@@ -105,7 +105,8 @@ export default {
       myRealName: -1,
       realName: false,
       reNumber: null,
-      free: false
+      free: false,
+      plh: ''
     };
   },
   created() {
@@ -145,6 +146,9 @@ export default {
       this.padAmount = formatAmount(minCharge);
       if(this.reNumber >= reNumber) {
         this.free = true;
+        this.plh = '您已符合半门槛推荐要求，可免费升级';
+      } else {
+        this.plh = '';
       }
       // this.padAmount =
     },
@@ -154,6 +158,11 @@ export default {
     },
     upgradeApplica1() {
       let flag = true;
+      if(!this.options.applyLevel) {
+        this.text = '请选择要升级的等级';
+        this.$refs.mytoast.show();
+        return;
+      }
       if(this.photos.length === 0){
         this.text = '请上传打款截图';
         this.$refs.mytoast.show();

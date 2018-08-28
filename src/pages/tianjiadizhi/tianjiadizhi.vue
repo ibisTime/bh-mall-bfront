@@ -59,26 +59,25 @@ export default {
             this.options.district = district;
         },
         add(){
-          if(!this.options.province) {
-            this.text = '省市区不能为空';
-            this.$refs.mytoast.show()
-          } else if(!this.options.receiver) {
+          if(!this.options.receiver) {
             this.text = '姓名不能为空';
             this.$refs.mytoast.show()
           } else if(!this.options.mobile) {
             this.text = '手机号不能为空';
+            this.$refs.mytoast.show()
+          } else if(!this.options.province) {
+            this.text = '省市区不能为空';
             this.$refs.mytoast.show()
           } else if(!this.options.address) {
             this.text = '地址不能为空';
             this.$refs.mytoast.show()
           } else {
             addAddress(this.options).then(res =>{
-              console.log(res.code)
               if(res.code !== '') {
-                this.text = '添加成功'
+                this.text = '添加成功';
                 this.$refs.mytoast.show(this.push)
               }else{
-                this.text = '添加失败'
+                this.text = '添加失败';
                 this.$refs.mytoast.show()
               }
             })

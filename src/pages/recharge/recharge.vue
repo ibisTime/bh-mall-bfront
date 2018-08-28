@@ -101,18 +101,18 @@ export default {
           } else if(this.status === 2) {
               this.loading = true;
               this.title = '充值中...';
-              // queryConfig(this.accountNumber,this.moneyNum * 1000).then(res => {
-              //     let wxConfig = {
-              //         appId: res.appId, // 公众号名称，由商户传入
-              //         timeStamp: res.timeStamp, // 时间戳，自1970年以来的秒数
-              //         nonceStr: res.nonceStr, // 随机串
-              //         wechatPackage: res.wechatPackage,
-              //         signType: res.signType, // 微信签名方式：
-              //         paySign: res.paySign // 微信签名
-              //     }
-              //     initPay(wxConfig, this.success, this.error, this.cancel)
-              // }).catch(() => { this.loading = false; })
-            this.success();
+              queryConfig(this.accountNumber,this.moneyNum * 1000).then(res => {
+                  let wxConfig = {
+                      appId: res.appId, // 公众号名称，由商户传入
+                      timeStamp: res.timeStamp, // 时间戳，自1970年以来的秒数
+                      nonceStr: res.nonceStr, // 随机串
+                      wechatPackage: res.wechatPackage,
+                      signType: res.signType, // 微信签名方式：
+                      paySign: res.paySign // 微信签名
+                  }
+                  initPay(wxConfig, this.success, this.error, this.cancel)
+              }).catch(() => { this.loading = false; })
+            // this.success();
           }
       }
   },
