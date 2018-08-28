@@ -5,10 +5,10 @@
                 <i class="tip" @click="$router.push('/journal?id=' + userinfo.userId + '&name=' + userinfo.realName);">流转日志</i>
             </p>
             <p>
-                <span>微信号：{{userinfo.wxId}}</span>
+                <span>微信号：{{userinfo.user.wxId}}</span>
             </p>
             <p>
-                <span>手机号：{{userinfo.mobile}}</span>
+                <span>手机号：{{userinfo.user.mobile}}</span>
             </p>
             <p v-show="userinfo.idNo">
                 <span>身份证号：{{userinfo.idNo}}</span>
@@ -18,9 +18,9 @@
             </p>
             <p style="padding: 0 0.3rem;" v-show="userinfo.idHand"><img style="max-width: 100%;float:none;" :src="formatImg(userinfo.idHand)"/><p>
             <p>区域：
-                <i>{{userinfo.province}}</i>
-                <i>{{userinfo.city}}</i>
-                <i>{{userinfo.area}}</i>
+                <i>{{userinfo.user.province}}</i>
+                <i>{{userinfo.user.city}}</i>
+                <i>{{userinfo.user.area}}</i>
             </p>
         </div>
         <div class="checkdispose-bottom">
