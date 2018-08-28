@@ -495,7 +495,7 @@ export default {
     .item {
       width: 33.3%;
       height: 1.9rem;
-      padding-top: 0.48rem;
+      padding-top: 0.24rem;
       text-align: center;
       border-bottom: 1px solid $color-border;
       border-right: 1px solid $color-border;

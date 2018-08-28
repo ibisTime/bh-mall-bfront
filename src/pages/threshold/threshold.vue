@@ -145,41 +145,42 @@ export default {
           }
         }
       }
-      .item{
-        height: 1.4rem;
-        border-bottom: 1px solid #eee;
+      .item {
         position: relative;
+        padding: 0.2rem 0.3rem;
+        border-bottom: 1px solid #eee;
+
         .center{
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          .item-time{
-            display: inline-block;
-            width: 1.23rem;
-            margin-left: 0.3rem;
-            text-align: center;
-            .day{
+          display: flex;
+          width: 100%;
+          align-items: center;
+
+          .item-time {
+            flex: 0 0 0.84rem;
+
+            .day {
                 font-size: $font-size-medium-xx;
                 color: #333;
             }
-            .minute{
+            .minute {
+                margin-top: 0.16rem;
                 font-size: $font-size-small;
                 color: #999;
-                margin-top: 0.16rem;
             }
           }
-          img{
+          img {
             width: 0.72rem;
           }
-          .detail{
-            display: inline-block;
-            width: 3.9rem;
-            .datail-money{
+          .detail {
+            padding-left: 0.2rem;
+
+            .datail-money {
+                line-height: 1.1;
                 font-size: $font-size-large-s;
                 color: #fe8472;
             }
-            .detail-text{
-                margin-top: 0.22rem;
+            .detail-text {
+                margin-top: 0.1rem;
                 font-size: $font-size-small;
                 color: #333;
             }

@@ -11,7 +11,9 @@ export default {
   mounted() {
     // setUser({ userId: 'U201808261104285013162' });
     if (!isLogin()) {
-      this.$router.push('/?userReferee=' + this.$route.query.userReferee);
+      if (this.$route.path !== '/fenxiangshangcheng') {
+        this.$router.push('/?userReferee=' + this.$route.query.userReferee || '');
+      }
     }
     this.resetFontSize();
   },

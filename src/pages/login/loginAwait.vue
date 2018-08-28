@@ -40,7 +40,9 @@ export default {
   },*/
   mounted() {
     if (!isLogin()) {
-      if (/userReferee=([^&]+)&code=([^&]+)&state=/.exec(location.href)) {
+      if (this.$route.path === '/fenxiangshangcheng') {
+        return;
+      } else if (/userReferee=([^&]+)&code=([^&]+)&state=/.exec(location.href)) {
         this.userReferee = RegExp.$1;
         this.code = RegExp.$2;
         this.toOther();
