@@ -22,12 +22,12 @@ export function initShare(config, suc, err, isInitImage) {
       let result = /\?([^#]*)$/.exec(config.link);
       if (result) {
         if (result[1]) {
-          config.link = config.link + '&userReferee=' + getUserId();
+          config.link = config.link;
         } else {
-          config.link = config.link + 'userReferee=' + getUserId();
+          config.link = config.link;
         }
       } else {
-        config.link = config.link + '?userReferee=' + getUserId();
+        config.link = config.link;
       }
     } else {
       config.link.replace(/((?:\?|&)userReferee=)[^&$]+/, '$1' + getUserId());
@@ -72,7 +72,7 @@ export function initShowImage () {
     wx.config({
       appId: data.appId,
       timestamp: data.timestamp,
-      nonceStr: data.nonceStr,
+      nonceStr: data.noncestr,
       signature: data.signature,
       jsApiList: ['previewImage']
     });
@@ -121,7 +121,7 @@ function _initShare(data, config, isInitImage) {
     wx.onMenuShareQZone(config);
   });
   wx.error((err) => {
-
+    // alert(err);
   });
 }
 // 微信支付

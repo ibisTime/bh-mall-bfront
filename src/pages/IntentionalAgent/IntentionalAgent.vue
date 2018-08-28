@@ -1,43 +1,54 @@
 <template>
   <div class="intentionalAgent">
       <div class="header clearfix">
-          <div @click="changeIndex(5)" :class="[index == 5 ? 'active' : '']">
+          <div @click="changeIndex('0')" :class="[index === '0' ? 'active' : '']">
               <i>待分配</i>
           </div>
-          <div @click="changeIndex(3)" :class="[index == 3 ? 'active' : '']">
+          <div @click="changeIndex('3')" :class="[index === '3' ? 'active' : '']">
               <i>已分配</i>
           </div>
-          <div @click="changeIndex(4)" :class="[index == 4 ? 'active' : '']">
+          <div @click="changeIndex('1')" :class="[index === '1' ? 'active' : '']">
               <i>已忽略</i>
           </div>
       </div>
-      <div v-for="item in userlist" class="item" @click="$router.push('/IntentionalAgent/detail?id=' + item.user.userId);">
-          <p>姓名：{{item.user.realName}} <i class="tip">{{item.applyLevel}}</i></p>
-          <p><span>微信号：{{item.user.wxId}}</span> <i class="tel">手机号：{{item.user.mobile}}</i> <img src="../../assets/imgs/more@2x.png" alt=""></p>
-          <p>区域：<i>{{item.user.province}}</i> <i>{{item.user.city}}</i> <i>{{item.user.area}}</i></p>
+      <div v-for="item in userlist" class="item" @click="$router.push('/IntentionalAgent/detail?id=' + item.userId + '&index=' + index);">
+          <p>姓名：{{item.realName}} <i class="tip">{{item.applyLevel}}</i></p>
+          <p><span>微信号：{{item.wxId}}</span> <i class="tel">手机号：{{item.mobile}}</i> <img src="../../assets/imgs/more@2x.png" alt=""></p>
+          <p>区域：<i>{{item.province}}</i> <i>{{item.city}}</i> <i>{{item.area}}</i></p>
       </div>
-      <!-- <div class="item"  @click="$router.push('/IntentionalAgent/detail?id=U20180328101135370654&index=' + index);">
-          <p>姓名：张北 <i class="tip">二级代理</i></p>
-          <p><span>微信号：哈哈哈</span> <i class="tel">手机号：12345678901</i> <img src="../../assets/imgs/more@2x.png" alt=""></p>
-          <p>区域：<i>浙江省</i> <i>杭州市</i> <i>余杭区</i></p>
-      </div> -->
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
-import { intentional, getLevel } from "api/baohuo";
-import { formatDate } from "common/js/util";
+import FullLoading from 'base/full-loading/full-loading';
+import { intentional, getLevel, getYixiang } from "api/baohuo";
+import { formatDate, getUserId } from "common/js/util";
 export default {
   name: "IntentionalAgent",
   data() {
     return {
-      index: 5,
+      loading: false,
+      title: '正在加载...',
+      index: '0',
       userlist: []
     };
   },
   methods: {
     changeIndex(index) {
       this.index = index;
-      intentional(index + '').then(res => {
+      let params = {
+        status: index
+      };
+      if(index === '0') {
+        params.toUserId = getUserId()
+        params.status = '3';
+      } else if(index === '3') {
+        params.approver = getUserId()
+      }
+      this.loading = true;
+
+      getYixiang(params).then(res => {
+        this.loading = false;
         res.list.map(function(item) {
           //格式化时间
           item.approveDatetime = formatDate(item.approveDatetime);
@@ -52,18 +63,10 @@ export default {
     }
   },
   mounted() {
-    intentional(5).then(res => {
-      res.list.map(function(item) {
-        //格式化时间
-        item.approveDatetime = formatDate(item.approveDatetime);
-
-        //数字等级转化文字等级
-        getLevel(item.applyLevel).then(res => {
-          item.applyLevel = res[0].name;
-        });
-      });
-      this.userlist = res.list;
-    });
+    this.changeIndex('0');
+  },
+  components: {
+    FullLoading
   }
 };
 </script>

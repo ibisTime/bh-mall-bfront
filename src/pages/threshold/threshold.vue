@@ -6,12 +6,12 @@
               <p class="money-balance">{{account / 1000}}</p>
           </div>
           <div class="header-bottom">
-              <div class="header-bottom-left fl" @click="$router.push('/recharge?accountNumber=' + accountNumber)">
+              <div class="header-bottom-left fl" @click="$router.push('/recharge?type=MK_CNY&accountNumber=' + accountNumber)">
                   <img src="../../assets/threshold/chongzhi.png" alt="">
                   <span>充值</span>
                   <i class="line"></i>
               </div>
-              <div class="header-bottom-right fl" @click="$router.push('/buyCloud')">
+              <div class="header-bottom-right fl" @click="goBuyCloud">
                   <img src="../../assets/threshold/goumaiyuncang.png" alt="">
                   <span>购买云仓</span>
               </div>
@@ -32,58 +32,72 @@
               </div>
           </div>
       </div>
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
+import FullLoading from 'base/full-loading/full-loading';
 import {getBill,queryBill,getAccount} from 'api/baohuo';
 import {setCookie,getCookie} from 'common/js/cookie';
 import {formatDate} from 'common/js/util';
 export default {
   name:'threshold',
   data(){
-      return{
-          list:[],
-          account:0,
-          accountNumber:'',
-      }
+    return{
+      list:[],
+      account:0,
+      accountNumber:'',
+      title: '正在加载...',
+      loading: false
+    }
   },
   methods:{
-
+    goBuyCloud() {
+      if(getCookie('isWare') == '1') {
+        // alert('buyCloud');
+        this.$router.push('/buyCloud');
+      } else {
+        // alert('noWare');
+        this.$router.push('/buyCloud/noWare');
+      }
+    }
   },
   mounted(){
-      //获取用户门槛账户
-      getBill().then(res => {
-            this.accountNumber = res[0].accountNumber
-            this.account = res[0].amount;
-            //查询门槛账户流水
-            queryBill(res[0].accountNumber).then(res => {
-                //   console.log(res)
-                  res.list.map(function(item){
-
-                      //格式化日期时间
-                      let date = new Date(item.createDatetime)
-                        let day = date.getDate()
-                        let hour = date.getHours()
-                        let minutes = date.getMinutes()
-                        day = day < 10 ? '0' + day : day
-                        hour = hour < 10 ? '0' + hour : hour
-                        minutes = minutes < 10 ? '0' + minutes : minutes
-                        item.day = day
-                        item.hour = hour
-                        item.minutes = minutes
-                  })
-                  this.list = res.list
-            })
+    //获取用户门槛账户
+    this.loading = true;
+    getBill().then(res => {
+      this.accountNumber = res[0].accountNumber;
+      this.account = res[0].amount;
+      //查询门槛账户流水
+      queryBill(res[0].accountNumber).then(res => {
+        this.loading = false;
+        res.list.map(function(item){
+          //格式化日期时间
+          let date = new Date(item.createDatetime);
+            let day = date.getDate();
+            let hour = date.getHours();
+            let minutes = date.getMinutes();
+            day = day < 10 ? '0' + day : day;
+            hour = hour < 10 ? '0' + hour : hour;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            item.day = day;
+            item.hour = hour;
+            item.minutes = minutes;
+        });
+        this.list = res.list
       })
+    })
   },
   computed:{
-
-      // 判断引入收入支出图片
-      img:function(){
-          this.list.map(function(item){
-              item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png')
-          })
-      }
+    // 判断引入收入支出图片
+    img:function(){
+      this.list.map(function(item){
+          item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png')
+      })
+    }
+  },
+  components: {
+    FullLoading
   }
 }
 </script>

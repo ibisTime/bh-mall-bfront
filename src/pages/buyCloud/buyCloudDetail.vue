@@ -1,15 +1,32 @@
 <template>
   <div class="buycloud">
-    <div class="item" v-for="(item, index) in list" v-show="list.length" @click="$router.push('/buyCloud/buyCloudDetail?code=' + item.code)">
-      <img :src="item.pic" alt="">
-      <div class="content" v-if="item.specsList[specsIndex[index]].priceList[0]">
-        <p>产品名称：{{item.name}} <br>单价：{{formatAmount(item.specsList[specsIndex[index]].priceList[0].price)}}</p>
-        <i>包装：{{item.specsList[specsIndex[index]].name}}</i>
-        <span @click="prodectDetail(item.code, index)">购买云仓</span>
+    <div class="goodsdetail">
+      <slider v-if="banners.length">
+        <div class="home-slider" v-for="item in banners" :key="item">
+          <img :src="item">
+        </div>
+      </slider>
+      <div class="center">
+        <p class="title">{{detail.name}}</p>
+        <p class="tip">{{detail.slogan}}</p>
+        <div class="price">
+          <p class="oldPrice">市场价：￥{{formatAmount(detail.price)}}</p>
+        </div>
       </div>
     </div>
-    <div v-show="!list.length">
-      <no-result title="抱歉，暂无内容"></no-result>
+    <div class="footer">
+      <div class="link">
+        <div class="service">
+          <img class="img" src="../../assets/imgs/kefu@2x.png">
+          <p class="text">客服</p>
+        </div>
+        <div class="car" @click="$router.push('/cart')">
+          <img class="img" src="../../assets/imgs/gouwuche@2x.png">
+          <p class="text">购物车</p>
+        </div>
+      </div>
+      <div class="shopCar" @click="productDetail(0)">加入购物车</div>
+      <div class="buy" @click="productDetail(1)">立即购买</div>
     </div>
     <div :class="['mask',flag ? 'show' : '']" @click="genghuan"></div>
     <div :class="['buypart',buypartFlag ? 'show' : '']">
@@ -21,19 +38,20 @@
           <p>{{detail.name}}</p>
           <span>请选择</span>
           <i @click="genghuan">X</i>
+          <p>库存：{{detail.specsList[num].stockNumber}}</p>
         </div>
       </div>
       <div class="packaging">
         <p>规格</p>
         <div class="select">
-          <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(item.productSpecsCode,index,$event)" :class="[num === index ? 'active' : '']">{{item.name}}</span>
+          <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(item.code,index,$event)" :class="[num === index ? 'active' : '']">{{item.name}}</span>
         </div>
       </div>
       <div class="total-money">
         <div class="left" v-if="detail.specsList">
           <i class="text">合计：</i>
-          <i class="symbol">￥</i>
-          <i class="sum">{{formatAmount(detail.specsList[specsIndex[curProductIdx]].price.price * number)}}</i>
+          <i class="symbol">￥{{formatAmount(this.price * this.number)}}</i>
+          <i class="sum"></i>
         </div>
         <div class="right">
           <span class="diamonds right-item" @click="add">+</span>
@@ -42,8 +60,7 @@
         </div>
       </div>
       <div class="buypart-bottom">
-        <div class="toCart" @click="toCart(detail.code)">加入购物车</div>
-        <div class="confirm" @click="confirm(detail.code)">提交订单</div>
+        <div class="confirm" @click="confirm(detail.code)">确定</div>
 
       </div>
     </div>
@@ -55,8 +72,10 @@
 import { queryProduct, productDetail, cloudBill, toCart } from "api/baohuo";
 import { getUser, getUserById } from "api/user";
 import { formatImg, formatAmount } from "common/js/util";
+import { getCookie } from "common/js/cookie";
 import toast from "base/toast/toast";
 import NoResult from 'base/no-result/no-result';
+import Slider from 'base/slider/slider';
 import FullLoading from 'base/full-loading/full-loading';
 export default {
   data() {
@@ -78,7 +97,12 @@ export default {
       num: 0,
       number: 1,
       text: "",
-      orderCode: []
+      orderCode: [],
+      banners: [],
+      loop: false,
+      total: 0,
+      buyNow: false,
+      price: 0
     };
   },
   methods: {
@@ -96,8 +120,15 @@ export default {
     changebuypartFlag() {
       this.buypartFlag = !this.buypartFlag;
     },
-    //确认商品
     confirm(code) {
+      if(this.buyNow) {
+        this.buy(code);
+      } else {
+        this.toCart();
+      }
+    },
+    //确认商品
+    buy(code) {
       let ref = this;
       this.options.specsCode = this.detail.specsList[this.num].code;
       this.options.quantity = this.number;
@@ -127,6 +158,7 @@ export default {
     //选购产品数量+1
     add() {
       this.number++;
+      // this.total =
     },
     // 选购产品数量-1
     sub() {
@@ -137,25 +169,22 @@ export default {
     //选择规格
     chooseSize(code,index) {
       this.num = index;
-      this.specsIndex[this.curProductIdx] = index;
-      this.productSpecsCode = code;
+      // this.specsIndex[this.curProductIdx] = index;
+      this.specsCode = code;
+      this.specsList.map((item) => {
+        if(item.code === code) {
+          this.price = item.price.price;
+        }
+      })
     },
     //选择规格
     _chooseSize(index) {
       this.number = index;
     },
     //产品详情查询
-    prodectDetail(code, index) {
+    productDetail(boolean) {
+      this.buyNow = !!boolean;
       this.genghuan();
-      let self = this;
-      this.curProductIdx = index;
-      productDetail({
-        level: this.level,
-        code: code
-      }).then(res => {
-        res.pic = formatImg(res.pic);
-        self.detail = res;
-      });
     },
     tiaozhuan() {
       this.$router.push("/home");
@@ -172,29 +201,41 @@ export default {
           this.changebuypartFlag();
         }
       })
+    },
+    getImgSyl(imgs) {
+      return {
+        backgroundImage: `url(${formatImg(imgs)})`
+      };
     }
   },
   mounted() {
+    this.code = this.$route.query.code;
     this.loading = true;
-    getUser().then(res => {
+    getUser().then((res) => {
       this.level = res.level;
-      //商品列表查询
-      queryProduct({
-        level: res.level,
-        status: '2'
-      }).then(res => {
+      productDetail({
+        code: this.code,
+        level: this.level
+      }).then((data) => {
         this.loading = false;
-        res.list.map((item) => {
-          item.pic = formatImg(item.pic);
-          this.specsIndex.push(0);
-        });
-        this.list = res.list;
-      });
+        let advPic = data.advPic.split('||').map(p => formatImg(p));
+        if(advPic.length > 1) {
+          this.loop = true;
+        }
+        let specsList = data.specsList;
+        data.pic = formatImg(data.pic);
+        this.banners = advPic;
+        this.specsList = specsList;
+        this.detail = data;
+        console.log(this.detail);
+        this.price = this.specsList[0].price.price;
+      })
     });
   },
   components: {
     toast,
     NoResult,
+    Slider,
     FullLoading
   }
 };
@@ -203,111 +244,124 @@ export default {
 @import "../../common/scss/variable.scss";
 .buycloud {
   background-color: #f7f7f7;
-  .fl {
-    float: left;
-  }
-  .fr {
-    float: right;
-  }
-  .show {
-    display: block !important;
-  }
-  .tip {
-    height: 0.6rem;
-    line-height: 0.6rem;
-    padding-left: 0.3rem;
-    background-color: #fff9e3;
-    color: #feaa00;
-    font-size: $font-size-small;
-    &.none {
-      display: none;
-    }
-    i {
-      display: inline-block;
-      width: 0.6rem;
-      height: 0.6rem;
-      float: right;
-      text-align: center;
-      margin-right: 12px;
-      img {
-        width: 0.24rem;
-      }
-    }
-  }
-  .item {
-    margin-top: 0.2rem;
-    padding: 0.2rem 0.3rem;
-    background-color: #fff;
-    overflow: hidden;
-    img {
-      float: left;
-      width: 1.8rem;
-      height: 1.8rem;
-    }
-    .content {
-      margin-left: 2rem;
-      position: relative;
-      p {
-        font-size: $font-size-medium-s;
-        color: #333;
-        line-height: 0.4rem;
-      }
-      i {
-        position: absolute;
-        top: 1.15rem;
-        left: 0;
-        font-size: $font-size-small;
-        color: #999;
-      }
-      span {
-        width: 1.2rem;
-        line-height: 0.5rem;
-        position: absolute;
-        top: 1rem;
-        right: 0;
-        background-color: $primary-color;
-        font-size: $font-size-small;
-        border-radius: 0.1rem;
-        color: #fff;
-        text-align: center;
-      }
-    }
-  }
-  .footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background-color: #fff;
-    display: none;
-    .total {
-      padding-left: 0.3rem;
-      line-height: 1rem;
-      color: #333;
-      font-size: $font-size-medium-s;
-      i {
-        color: $primary-color;
-      }
-    }
-    .payment {
-      width: 2.1rem;
-      line-height: 1rem;
-      text-align: center;
-      background-color: $primary-color;
-      color: #fff;
-      font-size: $font-size-medium-x;
-    }
-  }
-  .mask {
-    width: 100%;
-    height: 100%;
-    background-color: rgba($color: #000000, $alpha: 0.7);
+  .goodsdetail{
     position: fixed;
     top: 0;
+    bottom: 1rem;
+    width: 100%;
+    overflow: auto;
+    background-color: #f7f7f7;
+    /*.home-slider img {*/
+      /*height: 8rem;*/
+    /*}*/
+  }
+
+  /* 商品介绍 */
+  .center{
+    padding: 0.28rem 0.24rem;
+    background-color: #fff;
+  }
+  .center .title{
+    display: block;
+    font-size: 0.32rem;
+    color: rgb(51, 51, 51);
+    line-height: 0.4rem;
+  }
+  .center .tip{
+    margin-top: 0.1rem;
+    font-size: 0.24rem;
+    color: rgb(102, 102, 102);
+  }
+  .center .price{
+    margin-top: 0.25rem;
+    font-size: 0.24rem;
+    color: rgb(153, 153, 153);
+    overflow: hidden;
+  }
+  .center .price .newPrice{
+    display: inline-block;
+    color: rgb(252,68,24);
+  }
+  .center .price .newPrice>text{
+    font-size: 0.36rem;
+  }
+  .center .price .oldPrice{
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  /* 商品详情 */
+  .detail{
+    padding: 0 0.24rem;
+    margin-top: 0.2rem;
+    background-color: #fff;
+  }
+  .detail .title{
+    padding: 0.28rem 0;
+    display: block;
+    border-bottom: 1px solid #eee;
+  }
+  .detail .title .text{
+    padding-left: 0.19rem;
+    border-left: 0.06rem solid #72a52c;
+    font-size: 0.28rem;
+    color: rgb(51, 51, 51);
+    display: block;
+  }
+  .detail .detailImg{
+    margin-top: 0.2rem;
+    width: 100%;
+  }
+
+  /* 底部 */
+  .footer{
+    position: fixed;
     left: 0;
-    display: none;
-    &.show {
-      display: block;
-    }
+    bottom: 0;
+    overflow: hidden;
+    background-color: #fff;
+    width: 100%;
+    height: 1rem;
+  }
+  .footer>div{
+    float: left;
+    height: 1rem;
+    line-height: 1rem;
+    font-size: 0.28rem;
+  }
+  .footer .link{
+    width: 2.9rem;
+    overflow: hidden;
+  }
+  .footer .link>div{
+    float: left;
+    width: 50%;
+    text-align: center;
+    line-height: 1;
+  }
+  .footer .link .img{
+    width: 0.4rem;
+    display: block;
+    margin: 0 auto;
+    padding-top: 0.1rem;
+  }
+  .footer .link .text{
+    display: inline-block;
+    font-size: 0.2rem;
+    margin-top: 0.1rem;
+  }
+  .footer .link .car{
+    border-left: 1px solid #eee;
+  }
+  .footer .shopCar,.buy{
+    width: 2.3rem;
+    line-height: 1rem;
+    text-align: center;
+    color: #fff;
+    background-color: rgb(255, 122, 0);
+  }
+  .footer .shopCar{
+    background-color: rgb(255, 168, 0);
   }
   .buypart {
     width: 100%;
@@ -466,7 +520,8 @@ export default {
         background-color: $primary-color;
       }
       .confirm {
-        color: $primary-color;
+        background: #72a52c;
+        width: 100%;
       }
     }
   }

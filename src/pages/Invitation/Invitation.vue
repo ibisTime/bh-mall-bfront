@@ -1,5 +1,5 @@
 <template>
-  <div class="invitation">
+  <div class="invitation full-screen-wrapper">
       <div class="container" >
           <div class="top">
               <div>
@@ -34,7 +34,7 @@
               </div>
           </div>
           <div class="erweima-middle">
-              <p>欢迎关注rggg,扫描上方二维码即可关注</p>
+              <p>欢迎关注麦记新零售,扫描下方二维码即可关注</p>
               <p>在线办理授权，期待您的加入</p>
           </div>
           <div class="erweima-bottom">
@@ -117,12 +117,10 @@ export default {
 <style lang="scss" scoped>
 @import "../../common/scss/variable.scss";
 .invitation {
-  height: 11rem;
   background-image: url("../../assets/invitationLink/yaoqinglianjie@2x.png");
   background-repeat: no-repeat;
   background-size: 100% 100%;
   background-color: #f19a02;
-  position: relative;
   .container {
     padding: 0 0.3rem;
     font-size: $font-size-small;

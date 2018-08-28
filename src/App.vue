@@ -5,10 +5,11 @@
 </template>
 
 <script>
-import { isLogin } from "common/js/util";
+import { isLogin, setUser } from "common/js/util";
 export default {
   name: "App",
   mounted() {
+    // setUser({ userId: 'U201808261104285013162' });
     if (!isLogin()) {
       this.$router.push('/?userReferee=' + this.$route.query.userReferee);
     }

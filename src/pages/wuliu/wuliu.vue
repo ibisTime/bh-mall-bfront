@@ -10,6 +10,7 @@
 <script>
 import { getAcceptImg } from 'api/baohuo'
 import { getUserById } from 'api/user'
+import { getDictList } from 'api/general'
 import { formatImg, formatDateDate } from 'common/js/util'
 export default {
     data(){
@@ -20,7 +21,13 @@ export default {
     },
     mounted(){
       this.code =  this.$route.query.code;
-      this.company =  this.$route.query.company
+      this.company =  this.$route.query.company;
+      getDictList('kd_company').then((res) => {
+        res.map((item) => {
+          if(item.dkey === this.company)
+            this.company = item.dvalue;
+        })
+      })
     }
 }
 </script>

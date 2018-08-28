@@ -7,7 +7,7 @@
         <div>
             <i v-show="errors.has('introducer')" class="error-tip">{{errors.first('introducer')}}</i>
             <span>介绍人手机号</span>
-            <input class="pl2rem" @keyup="introducerChange" v-model="introducer" type="text" name="introducer" placeholder="可不填，跨级介绍时必填">
+            <input class="pl2rem" @keyup="introducerChange" v-model="introducer" type="tel" name="introducer" placeholder="可不填，跨级介绍时必填">
         </div>
         <div class="area">
             <i v-show="errors.has('applyLevel')" class="error-tip">{{errors.first('applyLevel')}}</i>
@@ -124,7 +124,7 @@ export default {
                 this.applyLevel = this.levelList[0].level;
                 this.level = this.levelList[0].name;
             } else {
-                this.text = '暂无可选择的等级';
+                this.text = '介绍人不能为最高等级代理';
                 this.$refs.toast.show();
                 this.applyLevel = '';
                 this.level = '';
@@ -149,6 +149,13 @@ export default {
               getUserByMobile(mobile).then(user => {
                 let leftLevel = this.userInfo.toLevel || 0;
                 let rightLevel = user.level;
+                // console.log(rightLevel);
+                // if(rightLevel === '1') {
+                //   console.log(2);
+                //   this.text = '介绍人不能为最高等级代理';
+                //   this.$refs.toast.show();
+                //   return;
+                // }
                 let list = this.allLevelList.filter(l => l.level >= leftLevel && l.level < rightLevel);
                 this.getRealParam(list);
               }).catch(() => {

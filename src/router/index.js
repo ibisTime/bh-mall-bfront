@@ -18,7 +18,10 @@ import ceshi from '@/pages/ceshi/ceshi'
 import home from '@/pages/home/home'
 import threshold from '@/pages/threshold/threshold'
 import buyCloud from '@/pages/buyCloud/buyCloud'
+import buyCloudDetail from '@/pages/buyCloud/buyCloudDetail'
 import tijiaodingdan from '@/pages/buyCloud/tijiaodingdan'
+import noWare from '@/pages/buyCloud/noWare'
+import noWarePay from '@/pages/buyCloud/noWarePay'
 import acceptimg from '@/pages/acceptimg/acceptimg'
 import agentTrajectory from '@/pages/agentTrajectory/agentTrajectory'
 import structure from '@/pages/structure/structure'
@@ -75,6 +78,7 @@ import zrmkWeiDian from '@/pages/weidianzhanghu/zrmkWeiDian'
 import fenxiangshangcheng from '@/pages/fenxiangshangcheng/fenxiangshangcheng'
 import daichulidingdan from '@/pages/daichulidingdan/daichulidingdan'
 import sucaichaxun from '@/pages/sucaichaxun/sucaichaxun'
+import sucaiDetail from '@/pages/sucaichaxun/sucaiDetail'
 
 // 内购商城
 import xuangoushangpin from '@/pages/xuangoushangpin/xuangoushangpin'
@@ -263,10 +267,29 @@ export default new Router({
           name: 'buyCloud',
           component: buyCloud
       },
+      // 购买云仓-产品详情
+      {
+        path: '/buyCloud/buyCloudDetail',
+        name: 'buyCloudDetail',
+        component: buyCloudDetail
+      },
+      // 购买云仓-提交订单
       {
           path: '/buyCloud/tijiaodingdan',
           name: 'tijiaodingdan',
           component: tijiaodingdan
+      },
+      // 购买云仓-提交订单-无云仓
+      {
+          path: '/buyCloud/noWare',
+          name: 'noWare',
+          component: noWare
+      },
+      // 购买云仓-支付-无云仓
+      {
+          path: '/buyCloud/noWarePay',
+          name: 'noWarePay',
+          component: noWarePay
       },
       //取现订单
       {
@@ -429,6 +452,12 @@ export default new Router({
           path: '/sucaichaxun',
           name: 'sucaichaxun',
           component: sucaichaxun
+      },
+      //素材查询
+      {
+          path: '/sucaichaxun/sucaiDetail',
+          name: 'sucaiDetail',
+          component: sucaiDetail
       },
       //待处理订单
       {

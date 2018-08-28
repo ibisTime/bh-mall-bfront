@@ -12,11 +12,13 @@
               <img class="zhifu" src="../../assets/imgs/xianxiachongzhi@2x.png">
               线下充值
               <img :class="['xuanzhong', status == 1 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+              <img :class="['xuanzhong', status == 1 ? '' : 'show']" src="../../assets/imgs/unchoosed.png" alt="">
           </div>
           <div class="chongzhi" @click="changeStatus(2)">
               <img class="zhifu" src="../../assets/imgs/weixinchongzhi@2x.png">
               微信充值
               <img :class="['xuanzhong', status == 2 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+              <img :class="['xuanzhong', status == 2 ? '' : 'show']" src="../../assets/imgs/unchoosed.png" alt="">
           </div>
       </div>
       <div class="footer">
@@ -31,8 +33,8 @@
 import Toast from 'base/toast/toast';
 import FullLoading from 'base/full-loading/full-loading';
 import Confirm from 'base/confirm/confirm';
-import { getCookie } from 'common/js/cookie'
-import { queryConfig, queryAmount, getBill, checkRed } from 'api/baohuo'
+import { getCookie, setCookie } from 'common/js/cookie'
+import { queryConfig, queryAmount, checkRed, getCaccount } from 'api/baohuo'
 import { initPay } from 'common/js/weixin';
 import { getUserId, formatAmount } from 'common/js/util';
 export default {
@@ -41,7 +43,7 @@ export default {
       return {
           isAlert: true,
           confirmText: '',
-          status: '',
+          status: 2,
           moneyNum: '',
           accountNumber: '',
           account: '',
@@ -56,8 +58,9 @@ export default {
       },
       checkUser() {
         checkRed(getUserId()).then(res => {
+          setCookie('isWare', res.isWare);
           if (res.result == '4') {
-            this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge');
+            this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge?type=MK_CNY');
           } else if (res.result == "0") {
             this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
           } else if (res.result == '1') {
@@ -108,16 +111,19 @@ export default {
                       paySign: res.paySign // 微信签名
                   }
                   initPay(wxConfig, this.success, this.error, this.cancel)
-              })
+              }).catch(() => { this.loading = false; })
           }
       }
   },
   mounted(){
-      getBill().then(data => {
-        this.loading = false;
-        this.accountNumber = data[0].accountNumber;
-        this.account = data[0].amount;
-      }).catch(() => this.loading = false);
+    let currency = this.$route.query.type;
+    getCaccount({
+      currency: currency
+    }).then(data => {
+      this.loading = false;
+      this.accountNumber = data[0].accountNumber;
+      this.account = data[0].amount;
+    }).catch(() => this.loading = false);
   },
   components: {
     Toast,

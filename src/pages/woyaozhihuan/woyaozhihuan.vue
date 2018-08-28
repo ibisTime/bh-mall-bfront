@@ -207,7 +207,6 @@ export default {
     },
     //查询置换价格
     queryMoney(index) {
-      console.log(this.changeSpecsCode);
       if (this.cloudDetail.name !== "") {
         let options = {
           changeSpecsCode: this.changeSpecsCode,
@@ -216,7 +215,8 @@ export default {
           quantity: this.initNum
         };
         if(!options.productSpecsCode) {
-          alert('请选择云仓产品!');
+          this.text = "请选择云仓产品";
+          this.$refs.mytoast.show();
           return
         }
         queryMoney(options).then(res => {
@@ -322,7 +322,7 @@ export default {
     //云仓商品信息
     if (JSON.parse(getCookie("cloudDetail")) !== null) {
       this.cloudDetail = JSON.parse(getCookie("cloudDetail"));
-      this.cloudDetailPic = formatImg(this.cloudDetail.product.advPic);
+      this.cloudDetailPic = formatImg(this.cloudDetail.product.pic);
     } else {
       this.cloudDetailFlag = false;
     }
@@ -477,6 +477,7 @@ export default {
         background-color: #fff;
         img {
           width: 2.2rem;
+          height: 2.2rem;
         }
       }
       .title-right {

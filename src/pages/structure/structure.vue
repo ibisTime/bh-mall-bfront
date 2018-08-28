@@ -1,12 +1,12 @@
 <template>
   <div class="structure">
-      <div :class="['tip',tipshow ? 'none' : '']">
-          <span>支出相关：啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊</span>
-          <i @click="changeTipShow">
-              <img src="../../assets/threshold/close.png" alt="">
-          </i>
-      </div>
-      <div class="content">
+      <!--<div :class="['tip',tipshow ? 'none' : '']">-->
+          <!--<span>支出相关：啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊</span>-->
+          <!--<i @click="changeTipShow">-->
+              <!--<img src="../../assets/threshold/close.png" alt="">-->
+          <!--</i>-->
+      <!--</div>-->
+    <div class="content" v-show="lists.length">
           <div class="brand">
               <!-- <i class="title">当前品牌：小易</i> -->
               <div class="item">
@@ -35,7 +35,7 @@
                       <span class="fl text">未授权</span>
                       <i class="fl bar"></i>
                         <span class="fl number">6</span>
-                  </div>    
+                  </div>
               </div>
           </div>
           <div class="blank"></div>
@@ -46,7 +46,8 @@
              </p>
           </div>
       </div>
-      <div :class="['mask',show ? 'show' : '']" @click="changeShow"></div>
+    <no-result v-show="!lists.length" class="no-result-wrapper" title="抱歉，暂无内容"></no-result>
+    <div :class="['mask',show ? 'show' : '']" @click="changeShow"></div>
       <div :class="['modal-frame',show ? 'show' : '']">
           <div class="model-top">
               <div class="container">
@@ -66,11 +67,11 @@
             </div>
             <div class="item">
                 <span>省市:</span>
-                <i>{{userInfo.province}}{{userInfo.area}}</i>
+                <i>{{userInfo.province ? userInfo.province : '暂无'}}{{userInfo.area}}</i>
             </div>
             <div class="item">
                 <span>地址:</span>
-                <i>{{userInfo.address}}</i>
+                <i>{{userInfo.address ? userInfo.address : '暂无'}}</i>
             </div>
             <div class="item">
                 <span>状态:</span>
@@ -93,11 +94,12 @@
   </div>
 </template>
 <script>
+import NoResult from 'base/no-result/no-result';
 import {getTrack,getLevel,getStructure,getMySub,getBill} from 'api/baohuo'
 import {setCookie,getCookie} from 'common/js/cookie';
 import {formatDate, formatAmount} from 'common/js/util';
 import {getUser,getUserById} from 'api/user';
-import {status} from 'api/status';
+import { getDictList } from 'api/general';
 export default {
   data(){
       return{
@@ -106,7 +108,7 @@ export default {
           lists:[],
           userInfo:{},
           amount:'',
-          status:[],
+          status:{},
       }
   },
   methods:{
@@ -121,30 +123,32 @@ export default {
       },
       showInfo(event){
           this.show = !this.show;
-          var userId = event.target.getAttribute('id')
+          let userId = event.target.getAttribute('id');
           getBill(userId).then(res => {
-              this.amount = res[0].amount
-          })
+              this.amount = res.length ? res[0].amount : '';
+          });
           getUserById(userId).then(res => {
               this.userInfo = res
           })
       },
   },
   mounted(){
-      this.status = status
-        getMySub().then(res => {
-            this.lists = res.list
-            res.list.map(function(item){
-                getLevel(item.level).then(res => {
-                    item.level = res[0].name
-                })
-            })
+    Promise.all([
+      getDictList('agent_status'),
+      getMySub()
+    ]).then(([res1, res2]) => {
+      let temp = {};
+      res1.map((item) => {
+        temp[item.dkey] = item.dvalue;
+      });
+      this.status = temp;
+      this.lists = res2.list;
+      res2.list.map(function(item){
+        getLevel(item.level).then(res => {
+          item.level = res[0].name
         })
-
-
-
-
-
+      })
+    })
         // getStructure(userId).then(res => {
         //     console.log(res)
         //     this.lists = res.list
@@ -154,6 +158,9 @@ export default {
         //         })
         //     })
         // })
+  },
+  components: {
+    NoResult
   }
 }
 </script>

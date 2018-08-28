@@ -135,8 +135,10 @@ export function getServiceTime(time) {
   });
 }
 // 获取服务电话
-export function getServiceTel(telephone) {
-  return fetch(805917, {
-    ckey: telephone
+export function getConfig(info) {
+  return fetch(627085, {
+    start: 1,
+    limit: 10,
+    type: info.type || ''
   });
 }

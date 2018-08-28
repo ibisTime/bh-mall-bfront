@@ -7,7 +7,7 @@
     </div>
 </template>
 <script>
-import { getAppId, usergo2, usergo1, getUserStatu, checkRed } from "api/baohuo";
+import { getAppId, usergo2, usergo1, checkRed } from "api/baohuo";
 import { isLogin, setUser, getWxMobAndCapt, formatAmount, getUserId } from "common/js/util";
 import { setCookie, getCookie } from "common/js/cookie";
 import Loading from "base/loading/loading";
@@ -64,6 +64,9 @@ export default {
     }
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     //获取用户微信code
     AppId() {
       //获取用户appid
@@ -110,10 +113,10 @@ export default {
     },
     checkUser(userId) {
       checkRed(userId).then(res => {
-        console.log(res);
-        setCookie('level', res.level);
+        // alert(JSON.stringify(res.isWare));
+        setCookie('isWare', res.isWare);
         if (res.result == '4') {
-          this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge');
+          this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge?type=MK_CNY');
         } else if (res.result == "0") {
           this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
         } else if (res.result == '1') {
@@ -154,11 +157,11 @@ export default {
       } else if (status == 6 || status == 7) {
         this.$router.push("/login/replying");
         //10没通过
-      } else if (status == 2 || status == 9) {
+      } else if (status == 8) {
+        this.checkUser(userId);
+      } else {
         this.text = '对不起,您没有被授权！';
         this.$refs.toast.show();
-      } else {
-        this.checkUser(userId);
       }
     }
   },

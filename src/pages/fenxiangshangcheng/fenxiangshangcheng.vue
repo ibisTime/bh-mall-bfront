@@ -20,28 +20,35 @@ import {initShare} from 'common/js/weixin'
 export default {
     data(){
         return{
-            wxUrl:'https://dev.hichengdai.com?userId=',
+            wxUrl:'http://front.bhxt.hichengdai.com/xcx/?userId=',
             userId:'',
             nickname:'',
-            info:{
-                title:'qqqqqqqqqqq',
-                desc:'qqqqqqqqqqq',
-                link:location.href,
-                imgUrl:'http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg'
-            },
+            // info:{
+            //     title:'qqqqqqqqqqq',
+            //     desc:'qqqqqqqqqqq',
+            //     link:this.wxUrl,
+            //     imgUrl:'http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg'
+            // },
         }
     },
     methods:{
         share(){
-            initShare(this.info,this.success)
+          let info = {
+              title:'qqqqqqqqqqq',
+              desc:'qqqqqqqqqqq',
+              link:location.origin+'/xcx/?userId='+this.userId,
+              imgUrl:'http://img.zcool.cn/community/0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg'
+          };
+          initShare(info,this.success);
         },
     },
     mounted(){
-        this.userId = getCookie('userId') || this.$route.query.userId
-        this.wxUrl += this.userId
-        getUserById(this.userId).then(res =>{
+      this.userId = getCookie('userId') || this.$route.query.userId;
+      this.wxUrl += this.userId;
+      console.log(this.wxUrl);
+      getUserById(this.userId).then(res =>{
             this.nickname = res.nickname
-        })
+        });
 
         //用插件生成二维码
         const container = document.getElementById("qrcode");

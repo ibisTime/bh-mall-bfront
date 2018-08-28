@@ -1,45 +1,26 @@
 <template>
     <div class="sucaichaxun">
         <div class="header clearfix">
-            <div @click="changeIndex(item.dkey)" :class="[num == item.dkey ? 'active' : '']" v-for="(item,index) in list">
-                <i>{{item.dvalue}}</i>
+            <div>
+                <i>{{title}}</i>
             </div>
-            <!-- <div @click="changeIndex(2)" :class="[index == 2 ? 'active' : '']">
-                <i>培训素材</i>
-            </div> -->
-            <!-- <div @click="changeIndex(3)" :class="[index == 3 ? 'active' : '']">
-                <i>素材三</i>
-            </div>
-            <div @click="changeIndex(4)" :class="[index == 4 ? 'active' : '']">
-                <i>素材四</i>
-            </div> -->
         </div>
         <div class="container">
-            <div class="item" v-for="v in shopList" @click="goSucaiDetail(v.code)">
-                <img :src="v.pic">
-                <p>{{v.title}}</p>
-            </div>
-            <!-- <div class="item">
-                <img src="../../assets/imgs/buyimg.png">
-                <p>商品名称</p>
-            </div>
             <div class="item">
-                <img src="../../assets/imgs/buyimg.png">
-                <p>商品名称</p>
-            </div> -->
+                <img :src="pic">
+            </div>
         </div>
     </div>
 </template>
 <script>
-import {queryFodder,queryFodderName} from 'api/baohuo';
+import { sucaiDetail } from 'api/baohuo';
 import { getUser } from 'api/user';
 import {formatDate,formatImg} from 'common/js/util';
 export default {
     data(){
       return{
-        num:0,
-        list:[],
-        shopList:[]
+        title: '',
+        pic: ''
       }
     },
     methods:{
@@ -65,17 +46,16 @@ export default {
         })
       },
       goSucaiDetail(code) {
-        this.$router.push('/sucaichaxun/sucaiDetail?code=' + code);
+
       }
     },
     mounted(){
+      let code = this.$route.query.code;
       Promise.all([
-        queryFodderName(),
-        getUser()
-      ]).then(([res1, res2]) => {
-        this.list = res1;
-        this.level = res2.level;
-        this.check(this.level);
+        sucaiDetail(code)
+      ]).then(([res]) => {
+        this.title = res.title;
+        this.pic = formatImg(res.pic);
       });
     }
 
@@ -90,7 +70,7 @@ export default {
             background-color: #fff;
             >div{
                 float: left;
-                width: 50%;
+                width: 100%;
                 height: 0.9rem;
                 position: relative;
                 i{
@@ -119,8 +99,7 @@ export default {
                 margin-top: 0.3rem;
                 margin-left: 0.3rem;
                 >img{
-                    width: 3.3rem;
-                    height: 3.3rem;
+                    width: 100%;
                 }
                 p{
                     margin-top: 0.3rem;

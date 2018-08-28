@@ -179,6 +179,8 @@
   @import "~common/scss/variable";
 
   .slider {
+    position: relative;
+    width: 100%;
     min-height: 1px;
 
     .slider-group {

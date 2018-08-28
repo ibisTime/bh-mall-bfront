@@ -1,7 +1,7 @@
 <template>
   <div class="recharge">
       <div class="header">
-          <div class="top">充值金额</div>
+          <div class="top">转入金额</div>
           <span class="yuan">￥</span>
           <input v-model="moneyNum" type="number">
           <div class="bottom">当前余额：{{account / 1000}}</div>

@@ -64,7 +64,6 @@ export default {
               item.level = info[0].name;
             });
           });
-          console.log(res.list);
           if (index === 6) {
             this.data1 = res.list;
           } else if (index === 10) {

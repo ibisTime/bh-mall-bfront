@@ -24,7 +24,7 @@
     </div>
     <div class="middle">
       <div class="middle-top" @click="goYuncan">
-        <span class="asset fl">余额</span>
+        <span class="asset fl">云仓余额</span>
         <span class="money fl">￥{{balance / 1000}}</span>
         <i class="fr more">
           <img src="../../assets/imgs/more@2x.png" alt="">
@@ -101,10 +101,11 @@
         <span>{{item.text}}</span>
       </div>
     </div>
-    <!-- <span class="tuichu" @click="tuichu">申请退出</span> -->
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
+import FullLoading from 'base/full-loading/full-loading';
 import { setCookie, getCookie, clearAllCookie } from "common/js/cookie.js";
 import { isLogin } from "common/js/util";
 import { getUser1, getUserById } from "api/user";
@@ -236,7 +237,7 @@ export default {
         },
         {
           text: "待处理订单",
-          src: require("../../assets/imgs/daichulidingdan@2x.png"),
+          src: require("../../assets/imgs/waitOrder.png"),
           to: "/waitOrder"
         },
         {
@@ -305,7 +306,9 @@ export default {
       userinfo: "",
       highuser: "",
       photo: "../../assets/imgs/head@2x.png",
-      balance: ""
+      balance: "",
+      title: '正在加载...',
+      loading: true
     };
   },
   methods: {
@@ -329,9 +332,13 @@ export default {
       this.balance = res.wareAmount;
       setCookie("level", res.level);
       getLevel(res.level).then(item => {
+        this.loading = false;
         res.level = item[0].name;
       });
     });
+  },
+  components: {
+    FullLoading
   }
 };
 </script>

@@ -128,8 +128,9 @@ export default {
     checkUser(userId) {
       Promise.all([
         checkRed(userId),
-        getLevel(getCookie("level"))
+        getLevel(this.level)
       ]).then(([res, levelInfo]) => {
+        setCookie('isWare', res.isWare);
         if (res.result == '4') {
           this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge');
         } else if (res.result == "0") {
@@ -167,7 +168,9 @@ export default {
   },
   mounted() {
     this.orderCode = this.$route.query.orderCode.split(',');
-    console.log(this.orderCode);
+    getUser().then((res) => {
+      this.level = res.level;
+    });
     this.orderCode.map((item) => {
       orderDetail({code: item}).then((res) => {
         console.log(res);

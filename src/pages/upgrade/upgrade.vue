@@ -160,7 +160,6 @@ export default {
       options.idNo = this.identity;
       console.log(this.identityPhotos[0].key);
       if(this.isIdentity) {
-        debugger;
         options.idHand = this.identityPhotos[0].key;
       }
       // options.idHand = this.identityPhotos[0].key || '';
@@ -387,12 +386,6 @@ export default {
       return this.currentItem ? this.currentItem.type : "";
     }
   },
-  components: {
-    Qiniu,
-    Toast,
-    Loading,
-    PhotoEdit
-  },
   mounted() {
     getUser().then(res => {
       this.mylevel = res.level;
@@ -410,7 +403,13 @@ export default {
           this.levelList = res.list.filter(item => {
             return item.level < this.mylevel;
           });
-          this.levelList = this.levelList;
+          if(!this.levelList.length) {
+            this.text = '您已是最高等级代理，无法升级';
+            this.$refs.mytoast.show();
+            setTimeout(() => {
+              this.$router.back();
+            }, 1000)
+          }
         });
       });
     });
@@ -420,7 +419,13 @@ export default {
     getQiniuToken().then(res => {
       this.token = res.uploadToken;
     });
-  }
+  },
+  components: {
+    Qiniu,
+    Toast,
+    Loading,
+    PhotoEdit
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -444,8 +449,7 @@ export default {
     }
   }
   .content {
-    padding-left: 0.3rem;
-    padding-bottom: 0.36rem;
+    padding: 0 0.3rem 0.36rem;
     font-size: $font-size-medium-s;
     color: #333;
     background-color: #fff;

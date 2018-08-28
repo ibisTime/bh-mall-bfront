@@ -3,40 +3,43 @@
     <category-scroll :currentIndex="currentIndex"
                      :categorys="categorys"
                      @select="selectCategory"></category-scroll>
-      <div class="item clearfix" v-for="(item,index) in list">
-            <div class="top clearfix">
-                <span class="user">提交人：{{item.realName}}</span>
-                <span class="status">{{status[item.status]}}</span>
-            </div>
-            <div :class="['info']" ref="divInfo">
-                <div class="downward" @click="changeHeight($event)">></div>
-                <p>订单编号：{{item.code}}</p>
-                <p>下单时间：{{item.applyDatetime}}</p>
-                <p>收货人：{{item.signer}}（{{item.mobile}}）</p>
-                <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
-                <div @click="shouhuo(item.code)" v-if="item.status == '2'" class="receive">收货</div>
-            </div>
-            <div class="pic">
-                <img :src="item.pic" alt="">
-                <div class="content">
-                    <p>{{item.productName}}</p>
-                    <i>￥{{item.price/1000 * item.quantity}}</i>
-                    <span>X{{item.quantity}}</span>
-                </div>
-            </div>
-            <div v-if="item.status == 0" class="bottom clearfix">
-                <div>取消订单</div>
-                <div @click="goPay(item.code)">去付款</div>
-            </div>
-      </div>
-      <toast ref="toast" :text="toastText"></toast>
+    <div class="item clearfix" v-for="(item,index) in list">
+          <div class="top clearfix">
+              <span class="user">提交人：{{item.realName}}</span>
+              <span class="status">{{status[item.status]}}</span>
+          </div>
+          <div :class="['info']" ref="divInfo">
+              <div class="downward" @click="changeHeight($event)">></div>
+              <p>订单编号：{{item.code}}</p>
+              <p>下单时间：{{item.applyDatetime}}</p>
+              <p>收货人：{{item.signer}}（{{item.mobile}}）</p>
+              <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
+          </div>
+          <div class="pic">
+              <img :src="item.pic" alt="">
+              <div class="content">
+                <p>{{item.productName}}</p>
+                <i>￥{{formatAmount(item.price) * item.quantity}}</i>
+                <span>X{{item.quantity}}</span>
+                <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3' || item.status == '4'">查看物流</div>
+                <div class="shouhuo" @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
+                <div class="fukuan" @click="goPay(item.code)" v-if="item.status == '0'">付款</div>
+              </div>
+          </div>
+          <!--<div v-if="item.status == 0" class="bottom clearfix">-->
+              <!--<div @click="goPay(item.code)">去付款</div>-->
+          <!--</div>-->
+    </div>
+    <toast ref="toast" :text="toastText"></toast>
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
 import Toast from 'base/toast/toast';
 import CategoryScroll from 'base/category-scroll/category-scroll';
+import FullLoading from 'base/full-loading/full-loading';
 import { queryShopForm, receiveNeigouOrder } from "api/baohuo";
-import { formatDate, formatImg } from "common/js/util";
+import { formatDate, formatImg, formatAmount } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 import { setCookie, getCookie } from "common/js/cookie";
 import { getDictList } from 'api/general';
@@ -44,6 +47,8 @@ import { getDictList } from 'api/general';
 export default {
   data() {
     return {
+      loading: false,
+      title: '正在加载...',
       index: 0,
       list: [],
       hightShow: false,
@@ -62,33 +67,32 @@ export default {
     };
   },
   methods: {
-    // changeIndex(index) {
-    //   this.index = index;
-    //   this.check();
-    // },
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     changeHeight(event) {
       console.log(event.target);
     },
     check() {
       let key = this.categorys[this.index].key;
       let index = key === 'all' ? [] : key.split('||');
-      queryShopForm(index).then(res => {
-        if (res.list.length <= 1) {
-          console.log(this.$refs.divInfo);
-        }
-        res.list.map(function(item) {
+      this.loading = true;
+      Promise.all([
+        queryShopForm(index),
+        getDictList('inner_order_status')
+      ]).then(([res1, res2]) => {
+        this.loading = false;
+        res1.list.map(function(item) {
           //格式化图片
           item.pic = formatImg(item.pic);
           //格式化时间
           item.applyDatetime = formatDate(item.applyDatetime);
         });
-        this.list = res.list;
-      });
-      getDictList('inner_order_status').then((res) => {
-        res.map((item) => {
+        this.list = res1.list;
+        res2.map((item) => {
           this.status[item.dkey] = item.dvalue;
         });
-      })
+      }).catch(() => { this.loading = false; })
     },
     goPay(index) {
       if (index) {
@@ -110,9 +114,13 @@ export default {
     },
     selectCategory(index) {
       this.index = index;
-      console.log(index);
       this.currentIndex = index;
       this.check();
+    },
+    wuliu(code, company) {
+      // this.toastText = '物流单号：'+code+'物流公司：'+company;
+      // this.$refs.toast.show();
+      this.$router.push('/wuliu?code='+code+'&company='+company);
     },
   },
   mounted() {
@@ -120,7 +128,8 @@ export default {
   },
   components: {
     Toast,
-    CategoryScroll
+    CategoryScroll,
+    FullLoading
   }
 };
 </script>
@@ -225,7 +234,7 @@ export default {
         }
         i {
           position: absolute;
-          top: 1.15rem;
+          top: 0.65rem;
           left: 0;
           font-size: $font-size-small;
           color: $primary-color;
@@ -234,12 +243,39 @@ export default {
           width: 1.2rem;
           line-height: 0.5rem;
           position: absolute;
-          top: 1.15rem;
+          top: 0.65rem;
           right: 0;
           font-size: $font-size-small;
           border-radius: 0.1rem;
           color: #333;
           text-align: center;
+        }
+        .wuliu {
+          font-size: 0.3rem;
+          position: absolute;
+          top: 1.15rem;
+          right: 1.2rem;
+          border: 1px solid #333;
+          border-radius: 0.1rem;
+          padding: 0.1rem 0.14rem;
+        }
+        .shouhuo {
+          font-size: 0.3rem;
+          position: absolute;
+          top: 1.15rem;
+          right: 0.2rem;
+          border: 1px solid #333;
+          border-radius: 0.1rem;
+          padding: 0.1rem 0.14rem;
+        }
+        .fukuan {
+          font-size: 0.3rem;
+          position: absolute;
+          top: 1.15rem;
+          right: 0.2rem;
+          border: 1px solid #333;
+          border-radius: 0.1rem;
+          padding: 0.1rem 0.14rem;
         }
       }
     }

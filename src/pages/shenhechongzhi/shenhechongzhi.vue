@@ -18,15 +18,19 @@
           <p>充值金额：<span>￥{{item.amount / 1000}}</span><img src="../../assets/imgs/more@2x.png" alt=""></p>
           <p>申请时间：{{item.applyDatetime}}</p>
       </div>
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
 import { intentional, queryIndent, getLevel } from "api/baohuo";
 import { formatDate } from "common/js/util";
+import FullLoading from 'base/full-loading/full-loading';
 export default {
   name: "IntentionalAgent",
   data() {
     return {
+      loading: false,
+      title: '正在加载...',
       index: 4,
       list: [],
       tips: [
@@ -43,7 +47,9 @@ export default {
   methods: {
     changeIndex(index) {
       this.index = index;
+      this.loading = true;
       queryIndent(this.index).then(res => {
+        this.loading = false;
         res.list.map(function(item) {
           //格式化时间
           item.applyDatetime = formatDate(item.applyDatetime);
@@ -58,18 +64,11 @@ export default {
     }
   },
   mounted() {
-    queryIndent(this.index).then(res => {
-      res.list.map(function(item) {
-        //格式化时间
-        item.applyDatetime = formatDate(item.applyDatetime);
-      });
-      res.list.map(function(item) {
-        getLevel(item.level).then(res => {
-          item.level = res[0].name;
-        });
-      });
-      this.list = res.list;
-    });
+    this.loading = true;
+    this.changeIndex(this.index);
+  },
+  components: {
+    FullLoading
   }
 };
 </script>

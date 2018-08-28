@@ -6,10 +6,10 @@
         </div>
         <div>
             <i v-show="errors.has('mobile')" class="error-tip">{{errors.first('mobile')}}</i>
-            <span>手机号</span> <input v-model="options.mobile" v-validate="'required|mobile'" type="text" name="mobile" placeholder="请输入手机号">
+            <span>手机号</span> <input v-model="options.mobile" v-validate="'required|mobile'" type="tel" name="mobile" placeholder="请输入手机号">
         </div>
         <div class="area">
-            <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>            
+            <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>
             <span>省份、市、区</span><img class="more" src="../../assets/imgs/more@2x.png" alt="">
             <city-picker class="item-input"
                         v-validate="'required'"
@@ -21,7 +21,7 @@
             </city-picker>
         </div>
         <div>
-            <i v-show="errors.has('address')" class="error-tip">{{errors.first('address')}}</i>  
+            <i v-show="errors.has('address')" class="error-tip">{{errors.first('address')}}</i>
             <span>详细地址</span> <input v-model="options.address" v-validate="'required'" type="text" name="address" placeholder="请输入详细地址">
         </div>
 
@@ -59,24 +59,38 @@ export default {
             this.options.district = district;
         },
         add(){
+          if(!this.options.province) {
+            this.text = '省市区不能为空';
+            this.$refs.mytoast.show()
+          } else if(!this.options.receiver) {
+            this.text = '姓名不能为空';
+            this.$refs.mytoast.show()
+          } else if(!this.options.mobile) {
+            this.text = '手机号不能为空';
+            this.$refs.mytoast.show()
+          } else if(!this.options.address) {
+            this.text = '地址不能为空';
+            this.$refs.mytoast.show()
+          } else {
             addAddress(this.options).then(res =>{
-                console.log(res.code)
-                if(res.code !== '') {
-                    this.text = '添加成功'
-                    this.$refs.mytoast.show(this.push)
-                }else{
-                    this.text = '添加失败'
-                    this.$refs.mytoast.show()
-                }
+              console.log(res.code)
+              if(res.code !== '') {
+                this.text = '添加成功'
+                this.$refs.mytoast.show(this.push)
+              }else{
+                this.text = '添加失败'
+                this.$refs.mytoast.show()
+              }
             })
+          }
         },
         push(){
-            this.$router.push('dizhi')
+            this.$router.push('dizhi?address=' + this.address);
         }
     },
 
     mounted(){
-
+      this.address = this.$route.query.address;
     },
 
     components:{
@@ -95,10 +109,13 @@ export default {
         padding: 0.3rem;
         border-bottom: 1px solid #eee;
         >i{
-            position: absolute;
-            top: 0.02rem;
-            color: $primary-color;
-            font-size: $font-size-small-ss;
+          position: absolute;
+          top: 0.02rem;
+          right: 0;
+          line-height: 1rem;
+          vertical-align: middle;
+          color: red;
+          font-size: 0.2rem;
         }
         span{
             display: inline-block;

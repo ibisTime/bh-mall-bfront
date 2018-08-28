@@ -1,17 +1,11 @@
 <template>
   <div class="buycloud">
-    <!--<div :class="['tip',tipshow ? 'none' : '']">-->
-      <!--<span>支出相关：啊啊啊啊啊啊啊啊啊啊啊啊啊啊</span>-->
-      <!--<i @click="changeTipShow">-->
-        <!--<img src="../../assets/threshold/close.png" alt="">-->
-      <!--</i>-->
-    <!--</div>-->
     <div class="item" v-for="item in list" v-show="list.length">
       <img :src="item.pic" alt="">
       <div class="content">
         <p>{{item.name}}</p>
-        <p>价格：{{formatAmount(item.price)}}</p>
-        <p>数量：{{item.quantity}}</p>
+        <p>价格：{{formatAmount(item.specsList[0].price)}}</p>
+        <p>数量：{{item.specsList[0].number}}</p>
         <span @click="prodectDetail(item.code)">购买</span>
       </div>
     </div>
@@ -33,14 +27,14 @@
       <div class="packaging">
         <p>规格</p>
         <div class="select">
-          <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(item.productSpecsCode,index,$event)" :class="[num === index ? 'active' : '']">{{item.name}}</span>
+          <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(item.specsCode,index,$event)" :class="[num === index ? 'active' : '']">{{item.name}}</span>
         </div>
       </div>
       <div class="total-money">
         <div class="left">
           <i class="text">合计：</i>
           <i class="symbol">￥</i>
-          <i class="sum">{{formatAmount(detail.price) * number}}</i>
+          <i class="sum">{{formatAmount(price) * number}}</i>
         </div>
         <div class="right">
           <span class="diamonds right-item" @click="add">+</span>
@@ -79,7 +73,8 @@ export default {
       options: {},
       i: 0,
       num: 0,
-      number: 1
+      number: 1,
+      price: 0
     };
   },
   methods: {
@@ -119,8 +114,10 @@ export default {
     },
 
     //选择包装
-    chooseSize(index, event) {
+    chooseSize(code, index, event) {
+      console.log(index);
       this.num = index;
+      this.price = this.detail.specsList[index].price;
     },
 
     //选择规格
@@ -137,6 +134,7 @@ export default {
       neigouProductDetail(code).then(res => {
         res.pic = formatImg(res.pic);
         self.detail = res;
+        this.price = this.detail.specsList[0].price;
       });
     },
     //确认商品
@@ -151,7 +149,6 @@ export default {
           this.number +
         "&num=" +
         this.num
-        // num传过去好知道是哪个规格
       );
     }
   },

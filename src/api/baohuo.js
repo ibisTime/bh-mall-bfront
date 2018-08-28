@@ -5,6 +5,7 @@ import {
 import {
     getCookie
 } from 'common/js/cookie';
+import {user} from "../store/getters";
 
 // 获取门槛账户
 export function getBill(userId) {
@@ -79,11 +80,11 @@ export function getCloudDetail(productCode) {
 }
 
 //分页查询云仓产品（front）
-export function getCloudList() {
+export function getCloudList(userId) {
     return fetch(627811, {
         start: 1,
         limit: 100,
-        userId: getUserId(),
+        userId: userId || getUserId(),
     });
 }
 
@@ -147,7 +148,7 @@ export function getLevelSub(level) {
 }
 
 //我的下级==按照关键字
-export function getKeywordSub(level, keyword) {
+export function getKeywordSub(keyword) {
     return fetch(627320, {
         limit: '100',
         start: '0',
@@ -382,9 +383,9 @@ export function accreditCancel(userId, result, remark) {
 export function queryProduct(info) {
     return fetch(627555, {
       level: info.level,
-      limit: 100,
+      limit: info.limit || 100,
       name: info.name || '',
-      start: 1,
+      start: info.start || 1,
       status: info.status || ''
     });
 }
@@ -457,9 +458,9 @@ export function inquireConfig(url) {
 }
 
 //支付
-export function payment(code, payType) {
+export function payment(codeList, payType) {
     return fetch(627721, {
-        code: code,
+      codeList: codeList,
         payType: payType
     })
 }
@@ -602,6 +603,16 @@ export function checkRecharge(code) {
     });
 }
 
+//审批线下充值订单-不通过
+export function checkRechargeNo(code) {
+  return fetch(627463, {
+    code: code,
+    payResult: '0',
+    payUser: getUserId(),
+    status: 6
+  });
+}
+
 //分页查询取现订单
 export function checkRechargeBill(status = '') {
     return fetch(627513, {
@@ -640,7 +651,10 @@ export function queryProductDetail(productCode) {
         productCode: productCode
     });
 }
-
+//详情查询出货订单
+export function outOrderDetail(code) {
+  return fetch(627664, { code });
+}
 //分页查询出货订单
 export function queryOrderForm(statusList) {
     return fetch(627665, {
@@ -658,12 +672,20 @@ export function queryOrderForm1(statusList) {
         toUserId: getUserId()
     });
 }
+export function queryOrderForm2(info) {
+  return fetch(627665, {
+    start: info.start || 1,
+    limit: info.limit || 100,
+    statusList: info.statusList || '',
+    applyUser: getUserId()
+  });
+}
 // 分页查云仓订单
-export function queryYunOrder(status) {
+export function queryYunOrder(info) {
   return fetch(627915, {
-    start: 1,
-    limit: 100,
-    status: status || ''
+    start: info.start || 1,
+    limit: info.limit || 100,
+    status: info.status || '',
   });
 }
 //分页查询内购商城理订单
@@ -675,7 +697,7 @@ export function queryShopForm(statusList) {
         statusList: statusList,
     });
 }
-//获取内购商品详情
+// 详情查内购订单
 export function thingDrtail(code) {
     return fetch(627733, {
         code: code
@@ -755,7 +777,12 @@ export function queryFodder(type) {
         type: type,
     });
 }
-
+// 详情查素材
+export function sucaiDetail(code) {
+  return fetch(627432, {
+    code
+  });
+}
 //素材名称
 export function queryFodderName() {
     return fetch(627076, {
@@ -900,5 +927,47 @@ export function orderDetail(info) {
 export function shouquandanDetail(info) {
   return fetch(627287, {
     userId: info.userId
+  });
+}
+
+// 详情查产品
+export function getProductDetail(code) {
+  return fetch(627557, {
+    code: code
+  });
+}
+// 发货
+export function fahuo(info) {
+  return fetch(627645, {
+    code: info.code,
+    deliver: getUserId(),
+    logisticsCode: info.logisticsCode,
+    logisticsCompany: info.logisticsCompany
+  });
+}
+
+// 分页查意向代理
+export function getYixiang(info) {
+  return fetch(627265, {
+    start: 1,
+    limit: 100,
+    toUserId: info.toUserId || '',
+    approver: info.approver || '',
+    status: info.status || ''
+  });
+}
+
+// 详情查意向代理
+export function getYixiangDetail(userId) {
+  return fetch(627267, {
+    userId
+  });
+}
+
+// 支付出货订单
+export function payOutOrder(info) {
+  return fetch(627642, {
+    codeList: info.codeList,
+    payType: info.payType
   });
 }

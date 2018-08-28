@@ -93,36 +93,46 @@ export default {
         this.audit();
     },
     audit() {
-        if (this.index == 6) {
-            accredit(this.userId, this.result, this.approveNote).then(res => {
-                if (res.isSuccess) {
-                    alert('审核成功');
-                    this.$router.go(-1);
-                } else {
-                    alert('审核失败');
-                }
-            }).catch(() => {});
-          } else if(this.index == 12){
-            upgrade(this.userId, this.result, this.approveNote).then(res => {
-                if (res.isSuccess) {
-                    this.text = '审核成功'
-                    this.$refs.mytoast.show()
-                } else {
-                    this.text = '审核失败'
-                    this.$refs.mytoast.show()
-                }
-            }).catch(() => {});
-        } else if(this.index == 8) {
-            accreditCancel(this.userId, this.result, this.approveNote).then(res => {
-                if (res.isSuccess) {
-                    this.text = '审核成功'
-                    this.$refs.mytoast.show()
-                } else {
-                    this.text = '审核失败'
-                    this.$refs.mytoast.show()
-                }
-            }).catch(() => {});
-        }
+      if (this.index == 6) {
+        accredit(this.userId, this.result, this.approveNote).then(res => {
+          if (res.isSuccess) {
+            this.text = '审核成功';
+            this.$refs.mytoast.show();
+            setTimeout(() => {
+              this.$router.back();
+            }, 300);
+          } else {
+            this.text = '审核失败';
+            this.$refs.mytoast.show();
+          }
+        }).catch(() => {});
+        } else if(this.index == 12){
+          upgrade(this.userId, this.result, this.approveNote).then(res => {
+            if (res.isSuccess) {
+              this.text = '审核成功';
+              this.$refs.mytoast.show();
+              setTimeout(() => {
+                this.$router.back();
+              }, 300);
+            } else {
+              this.text = '审核失败';
+              this.$refs.mytoast.show()
+            }
+          }).catch(() => {});
+      } else if(this.index == 8) {
+        accreditCancel(this.userId, this.result, this.approveNote).then(res => {
+          if (res.isSuccess) {
+            this.text = '审核成功';
+            this.$refs.mytoast.show();
+            setTimeout(() => {
+              this.$router.back();
+            }, 300);
+          } else {
+            this.text = '审核失败';
+            this.$refs.mytoast.show()
+          }
+        }).catch(() => {});
+      }
     },
   },
   mounted(){

@@ -1,17 +1,17 @@
 <template>
     <div class="huopinjilu">
         <div class="header">
-            <img :src="formatImg(info.product && info.product.advPic)" alt="">
+            <img :src="formatImg(info.product && info.product.pic)" alt="">
             <div class="content">
                 <p>{{ info.productName}}</p>
-                <i v-for="item in info.specsList" class="guige">￥{{ item.price /1000}}元/{{item.productSpecsName}}</br></i>
+                <i v-for="item in info.specsList" class="guige">￥{{formatAmount(item.price)}}元/{{item.specsName}}</br></i>
             </div>
         </div>
     </div>
 </template>
 <script>
 import {queryProductDetail,getCloudDetail} from 'api/baohuo'
-import {formatDate,formatImg} from 'common/js/util';
+import {formatDate, formatImg, formatAmount} from 'common/js/util';
 export default {
   data(){
       return{
@@ -21,6 +21,9 @@ export default {
   methods: {
     formatImg(pic) {
         return formatImg(pic);
+    },
+    formatAmount(amount) {
+      return formatAmount(amount);
     }
   },
   mounted(){

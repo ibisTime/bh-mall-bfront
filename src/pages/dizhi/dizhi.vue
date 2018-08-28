@@ -1,47 +1,63 @@
 <template>
-    <div class="dizhi">
-        <div class="address">
-            <div class="item" v-for="item in list" @click="setDefault(item.code)">
-                <img src="../../assets/imgs/shouhuodizhi@2x.png"  class="left">
-                <p class="name-mobile">
-                    <span>姓名：{{item.receiver}}</span>
-                    <i>电话：{{item.mobile}}</i>
-                </p>
-                <p class="address">
-                    收货地址：<i>{{item.province}}</i> <i>{{item.city}}</i> <i>{{item.area}}</i> {{item.address}}
-                </p>
-            </div>
-        </div>
-        <div class="footer" @click="$router.push('/tianjiadizhi')">添加地址</div>
+  <div class="dizhi">
+    <div class="address">
+      <div class="item" v-for="item in list" @click="setDefault(item.code)">
+        <img src="../../assets/imgs/shouhuodizhi@2x.png"  class="left">
+        <p class="name-mobile">
+          <span>姓名：{{item.receiver}}</span>
+          <i>电话：{{item.mobile}}</i>
+        </p>
+        <p class="address">
+          收货地址：<i>{{item.province}}</i> <i>{{item.city}}</i> <i>{{item.area}}</i> {{item.address}}
+        </p>
+      </div>
     </div>
+    <div class="footer" @click="$router.push('/tianjiadizhi?address=' + address)">添加地址</div>
+    <toast ref="toast" :text="toastText"></toast>
+  </div>
 </template>
 <script>
+import Toast from 'base/toast/toast';
 import { queryAddress, setDefultAddress } from "api/baohuo";
 export default {
   data() {
     return {
-      list: []
+      list: [],
+      toastText: ''
     };
   },
   methods: {
     setDefault(code) {
-      setDefultAddress(code).then(res => {
-        if (res) {
-          if (this.$route.query.address === "1") {
-            this.$router.push("/xuangoushangpin/shangpingoumai?code=" + code);
-          } else if (this.$route.query.address === "2") {
-            this.$router.push("/buyCloud/tijiaodingdan?code=" + code);
-          } else if (this.$route.query.address === "3") {
-            this.$router.push("/woyaochuhuo?code=" + code);
+      if(this.list.length == '1') {
+        this.$router.back();
+      } else {
+        setDefultAddress(code).then(res => {
+          if (res) {
+            this.toastText = '设置默认地址成功';
+            this.$refs.toast.show();
+            if (this.address === "1") {
+              this.$router.push("/xuangoushangpin/shangpingoumai?code=" + code);
+            } else if (this.address === "2") {
+              this.$router.push("/buyCloud/tijiaodingdan?code=" + code);
+            } else if (this.address === "3") {
+              this.$router.push("/woyaochuhuo?code=" + code);
+            } else {
+              this.$router.back();
+            }
           }
-        }
-      });
+        });
+      }
     }
   },
   mounted() {
+    this.address = this.$route.query.address;
+    // console.log(this.address);
     queryAddress().then(res => {
       this.list = res;
     });
+  },
+  components: {
+    Toast
   }
 };
 </script>

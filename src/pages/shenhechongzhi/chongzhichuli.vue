@@ -1,25 +1,30 @@
 <template>
-    <div class="chongzhichuli">
-        <div class="header">
-            <span class="title">充值金额（元）</span>
-            <i class="num">{{info.amount / 1000}}</i>
-        </div>
-        <div class="content">
-            <p>订单编号 <span>{{info.code}}</span></p>
-            <p>充值金额 <span>{{info.amount / 1000}}</span></p>
-            <p>打款凭证 <img :src="info.chargePdf | formatImg" /></p>
-            <p>申请时间 <span>{{info.applyDatetime}}</span></p>
-            <p>状态 <span>{{tips[info.status]}}</span></p>
-        </div>
-        <button :class="['btn',index != 4 ? 'hide' : '']" @click="check">确认收到款项</button>
-        <div :class="['mask',show ? 'show' : '']" @click="lookOver"></div>
-        <div :class="['img',show ? 'show' : '']">
-            <img src="../../assets/imgs/buyimg.png">
-        </div>
+  <div class="chongzhichuli">
+    <div class="header">
+      <span class="title">充值金额（元）</span>
+      <i class="num">{{info.amount / 1000}}</i>
     </div>
+    <div class="content">
+      <p>订单编号 <span>{{info.code}}</span></p>
+      <p>充值金额 <span>{{info.amount / 1000}}</span></p>
+      <p>打款凭证 <img :src="info.chargePdf | formatImg" /></p>
+      <p>申请时间 <span>{{info.applyDatetime}}</span></p>
+      <p>状态 <span>{{tips[info.status]}}</span></p>
+    </div>
+    <div class="buttons">
+      <button :class="['btn',index != 4 ? 'hide' : '']" @click="check(1)">确认收到款项</button>
+      <button :class="['btn',index != 4 ? 'hide' : '']" @click="check(0)">未收到款项</button>
+    </div>
+    <div :class="['mask',show ? 'show' : '']" @click="lookOver"></div>
+    <div :class="['img',show ? 'show' : '']">
+      <img src="../../assets/imgs/buyimg.png">
+    </div>
+    <toast ref="toast" :text="toastText"></toast>
+  </div>
 </template>
 <script>
-import { queryIndentDetail, checkRecharge } from "api/baohuo";
+import Toast from 'base/toast/toast';
+import { queryIndentDetail, checkRecharge, checkRechargeNo } from "api/baohuo";
 import { formatDate } from "common/js/util";
 import { commonMixin } from 'common/js/mixin';
 
@@ -40,7 +45,8 @@ export default {
         "待审核",
         "审核未通过",
         "审核通过"
-      ]
+      ],
+      toastText: ''
     };
   },
   methods: {
@@ -53,15 +59,34 @@ export default {
     lookOver() {
       this.changeShow();
     },
-    check() {
-      checkRecharge(this.code).then(res => {
-        if (res.isSuccess === true) {
-          alert("充值成功！");
-          setTimeout(this.$router.go(-1), 1000);
-        } else {
-          alert("充值失败！请联系管理员");
-        }
-      });
+    check(index) {
+      if(index === 0) {
+        checkRechargeNo(this.code).then(res => {
+          if (res.isSuccess === true) {
+            this.toastText = '确认未收到款项成功';
+            this.$refs.toast.show();
+            setTimeout(() => {
+              this.$router.go(-1);
+            }, 1000);
+          } else {
+            this.toastText = '确认未收到款项失败，请联系管理员';
+            this.$refs.toast.show();
+          }
+        });
+      } else {
+        checkRecharge(this.code).then(res => {
+          if (res.isSuccess === true) {
+            this.toastText = '充值成功';
+            this.$refs.toast.show();
+            setTimeout(() => {
+              this.$router.go(-1);
+              }, 1000);
+          } else {
+            this.toastText = '充值失败！请联系管理员';
+            this.$refs.toast.show();
+          }
+        });
+      }
     }
   },
   mounted() {
@@ -72,6 +97,9 @@ export default {
       res.applyDatetime = formatDate(res.applyDatetime);
       this.info = res;
     });
+  },
+  components: {
+    Toast
   }
 };
 </script>
@@ -120,16 +148,21 @@ export default {
       width: 100%;
     }
   }
-  .btn {
-    display: block;
-    width: 90%;
-    line-height: 0.9rem;
-    margin: 0.84rem auto;
-    background-color: $primary-color;
-    color: #fff;
-    border-radius: 0.1rem;
-    &.hide {
-      display: none;
+  .buttons {
+    display: flex;
+    padding: 0.2rem;
+    .btn {
+      display: block;
+      width: 15%;
+      line-height: 0.9rem;
+      margin: 0.84rem 0.2rem;
+      background-color: #72a52c;
+      color: #fff;
+      border-radius: 0.1rem;
+      flex: 1;
+      &.hide {
+        display: none;
+      }
     }
   }
   .mask {

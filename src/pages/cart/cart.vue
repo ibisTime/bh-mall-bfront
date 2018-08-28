@@ -13,6 +13,7 @@
         <div class='img-item'><img class="p-img" :src="formatImg(item.product.advPic)"></div>
         <div class="info-item">
           <div class="title">{{item.product.name}}</div>
+          <div class="title">规格：{{item.specsName}}</div>
           <div class="btm-info">
             <p class="price">¥{{formatAmount(item.price)}}</p>
             <p class="diamonds decrease" @click="decrease(item.code)">-</p>
@@ -90,6 +91,7 @@ export default {
     },
     // 数量修改
     inputChange(quantity, code) {
+      console.log(quantity);
       quantity = Math.max(quantity, 1);
       let index = this.list.findIndex(d => d.code === code);
       let item = this.list[index];
@@ -97,9 +99,7 @@ export default {
     },
     // 数量增加
     add(code) {
-      console.log(code);
       let index = this.list.findIndex(d => d.code === code);
-      console.log(index);
       let item = this.list[index];
       let quantity = item.quantity + 1;
       this.editQuantity(code, quantity, item, index);
@@ -121,16 +121,23 @@ export default {
         quantity: quantity
       }).then((res) => {
         this.loading = false;
-        console.log(res);
         let list = this.list;
         item.quantity = quantity;
         list.splice(index, 1, item);
         this.list = list;
-      })
+        let amount = 0;
+        this.list.forEach(d => {
+          if (!d.checked) {
+            flag = false;
+            return;
+          }
+          amount += d.price * d.quantity;
+        });
+        this.totalAmount = amount;
+      }).catch(() => { this.loading = false; })
     },
     // 选择商品
     choseItem(code) {
-      console.log(code);
       let index = this.list.findIndex(d => d.code === code);
       let item = this.list[index];
       item.checked = !item.checked;
@@ -143,7 +150,6 @@ export default {
     checkAll() {
       let flag = true;
       let amount = 0;
-      console.log(this.list);
       this.list.forEach(d => {
         if (!d.checked) {
           flag = false;
@@ -200,11 +206,9 @@ export default {
       let list = [];
       this.list.forEach(p => {
         if (p.checked) {
-          console.log(p);
           list.push(p.code);
         }
       });
-      console.log(list);
       if (list.length) {
         placeOrderCart({
           codeList: list

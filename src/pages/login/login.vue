@@ -6,7 +6,7 @@
         </div>
         <div>
             <i v-show="errors.has('mobile')" class="error-tip">{{errors.first('mobile')}}</i>
-            <span>手机号</span> <input class="pl2rem" v-model="options.mobile" v-validate="'required|mobile'" type="text" name="mobile" placeholder="请输入手机号">
+            <span>手机号</span> <input class="pl2rem" v-model="options.mobile" v-validate="'required|mobile'" type="tel" name="mobile" placeholder="请输入手机号">
         </div>
         <div>
             <i v-show="errors.has('wxNum')" class="error-tip">{{errors.first('wxNum')}}</i>
@@ -148,6 +148,7 @@ export default {
       this.levelList = res.list.filter(l => {
         return l.level != '6' && l.level >= level;
       });
+      console.log(this.levelList);
       this.options.applyLevel = this.levelList[0].level;
       this.level = this.levelList[0].name;
 

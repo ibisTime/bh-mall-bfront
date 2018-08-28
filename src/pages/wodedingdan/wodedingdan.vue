@@ -1,68 +1,85 @@
 <template>
   <div class="intentionalAgent">
-      <div class="header clearfix">
-          <div @click="changeIndex('')" :class="[index == '' ? 'active' : '']">
-              <i>全部</i>
-          </div>
-          <div @click="changeIndex('0')" :class="[index == '0' ? 'active' : '']">
-              <i>待支付</i>
-          </div>
-          <div @click="changeIndex('1')" :class="[index == '1' ? 'active' : '']">
-              <i>已收货</i>
-          </div>
-          <div @click="changeIndex('2')" :class="[index == '2' ? 'active' : '']">
-              <i class="width">申请取消</i>
-          </div>
-      </div>
-      <div class="item clearfix" v-for="(item,index) in list">
-            <div class="top clearfix">
-                <span class="user">提交人：{{item.realName || item.nickName}}（{{item.agent.mobile}}）</span>
-                <span class="status">{{status[item.status]}}</span>
-            </div>
-            <div class="info" :class="{ active: heightActive === index }" ref="divInfo">
-                <div class="downward" @click="changeHeight(index)">></div>
-                <p>订单编号：{{item.code}}</p>
-                <p>订单类型：{{item.kind}}</p>
-                <p>下单时间：{{formatDate(item.applyDatetime)}}</p>
-                <p>收货人：{{item.signer}}（{{item.mobile}}）</p>
-                <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
-            </div>
-            <div class="pic">
-                <img :src="formatImg(item.pic)" alt="">
-                <div class="content">
+    <div class="header clearfix">
+        <div @click="changeIndex('')" :class="[index == '' ? 'active' : '']">
+            <i>全部</i>
+        </div>
+        <div @click="changeIndex('0')" :class="[index == '0' ? 'active' : '']">
+            <i>待支付</i>
+        </div>
+        <div @click="changeIndex('1')" :class="[index == '1' ? 'active' : '']">
+            <i>已收货</i>
+        </div>
+        <div @click="changeIndex('2')" :class="[index == '2' ? 'active' : '']">
+            <i class="width">申请取消</i>
+        </div>
+    </div>
+    <div class="orders-content">
+      <scroll :data="list"
+              :hasMore="hasMore"
+              @pullingUp="getPageOrders">
+        <div class="item clearfix" v-for="(item,index) in list">
+              <div class="top clearfix">
+                  <span class="user">提交人：{{item.realName || item.nickName}}（{{item.agent.mobile}}）</span>
+                  <span class="status">{{status[item.status]}}</span>
+              </div>
+              <div class="info" :class="{ active: heightActive === index }" ref="divInfo">
+                  <div class="downward" @click="changeHeight(index)">></div>
+                  <p>订单编号：{{item.code}}</p>
+                  <p>下单时间：{{formatDate(item.applyDatetime)}}</p>
+              </div>
+              <div class="pic">
+                  <img :src="formatImg(item.pic)" alt="">
+                  <div class="content">
                     <p>{{item.productName}}</p>
-                    <p style="padding-top:0.1rem;">{{item.productSpecsName}}</p>
-                    <i>￥{{item.price/1000}}</i>
-                    <span>{{item.quantity}}{{item.productSpecsName}}</span><span class="status">{{item.kind == '2' ? '购买云仓' : '云仓提货'}}</span>
-                    <div class="shouhuo" @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
-                    <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3'">物流信息</div>
-                  <div class="quxiao" @click="shenqingquxiao(item.code)" v-if="item.status == '0'">取消</div>
-                  <!--<div class="quxiao" @click="shenqingquxiao(item.code)" v-if="item.status == '1'">取消</div>-->
-                </div>
-            </div>
-      </div>
-      <toast ref="toast" :text="toastText"></toast>
+                    <!--<p style="padding-top:0.1rem;">{{item.specsName}}</p>-->
+                    <i>￥{{formatAmount(item.price)}}</i>
+                    <span>{{item.quantity}}{{item.specsName}}</span>
+                    <span class="total">总价：¥{{formatAmount(item.amount)}}</span>
+                    <div class="quxiao" @click="cancel(item.code)" v-if="item.status == '0'">取消</div>
+                    <div class="fukuan" @click="goPay(item.code)" v-if="item.status == '0'">付款</div>
+                    <!--<div class="quxiao" @click="shenqingquxiao(item.code)" v-if="item.status == '1'">取消</div>-->
+                  </div>
+              </div>
+        </div>
+      </scroll>
+    </div>
+    <toast ref="toast" :text="toastText"></toast>
+    <full-loading :title="title" v-show="loading"></full-loading>
+    <confirm ref="confirm" :text="confirmText" @confirm="cancelEvent"></confirm>
   </div>
 </template>
 <script>
 import Toast from 'base/toast/toast';
+import FullLoading from 'base/full-loading/full-loading';
+import Confirm from 'base/confirm/confirm';
+import Scroll from 'base/scroll/scroll';
 import { queryYunOrder, receiveNromalOrder, cencelCloudOrder} from "api/baohuo";
-import { formatDate, formatImg } from "common/js/util";
+import { formatDate, formatImg, formatAmount } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 import { getDictList } from 'api/general';
 export default {
   data() {
     return {
+      loading: false,
+      title: '正在加载...',
       index: "",
       list: [],
       hightShow: false,
       num: "",
       status: {},
       heightActive: '',
-      toastText: ''
+      toastText: '',
+      confirmText: '确定取消订单吗',
+      start: 1,
+      limit: 10,
+      hasMore: true
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     formatDate(date) {
       return formatDate(date);
     },
@@ -76,26 +93,35 @@ export default {
     formatImg(img) {
       return formatImg(img);
     },
-    check() {
+    getPageOrders() {
       let params;
       if(this.index == '') {
         params = '';
       } else {
         params = this.index;
       }
-      queryYunOrder(params).then(res => {
-        if (res.list.length <= 1) {
+      this.loading = true;
+      Promise.all([
+        queryYunOrder({
+          start: this.start,
+          limit: this.limit,
+          status: params
+        }),
+        getDictList('in_order_status')
+      ]).then(([res1, res2]) => {
+        if (res1.list.length < this.limit || res1.totalCount <= this.limit) {
+          this.hasMore = false;
         }
-        res.list.map(function () {
-          res.applyDatetime = formatDate(res.applyDatetime);
+        this.loading = false;
+        res1.list.map(function () {
+          res1.applyDatetime = formatDate(res1.applyDatetime);
         });
-        this.list = res.list;
-      });
-      getDictList('in_order_status').then((res) => {
-        res.map((item) => {
+        this.list = this.list.concat(res1.list);
+        this.start++;
+        res2.map((item) => {
           this.status[item.dkey] = item.dvalue;
         });
-      })
+      }).catch(() => { this.loading = false; });
     },
     shouhuo(code) {
       receiveNromalOrder(code).then(res => {
@@ -115,21 +141,33 @@ export default {
       // this.$refs.toast.show();
       this.$router.push('/wuliu?code='+code+'&company='+company);
     },
-    shenqingquxiao(code){
-      cencelCloudOrder(code).then(res => {
-          if(res.isSuccess == true){
-            this.toastText = '取消成功';
-            this.$refs.toast.show();
-            window.location.reload()
-          }
+    cancel(code){
+      this.$refs.confirm.show();
+      this.cancelCode = code;
+    },
+    cancelEvent() {
+      cencelCloudOrder(this.cancelCode).then(res => {
+        if(res.isSuccess == true){
+          this.toastText = '取消成功';
+          this.$refs.toast.show();
+          window.location.reload()
+        }
       })
+    },
+    goPay(index) {
+      if (index) {
+        this.$router.push("/xuangoushangpin/shangpingoumai?pay=" + 2 + '&code=' + index);
+      }
     }
   },
   mounted() {
-    this.check();
+    this.getPageOrders();
   },
   components: {
-      Toast
+    Toast,
+    FullLoading,
+    Confirm,
+    Scroll
   }
 };
 </script>
@@ -141,6 +179,13 @@ export default {
   height: 100%;
   .fl {
     float: left;
+  }
+  .orders-content {
+    position: absolute;
+    top: 0.8rem;
+    left: 0;
+    width: 100%;
+    bottom: 0;
   }
   .header {
     background-color: #fff;
@@ -240,13 +285,14 @@ export default {
         }
         i {
           position: absolute;
-          top: 1.15rem;
+          /*top: 1.15rem;*/
+          top: 0.45rem;
           left: 0;
           font-size: $font-size-small;
           color: $primary-color;
         }
         span {
-          width: 1.2rem;
+          width: 2.2rem;
           line-height: 0.5rem;
           position: absolute;
           top: 0;
@@ -269,7 +315,7 @@ export default {
           border-radius: 0.1rem;
           padding: 0.1rem 0.14rem;
         }
-        .quxiao {
+        .fukuan {
           font-size: 0.3rem;
           position: absolute;
           top: 1.15rem;
@@ -287,14 +333,29 @@ export default {
           border-radius: 0.1rem;
           padding: 0.1rem 0.14rem;
         }
+        .quxiao {
+          font-size: 0.3rem;
+          position: absolute;
+          top: 1.15rem;
+          right: 0.2rem;
+          border: 1px solid #333;
+          border-radius: 0.1rem;
+          padding: 0.1rem 0.14rem;
+        }
       }
     }
     .total {
-      padding: 0.3rem;
-      border-bottom: 1px solid #eee;
-      font-size: $font-size-medium-s;
-      color: #333;
+      padding: 0.3rem 0;
       text-align: right;
+      width: 2.2rem;
+      line-height: 0.5rem;
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 0.24rem;
+      border: none;
+      text-align: right;
+      color: $primary-color !important;
       p + p {
         margin-top: 0.18rem;
       }

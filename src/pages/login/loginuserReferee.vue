@@ -6,7 +6,7 @@
         </div>
         <div>
             <i v-show="errors.has('mobile')" class="error-tip">{{errors.first('mobile')}}</i>
-            <span>手机号</span> <input class="pl2rem" v-model="options.mobile" v-validate="'required|mobile'" type="text" name="mobile" placeholder="请输入手机号">
+            <span>手机号</span> <input class="pl2rem" v-model="options.mobile" v-validate="'required|mobile'" type="tel" name="mobile" placeholder="请输入手机号">
         </div>
         <div>
             <i v-show="errors.has('wxNum')" class="error-tip">{{errors.first('wxNum')}}</i>
@@ -14,7 +14,7 @@
         </div>
         <div>
             <i v-show="errors.has('introducer')" class="error-tip">{{errors.first('introducer')}}</i>
-            <span>介绍人手机号</span> <input @keyup="introducerChange" class="pl2rem" v-model="options.introducer" type="text" name="introducer" placeholder="可不填，跨级介绍时必填">
+            <span>介绍人手机号</span> <input @keyup="introducerChange" class="pl2rem" v-model="options.introducer" type="tel" name="introducer" placeholder="可不填，跨级介绍时必填">
         </div>
         <div class="area">
             <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>
@@ -167,7 +167,7 @@ export default {
         this.options.applyLevel = this.levelList[0].level;
         this.level = this.levelList[0].name;
       } else {
-        this.text = '暂无可选择的等级';
+        this.text = '介绍人不能为最高等级代理';
         this.$refs.toast.show();
         this.options.applyLevel = '';
         this.level = '';

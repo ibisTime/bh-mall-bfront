@@ -97,7 +97,7 @@ export default {
                   });
                   //查询用户余额
                   getBill(item.userId).then(res => {
-                      item.amount = res[0].amount
+                      item.amount = res.length ? res[0].amount : '';
                   });
               });
               this.list = res.list;
@@ -255,7 +255,7 @@ export default {
                         line-height: 0.58rem;
                         font-size: $font-size-small-s;
                         color: #333;
-                        
+
                     }
                     span + span {
                         border-top: 1px dashed #dedede;

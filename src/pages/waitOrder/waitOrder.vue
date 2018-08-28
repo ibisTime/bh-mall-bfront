@@ -11,8 +11,8 @@
       <div class="info" :class="{ active: heightActive === index }" ref="divInfo">
         <div class="downward" @click="changeHeight(index)">></div>
         <p>订单编号：{{item.code}}</p>
-        <p>订单类型：{{item.kind}}</p>
-        <p>下单时间：{{item.applyDatetime}}</p>
+        <p>订单类型：{{type[item.kind]}}</p>
+        <p>下单时间：{{formatDate(item.applyDatetime)}}</p>
         <p>收货人：{{item.signer}}（{{item.mobile}}）</p>
         <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
       </div>
@@ -22,29 +22,39 @@
           <p>{{item.productName}}</p>
           <p style="padding-top:0.1rem;">{{item.productSpecsName}}</p>
           <i>￥{{item.price/1000}}</i>
-          <span>{{item.quantity}}{{item.productSpecsName}}</span><span class="status">{{item.kind == '2' ? '购买云仓' : '云仓提货'}}</span>
-          <div class="shouhuo" @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
-          <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3'">物流信息</div>
-          <div class="quxiao" @click="shenqingquxiao(item.code)" v-if="item.status == '0'">取消</div>
-          <div class="quxiao" @click="shenqingquxiao(item.code)" v-if="item.status == '1'">取消</div>
+          <span>{{item.quantity}}{{item.productSpecsName}}</span>
+          <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3' || item.status == '4'">物流信息</div>
+          <div class="quxiao" @click="cancel(item.code)" v-if="item.status == '5'">审核取消</div>
+          <div class="fahuo" @click="sendM(item.code)" v-if="item.status == '2'">发货</div>
         </div>
       </div>
     </div>
     <toast ref="toast" :text="toastText"></toast>
+    <full-loading :title="title" v-show="loading"></full-loading>
+    <!--<confirm ref="confirm" :text="confirmText" @confirm="cancelEvent"></confirm>-->
+    <send-modal ref="sendModal" @confirm="handleConfirm"></send-modal>
+    <confirm-input ref="confirmInput" text="取消审核" @confirm="ok" @cancel="no" confirmBtnText="通过" cancelBtnText="不通过"></confirm-input>
   </div>
 </template>
 <script>
   import Toast from 'base/toast/toast';
   import CategoryScroll from 'base/category-scroll/category-scroll';
-  import { queryOrderForm1, receiveNromalOrder,cencelChuHuoOrder} from "api/baohuo";
-  import { formatDate, formatImg } from "common/js/util";
+  import FullLoading from 'base/full-loading/full-loading';
+  import Confirm from 'base/confirm/confirm';
+  import SendModal from 'components/send-modal/send-modal';
+  import ConfirmInput from 'base/confirm-input/confirm-input';
+  import { queryOrderForm1, receiveNromalOrder, fahuo, checkCancel } from "api/baohuo";
+  import { formatDate, formatImg, getUserId } from "common/js/util";
   import { getUser, getUserById } from "api/user";
   import { getDictList } from 'api/general';
   export default {
     data() {
       return {
+        loading: false,
+        title: '正在加载...',
         index: 0,
         list: [],
+        type: {},
         hightShow: false,
         num: "",
         status: {},
@@ -57,37 +67,46 @@
           {value: '待发货', key: '1||2'},
           {value: '待收货', key: '3'},
           {value: '已收货', key: '4'},
-          {value: '申请取消', key: '5'}]
+          {value: '申请取消', key: '5'}],
+        confirmText: '确定取消订单吗',
+        userId: '',
+        content: ''
       };
     },
     methods: {
-      // changeIndex(index) {
-      //   this.index = index;
-      //   this.check();
-      // },
       changeHeight(index) {
         this.heightActive = this.heightActive === index ? '' : index;
       },
       formatImg(img) {
         return formatImg(img);
       },
+      formatDate(date) {
+        return formatDate(date);
+      },
       check() {
         let key = this.categorys[this.index].key;
         let index = key === 'all' ? [] : key.split('||');
         // 请求订单
-        queryOrderForm1(index).then(res => {
-          if (res.list.length <= 1) {
-          }
-          res.list.forEach(function () {
-            res.applyDatetime = formatDate(res.applyDatetime);
+        this.loading = true;
+        Promise.all([
+          queryOrderForm1(index),
+          getDictList('out_order_status'),
+          getUserId(),
+          getDictList('out_order_type')
+        ]).then(([res1, res2, res3, res4]) => {
+          this.loading = false;
+          res1.list.forEach(function () {
+            res1.applyDatetime = formatDate(res1.applyDatetime);
           });
-          this.list = res.list;
-        })
-        getDictList('out_order_status').then((res) => {
-          res.map((item) => {
+          this.list = res1.list;
+          res2.map((item) => {
             this.status[item.dkey] = item.dvalue;
           });
-        })
+          this.userId = res3;
+          res4.map((item) => {
+            this.type[item.dkey] = item.dvalue;
+          });
+        }).catch(() => { this.loading = false; })
       },
       shouhuo(code) {
         receiveNromalOrder(code).then(res => {
@@ -107,12 +126,26 @@
         // this.$refs.toast.show();
         this.$router.push('/wuliu?code='+code+'&company='+company);
       },
-      shenqingquxiao(code){
-        cencelChuHuoOrder(code).then(res => {
-          if(res.isSuccess == true){
-            this.toastText = '取消成功';
+      cancel(code){
+        this.$refs.confirmInput.show();
+        // this.$refs.confirm.show();
+        this.cancelCode = code;
+
+      },
+      ok() {
+        this.result = 1;
+        this.cancelEvent();
+      },
+      no() {
+        this.result = 0;
+        this.cancelEvent();
+      },
+      cancelEvent() {
+        checkCancel(this.cancelCode, this.result, this.content, ).then((res) => {
+          if(res.isSuccess) {
+            this.toastText = '审核取消成功';
             this.$refs.toast.show();
-            window.location.reload()
+            this.check();
           }
         })
       },
@@ -122,13 +155,49 @@
         this.currentIndex = index;
         this.check();
       },
+      sendM(code) {
+        this.curCode = code;
+        this.$refs.sendModal.show();
+      },
+      handleConfirm(wlCode, wlCompany) {
+        if (!wlCompany || !wlCode) {
+          this.toastText = '物流单号和物流公司未填写完整';
+          this.$refs.toast.show();
+        } else {
+          this.fahuo(wlCode, wlCompany);
+        }
+      },
+      fahuo(logisticsCode, logisticsCompany) {
+        let params = {
+          logisticsCode: logisticsCode,
+          logisticsCompany: logisticsCompany,
+          code: this.curCode
+        };
+        fahuo(params).then(res => {
+          console.log(res);
+          if (res.isSuccess) {
+            this.toastText = '发货成功';
+            this.$refs.toast.show();
+            setTimeout(() => {
+              window.location.reload();
+            }, 300)
+          } else {
+            this.toastText = '发货失败';
+            this.$refs.toast.show();
+          }
+        });
+      },
     },
     mounted() {
       this.check();
     },
     components: {
       Toast,
-      CategoryScroll
+      CategoryScroll,
+      FullLoading,
+      Confirm,
+      SendModal,
+      ConfirmInput
     }
   };
 </script>
@@ -278,6 +347,15 @@
             padding: 0.1rem 0.14rem;
           }
           .shouhuo {
+            font-size: 0.3rem;
+            position: absolute;
+            top: 1.15rem;
+            right: 0.2rem;
+            border: 1px solid #333;
+            border-radius: 0.1rem;
+            padding: 0.1rem 0.14rem;
+          }
+          .fahuo {
             font-size: 0.3rem;
             position: absolute;
             top: 1.15rem;

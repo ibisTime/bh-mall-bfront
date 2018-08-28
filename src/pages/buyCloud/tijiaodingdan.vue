@@ -100,19 +100,19 @@ export default {
     buy() {
       this.title = "提交中...";
       this.loading = true;
-      let code = this.$route.query.code;
-      let options = {
-        address: this.address.address,
-        area: this.address.area,
-        city: this.address.city,
-        mobile: this.address.mobile,
-        province: this.address.province,
-        signer: this.address.code,
-        productSpecsCode: this.productSpecsCode,
-        quantity: this.number,
-        applyNote: this.applyNote,
-        toUser: this.$route.query.highUserId
-      };
+      // let code = this.$route.query.code;
+      // let options = {
+      //   address: this.address.address,
+      //   area: this.address.area,
+      //   city: this.address.city,
+      //   mobile: this.address.mobile,
+      //   province: this.address.province,
+      //   signer: this.address.code,
+      //   productSpecsCode: this.productSpecsCode,
+      //   quantity: this.number,
+      //   applyNote: this.applyNote,
+      //   toUser: this.$route.query.highUserId
+      // };
       this.codeList = this.orderCode.split(',');
       cloudPayment(this.codeList, this.status).then(data => {
         if (this.status === 0) {
@@ -150,8 +150,9 @@ export default {
     checkUser(userId) {
       Promise.all([
         checkRed(userId),
-        getLevel(getCookie("level"))
+        getLevel(this.level)
       ]).then(([res, levelInfo]) => {
+        setCookie('isWare', res.isWare);
         if (res.result == '4') {
           this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge');
         } else if (res.result == "0") {
@@ -165,7 +166,9 @@ export default {
         } else if (res.result == '3') {
           this.redirectPage(`您的门槛余额已经高于${formatAmount(res.minAmount)}元，请前去购买云仓`, '/threshold');
         } else {
-          this.$router.push('/home');
+          setTimeout(() => {
+            this.$router.push('/home');
+          }, 300)
         }
       }).catch(() => {});
     },
@@ -189,28 +192,40 @@ export default {
   },
   mounted() {
     //获取用户等级
-    let level = getCookie("level");
+    let specsCode = this.$route.query.specsCode;
+    this.level = '';
     let code = this.$route.query.code;
     this.orderCode = this.$route.query.orderCode;
     this.code = code;
     let number = this.$route.query.number;
-    let specsCode = this.$route.query.specsCode;
     this.number = number;
     setCookie("yuncangshuliang", this.number);
     setCookie("yuncangcode", this.code);
-    let info = {
-      level: level,
-      specsCode: specsCode
-    };
     this.loading = true;
+    // console.log(info);
+    // Promise.all([
+    //   productDetailBySpec(this.info),
+    //   queryDefaultAddress()
+    // ]).then(([item, res]) => {
+    //   this.loading = false;
+    //   item.pic = formatImg(item.pic);
+    //   this.thingInfo = item;
+    //   this.productSpecsCode = item.specs.code;
+    //   this.address = res.length ? res[0] : {};
+    // }).catch(() => this.loading = false);
     Promise.all([
-      productDetailBySpec(info),
+      getUser(),
       queryDefaultAddress()
-    ]).then(([item, res]) => {
-      this.loading = false;
-      item.pic = formatImg(item.pic);
-      this.thingInfo = item;
-      this.productSpecsCode = item.specs.code;
+    ]).then(([info, item, res]) => {
+      productDetailBySpec({
+        level: info.level,
+        specsCode: specsCode
+      }).then((item) => {
+        this.loading = false;
+        item.pic = formatImg(item.pic);
+        this.thingInfo = item;
+        this.productSpecsCode = item.specs.code;
+      });
       this.address = res.length ? res[0] : {};
     }).catch(() => this.loading = false);
   },

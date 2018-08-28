@@ -21,6 +21,7 @@
 </template>
 <script>
 import {queryProduct} from 'api/baohuo'
+import {getUser} from 'api/user'
 import {setCookie,getCookie} from 'common/js/cookie.js';
 import {formatImg} from 'common/js/util';
 export default {
@@ -33,8 +34,10 @@ export default {
 
   },
   mounted(){
-      let level = getCookie('level')
-      queryProduct({level: level}).then(res => {
+      getUser().then((res) => {
+        this.level = res.level;
+      })
+      queryProduct({level: this.level}).then(res => {
           res.list.map(function(item){
               item.pic = formatImg(item.pic)
           })

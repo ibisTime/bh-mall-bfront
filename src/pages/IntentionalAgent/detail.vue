@@ -17,13 +17,12 @@
             </p>
         </div>
         <div class="detail-bottom">
-            <p>意向等级：<i>{{userinfo.level}}</i></p>
+            <p>意向等级：<i>{{userinfo.applyLevel}}</i></p>
             <p>该等级政策：</p>
-            <p>1.门槛非同20000，天王盖地虎</p>
-            <p>2.天王盖地虎，小鸡炖蘑菇。</p>
-            <p>3.天王盖地虎，小鸡炖蘑菇。</p>
+            <p>门槛费用： {{formatAmount(userinfo.minCharge)}}</p>
+            <p>云仓红线：{{formatAmount(userinfo.redAmount)}}</p>
         </div>
-        <div :class="['choose']">
+        <div :class="['choose']" v-show="index === '0'">
             <span class="item"  @click="changSubShow">
                 <img src="../../assets/imgs/xiangxiafenpei@2x.png" alt="">
                 向下分配
@@ -39,7 +38,8 @@
         </div>
         <div :class="[maskShow ? 'show' : '','mask']" @click="changSubShow"></div>
         <div :class="[panelLevelShow ? 'show' : '','panel']" @click="chooseUser($event)">
-            <i v-for="item in list" :id="item.userId" >{{item.realName}}</i>
+            <i v-for="item in list" :id="item.userId" v-show="list.length">{{item.realName}}</i>
+            <i v-show="!list.length">无内容</i>
         </div>
         <toast ref="mytoast" :text="text"></toast>
     </div>
@@ -50,10 +50,10 @@ import {
   acceptAgent,
   ignoreAgent,
   getLevel,
-  getMySub
-  // queryManager
+  getMySub,
+  getYixiangDetail
 } from "api/baohuo";
-import { getUserById } from "api/user";
+import { formatAmount } from "../../common/js/util";
 import toast from "base/toast/toast";
 export default {
   name: "detail",
@@ -74,26 +74,32 @@ export default {
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     // downward(){
-    //     changSubShow(){
+    //     changSubShow() {
     //     this.maskShow = !this.maskShow
     //     this.panelLevelShow = !this.panelLevelShow
     //     }
-    //     // allotAgent(this.options).then(res => {
-    //     //         if(res.isSuccess){
-    //     //             this.text = '向下分配成功'
-    //     //             this.$refs.mytoast.show()
-    //     //         }else{
-    //     //             this.text = '向下分配失败'
-    //     //             this.$refs.mytoast.show()
-    //     //         }
-    //     // })
+    //     allotAgent(this.options).then(res => {
+    //             if(res.isSuccess){
+    //                 this.text = '向下分配成功'
+    //                 this.$refs.mytoast.show()
+    //             }else{
+    //                 this.text = '向下分配失败'
+    //                 this.$refs.mytoast.show()
+    //             }
+    //     })
     // },
     accept() {
       acceptAgent(this.options.userId).then(res => {
         if (res.isSuccess) {
           this.text = "接受成功";
           this.$refs.mytoast.show();
+          setTimeout(() => {
+            this.$router.back();
+          }, 300)
         } else {
           this.text = "接受失败";
           this.$refs.mytoast.show();
@@ -133,23 +139,19 @@ export default {
     //从地址栏获取用户userId
     this.options.userId = this.$route.query.id;
     this.index = this.$route.query.index;
-    getUserById(this.options.userId).then(res => {
-      //获取用户等级
-      getLevel(res.level).then(info => {
-        res.level = info[0].name;
-        this.userinfo = res;
+    Promise.all([
+      getYixiangDetail(this.options.userId),
+      getMySub(this.options.userId)
+    ]).then(([res1, res2]) => {
+      getLevel(res1.applyLevel).then(info => {
+        res1.applyLevel = info[0].name;
+        res1.minCharge = info[0].minCharge;
+        res1.redAmount = info[0].redAmount;
+        this.userinfo = res1;
       });
-    });
-
-    //获取我的下级
-    getMySub(this.userId).then(res => {
-      this.list = res.list;
-    });
-
-    //查询管理员
-    // queryManager().then(res => {
-    //   this.options.manager = res.list[0].code;
-    // });
+      this.list = res2.list;
+    })
+    // getLevel('')
   },
   components: {
     toast

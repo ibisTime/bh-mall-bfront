@@ -30,7 +30,6 @@
 <script>
 import { sendMoney, queryAmount, checkRed } from 'api/baohuo'
 import { getQiniuToken } from 'api/general'
-import BScroll from 'better-scroll';
 import EXIF from 'exif-js';
 import Qiniu from 'base/qiniu/qiniu';
 import Toast from 'base/toast/toast';
@@ -38,6 +37,7 @@ import Loading from 'base/loading/loading';
 import FullLoading from 'base/full-loading/full-loading';
 import { getImgData, formatImg, getUserId } from 'common/js/util';
 import PhotoEdit from 'components/photo-edit/photo-edit';
+import { setCookie } from "../../common/js/cookie";
 
 const MAX_LENGTH = 12;
 
@@ -77,19 +77,21 @@ export default {
                     }
                 }).catch(() => this.loading = false);
             }else{
-                this.loading = false
+                this.loading = false;
                 this.text = '请上传图片';
                 this.$refs.toast.show();
             }
         },
         checkUser() {
           checkRed(getUserId()).then(res => {
+            setCookie('isWare', res.isWare);
             this.loading = false;
             this.text = '提交成功，待审核';
             this.$refs.toast.show(() => {
               if (res.result == '0' || res.result == '1' || res.result == '2'
                 || res.result == '3' || res.result == '4' || res.result == '6') {
                 this.$router.push('/login/reCharge');
+                // this.$router.push('/home');
               } else {
                 this.$router.push('/home');
               }
@@ -210,7 +212,6 @@ export default {
          * 图片上传完成后更新photos
          * */
         updatePhotos(item) {
-            console.log('item:', item);
             for (let i = 0; i < this.photos.length; i++) {
             if (this.photos[i].key === item.key) {
                 this.photos.splice(i, 1, item);

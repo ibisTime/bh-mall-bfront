@@ -36,7 +36,6 @@ const mutations = {
     state.account = account;
   },
   [types.SET_MY_PRODUCT](state, myProduct) {
-    debugger;
     state.myProduct = myProduct;
   },
 };

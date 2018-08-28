@@ -1,43 +1,45 @@
 <template>
   <div class="recharge">
-        <div class="bank-card">
-            <span class="card">{{options.payCardInfo}}</span>
-            <span class="carnum">{{options.payCardNo}}</span>
-            <i class="downward" @click="changeShow">></i>
+      <div class="bank-card">
+        <span class="card">{{options.payCardInfo}}</span>
+        <span class="carnum">{{options.payCardNo}}</span>
+        <i class="downward" @click="changeShow">></i>
+      </div>
+      <router-link to='/yejizhanghu/addBankCard' tag='div' class="add-bankCard">
+       添加银行卡
+      </router-link>
+      <div :class="['menu',show ? 'show' : '']">
+        <div
+        v-for="item in cardList"
+        class="item"
+        :code="item.code"
+        @click="(queryBankCardDetail(item.code))"
+        ><span>{{item.bankName}}：</span><i>{{item.bankcardNumber}}</i></div>
+      </div>
+      <div class="header">
+        <div class="top">取现金额</div>
+        <span class="yuan">￥</span>
+        <input v-model="options.account" type="number">
+        <div class="bottom">当前余额：{{account / 1000}}</div>
+      </div>
+      <div class="servicCharge">
+        <i>本次提现手续费：</i><span>{{servicCharge}}元</span>
+      </div>
+      <div class="footer">
+        <span  @click="recharge" >取现</span>
+      </div>
+      <div class="tip">
+        <p>取现规则:</p>
+        <div v-for="item in rules">
+          <p>{{item.remark}}: {{item.cvalue}}</p>
         </div>
-        <router-link to='/yejizhanghu/addBankCard' tag='div' class="add-bankCard">
-         添加银行卡
-        </router-link>
-        <div :class="['menu',show ? 'show' : '']">
-            <div
-            v-for="item in cardList"
-            class="item"
-            :code="item.code"
-            @click="(queryBankCardDetail(item.code))"
-            ><span>{{item.bankName}}：</span><i>{{item.bankcardNumber}}</i></div>
-        </div>
-        <div class="header">
-            <div class="top">取现金额</div>
-            <span class="yuan">￥</span>
-            <input v-model="options.account" type="number">
-            <div class="bottom">当前余额：{{account / 1000}}</div>
-        </div>
-        <div class="servicCharge">
-            <i>本次提现手续费：</i><span>{{servicCharge}}元</span>
-        </div>
-        <div class="footer">
-            <span  @click="recharge" >取现</span>
-        </div>
-        <div class="tip">
-            <p>取现规则:</p>
-            <p>每个月提现最大次数100次</p>
-            <p>单笔提现金额必须是5的倍数,单笔最大提现金额50000</p>
-        </div>
+      </div>
     <toast ref="mytoast" :text="text"></toast>
   </div>
 </template>
 <script>
 import { getCookie } from "common/js/cookie";
+import { getConfig } from "../../api/general";
 import {
   queryAmount,
   queryBankCard,
@@ -54,6 +56,7 @@ export default {
       percent: "",
       show: false,
       cardList: [],
+      rules: [],
       options: {
         account: "",
         accountNumber: "",
@@ -65,16 +68,20 @@ export default {
   },
   methods: {
     recharge() {
-      quxian(this.options).then(res => {
-        console.log(res);
-        if(res.code) {
-          this.text = "操作成功";
-          this.$refs.mytoast.show();
-          setTimeout(() => {
-            this.$router.back();
-          }, 500)
-        }
-      });
+      if(!this.options.payCardNo) {
+        this.text = "请选择银行卡";
+        this.$refs.mytoast.show();
+      } else {
+        quxian(this.options).then(res => {
+          if(res.code) {
+            this.text = "操作成功";
+            this.$refs.mytoast.show();
+            setTimeout(() => {
+              this.$router.back();
+            }, 500)
+          }
+        });
+      }
     },
     queryBankCardDetail(code) {
       this.changeShow();
@@ -89,15 +96,26 @@ export default {
   },
   mounted() {
     this.options.accountNumber = this.$route.query.accountNumber;
-    queryAmount(this.options.accountNumber).then(res => {
-      this.account = res.amount;
-    });
-    getPercent("BUSERQXFL").then(res => {
-      this.percent = res.cvalue;
-    });
-    queryBankCard().then(res => {
-      this.cardList = res;
-    });
+    Promise.all([
+      queryAmount(this.options.accountNumber),
+      getPercent("BUSERQXFL"),
+      queryBankCard(),
+      getConfig({ type: 'AT_QX' })
+    ]).then(([res1, res2, res3, res4]) => {
+      this.account = res1.amount;
+      this.percent = res2.cvalue;
+      this.options.payCardInfo = res3[0].bankName;
+      this.options.payCardNo = res3[0].bankcardNumber;
+      this.cardList = res3;
+      this.rules = res4.list;
+      if(!this.cardList.length) {
+        this.text = "您暂无银行卡，请添加";
+        this.$refs.mytoast.show();
+        setTimeout(() => {
+          this.$router.push('/yejizhanghu/addBankCard');
+        }, 300)
+      }
+    })
   },
   computed: {
     servicCharge() {

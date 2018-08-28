@@ -1,60 +1,68 @@
 <template>
-    <div class="shangpinliebiao">
-        <div class="header">
-            <span class="left" @click="back">取消</span>
-            <span class="center">商品列表</span>
-            <span class="right" @click="backParams">确定</span>
-        </div>
-        <div v-if="flag == 1" class="item" v-for="(item,index) in list" @click="choose(item.code,index)">
-            <div :class="['circle',num === index ? 'active' : '']"></div>
-            <img :src="item.pic">
-            <div class="content">
-                <p>{{item.name}}</p>
-                <i>￥{{item.specsList[0].priceList[0].price / 1000}}</i>
-                <span>1{{item.specsList[0].name}}</span>
-            </div>
-        </div>
-        <div v-if="flag == 2" class="item" v-for="(item,index) in list" @click="choose(item.code,index)">
-            <div :class="['circle',num === index ? 'active' : '']"></div>
-            <img :src="item.product.advPic">
-            <div class="content">
-                <p>{{item.productName}}</p>
-                <i>￥{{item.price / 1000}}</i>
-                <span>{{item.quantity}}{{item.productSpecsName}}</span>
-            </div>
-        </div>
+  <div class="shangpinliebiao">
+    <div class="header">
+      <span class="left" @click="back">取消</span>
+      <span class="center">商品列表</span>
+      <span class="right" @click="backParams">确定</span>
     </div>
+    <div v-if="flag == 1" class="item" v-for="(item,index) in list" @click="choose(item.code,index)">
+      <div :class="['circle',num === index ? 'active' : '']"></div>
+      <img :src="item.pic">
+      <div class="content">
+        <p>{{item.name}}</p>
+        <i>￥{{item.specsList[0].priceList[0].price / 1000}}</i>
+        <span>1{{item.specsList[0].name}}</span>
+      </div>
+    </div>
+    <div v-if="flag == 2" class="item" v-for="(item,index) in list" @click="choose(item.code,index)">
+      <div :class="['circle',num === index ? 'active' : '']"></div>
+      <img :src="item.product.pic">
+      <div class="content">
+        <p>{{item.productName}}</p>
+        <i>￥{{item.price / 1000}}</i>
+        <span>{{item.quantity}}{{item.specsName}}</span>
+      </div>
+    </div>
+    <full-loading :title="title" v-show="loading"></full-loading>
+  </div>
 </template>
 <script>
+import FullLoading from 'base/full-loading/full-loading';
 import {queryProduct,getCloudList,productDetail,getCloudDetail,_productDetail} from 'api/baohuo'
 import {getUser,getUserById} from 'api/user';
 import {setCookie,getCookie} from 'common/js/cookie.js';
 import {formatDate,formatImg} from 'common/js/util';
 export default {
     data(){
-        return{
-            list:[],
-            code:'',
-            flag:'',
-            num:'',
-            level:'',
-        }
+      return{
+        list:[],
+        code:'',
+        flag:'',
+        num:'',
+        level:'',
+        title: '正在加载...',
+        loading: false
+      }
     },
     methods:{
         choose(code,index){
             this.code = code;
             this.num = index;
             if(this.flag == 1) {
+              this.loading = true;
                 productDetail({
                   level: this.level,
                   code: this,code
                 }).then(res => {
-                    setCookie('myDetail',JSON.stringify(res))
+                  this.loading = false;
+                  setCookie('myDetail',JSON.stringify(res))
                 })
             }else if(this.flag == 2) {
-                getCloudDetail(this.code).then(res => {
-                    setCookie('cloudDetail',JSON.stringify(res))
-                })
+              this.loading = true;
+              getCloudDetail(this.code).then(res => {
+                this.loading = false;
+                setCookie('cloudDetail',JSON.stringify(res))
+              })
             }
         },
         backParams(){
@@ -65,40 +73,43 @@ export default {
         }
     },
     mounted(){
-        this.flag = this.$route.query.flag
-        this.level = getCookie('level')
-        let self = this;
-        // console.log(this.flag)
-        // console.log(typeof this.flag)
-        if(this.flag == '1') {
-            //查询我的商品
-            queryProduct({
-              level: this.level,
-              status: '2'
-            }).then(res =>{
-                res.list.map(function(item){
-                    item.pic = formatImg(item.pic)
-                });
-                this.list = res.list
-            })
-        }else if(this.flag == '2') {
-
-            //获取云仓商品
-            getCloudList().then(res => {
-                //遍历格式化图片
-                res.list.map(function(item){
-                    item.product.advPic = formatImg(item.product.advPic)
-                    //查询产品详情
-                    // getCloudDetail(item.code).then(info => {
-                    //     item.pic = formatImg(info.pic)
-                    // })
-                })
-                console.log(res)
-                this.list = res.list
-                console.log(this.list);
-            })
-        }
+      this.flag = this.$route.query.flag;
+      if(this.flag == '1') {
+        //查询我的商品
+        this.loading = true;
+        getUser().then((res) => {
+          this.level = res.level;
+          queryProduct({
+            level: res.level,
+            status: '2'
+          }).then(res =>{
+            this.loading = false;
+            res.list.map(function(item){
+              item.pic = formatImg(item.pic)
+            });
+            this.list = res.list
+          })
+        });
+      }else if(this.flag == '2') {
+        //获取云仓商品
+        this.loading = true;
+        getCloudList().then(res => {
+          //遍历格式化图片
+          this.loading = false;
+          res.list.map(function(item){
+            item.product.pic = formatImg(item.product.pic)
+            //查询产品详情
+            // getCloudDetail(item.code).then(info => {
+            //     item.pic = formatImg(info.pic)
+            // })
+          });
+          this.list = res.list;
+        })
+      }
     },
+  components: {
+    FullLoading
+  }
 }
 </script>
 <style lang="scss" scoped>

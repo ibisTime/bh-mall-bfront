@@ -1,51 +1,70 @@
 <template>
   <div class="journal">
-      <div class="item" v-for="item in list">
-          <p>操作人：{{name}}</p>
-          <p>流转时间：{{item.approveDatetime}}</p>
-      </div>
+    <div class="item" v-for="item in list.logList" v-show="list.logList">
+      <p>操作人：{{name}}</p>
+      <p>操作类型：{{logType[item.type]}}</p>
+      <p>流转时间：{{item.approveDatetime ? formatDate(item.approveDatetime) : formatDate(item.applyDatetime)}}</p>
+      <p>备注：{{item.remark}}</p>
+    </div>
+    <no-result v-show="!list.logList" title="暂无流转日志"></no-result>
   </div>
 </template>
 <script>
+import NoResult from 'base/no-result/no-result';
 import {getUserById,getTrack} from 'api/baohuo'
+import { getDictList } from 'api/general'
 import {formatDate} from 'common/js/util'
 export default {
   name:'journal',
   data(){
-      return{
-          list:[],
-          name:''
-      }
+    return{
+      list: [],
+      logType: {},
+      name: '',
+      type: '',
+      remark: ''
+    }
   },
-  methods:{},
+  methods:{
+    formatDate(date) {
+      return formatDate(date);
+    }
+  },
   mounted(){
-        this.name = this.$route.query.name
-        let userId = this.$route.query.id
-        getTrack(userId).then(res => {
-            res.logList.map(item => {
-                item.approveDatetime = formatDate(item.approveDatetime)
-            })
-            this.list = res
-        })
+    this.name = this.$route.query.name;
+    let userId = this.$route.query.id;
+    Promise.all([
+      getDictList(),
+      getTrack(userId)
+    ]).then(([res1, res2]) => {
+      let arr = {};
+      res1.map((item) => {
+        arr[item.dkey] = item.dvalue;
+      });
+      this.logType = arr;
+      this.list = res2;
+    });
   },
+  components: {
+    NoResult
+  }
 }
 </script>
 <style lang="scss" scoped>
 @import '../../common/scss/variable.scss';
-    .journal{
-        background-color: #f7f7f7;
-        font-size: $font-size-medium-s;
-        color: #333;
-        .item{
-            height: 1.4rem;
-            padding: 0.28rem 0.3rem;
-            background-color: #fff;
-            p + p {
-                margin-top: 0.34rem;
-            }
-        }
-        .item + .item {
-            margin-top: 0.2rem;
-        }
+  .journal{
+    background-color: #f7f7f7;
+    font-size: $font-size-medium-s;
+    color: #333;
+    .item{
+      padding: 0.28rem 0.3rem;
+      background-color: #fff;
+      p + p {
+        margin-top: 0.34rem;
+      }
     }
+    .item + .item {
+      margin-top: 0.2rem;
+    }
+  }
 </style>

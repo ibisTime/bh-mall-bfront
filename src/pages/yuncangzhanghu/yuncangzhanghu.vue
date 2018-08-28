@@ -1,32 +1,35 @@
 <template>
-    <div class="threshold">
-        <div class="header">
-            <div class="header-top">
-                <p class="now-balance">当前余额 （元）</p>
-                <p class="money-balance">{{account / 1000}}</p>
-            </div>
-            <div class="header-bottom">
-                <div class="header-bottom-left fl" @click="$router.push('/woyaochuhuo')">
-                    <img src="../../assets/threshold/chongzhi.png" alt="">
-                    <span>我要出货</span>
-                    <i class="line"></i>
-                </div>
-                <div class="header-bottom-right fl" @click="$router.push('/woyaozhihuan')">
-                    <img src="../../assets/threshold/goumaiyuncang.png" alt="">
-                    <span>我要置换</span>
-                </div>
-            </div>
+  <div class="threshold">
+    <div class="header">
+      <div class="header-top">
+        <p class="now-balance">当前余额 （元）</p>
+        <p class="money-balance">{{account / 1000}}</p>
+      </div>
+      <div class="header-bottom">
+        <div class="header-bottom-left fl" @click="$router.push('/woyaochuhuo')">
+          <img src="../../assets/threshold/chongzhi.png" alt="">
+          <span>我要出货</span>
+          <i class="line"></i>
         </div>
-        <div class="item" v-for="item in list" @click="$router.push('/yuncangzhanghu/huopinjilu?code=' + item.code + '&productCode=' + item.productCode)">
-          <img :src="formatImg(item.product.advPic)" alt="">
-            <div class="content">
-                <p>产品名称: {{item.productName}}</p>
-                <p style="padding-top: 0.2rem;">数量: {{item.allQuantity}}</p>
-            </div>
+        <div class="header-bottom-right fl" @click="$router.push('/woyaozhihuan')">
+          <img src="../../assets/threshold/goumaiyuncang.png" alt="">
+          <span>我要置换</span>
+        </div>
+      </div>
+    </div>
+    <div class="item" v-for="item in list" @click="$router.push('/yuncangzhanghu/huopinjilu?code=' + item.code + '&productCode=' + item.productCode)">
+      <img :src="formatImg(item.product.pic)" alt="">
+        <div class="content">
+          <p>产品名称: {{item.productName}}</p>
+          <p style="padding-top: 0.2rem;">数量: {{item.allQuantity}}</p>
+          <p style="padding-top: 0.2rem;">规格: {{item.specsName}}</p>
         </div>
     </div>
+    <full-loading :title="title" v-show="loading"></full-loading>
+  </div>
 </template>
 <script>
+import FullLoading from 'base/full-loading/full-loading';
 import {
   getCloud,
   getCloudDetail,
@@ -39,6 +42,8 @@ export default {
   name: "threshold",
   data() {
     return {
+      loading: false,
+      title: '正在加载...',
       list: [],
       account: 0,
       accountNumber: ""
@@ -50,21 +55,19 @@ export default {
     }
   },
   created() {
-    let level = getCookie("level");
     //获取用户云仓账户
-    getCloud().then(res => {
-      this.account = res.amount;
+    this.loading = true;
+    Promise.all([
+      getCloud(),
+      getCloudList()
+    ]).then(([res1, res2]) => {
+      this.loading = false;
+      this.account = res1.amount;
+      this.list = res1.list;
     });
-    getCloudList().then(res => {
-      //遍历格式化图片
-      res.list.map(function(item) {
-        // item.product.pic = formatImg(item.product.pic);
-        //查询产品详情
-        // productDetail(item.productCode, level).then(info => {});
-      });
-      this.list = res.list;
-    });
-    
+  },
+  components: {
+    FullLoading
   }
 };
 </script>

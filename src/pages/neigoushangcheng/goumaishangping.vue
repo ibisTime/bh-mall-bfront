@@ -38,12 +38,12 @@ export default {
   methods:{},
   mounted(){
       getUser().then(res => {
-          this.userinfo = res
+          this.userinfo = res;
+          this.level = res.level;
       })
-      let level = getCookie('level')
-      let code = this.$route.query.code
+      let code = this.$route.query.code;
       productDetail({
-        level: level,
+        level: this.level,
         code: code
       }).then(res => {
       })

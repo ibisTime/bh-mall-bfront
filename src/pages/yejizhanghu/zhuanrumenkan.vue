@@ -1,7 +1,7 @@
 <template>
   <div class="recharge">
       <div class="header">
-          <div class="top">充值金额</div>
+          <div class="top">转入金额</div>
           <span class="yuan">￥</span>
           <input v-model="moneyNum" type="number">
           <div class="bottom">当前余额：{{account / 1000}}</div>
@@ -26,20 +26,24 @@ export default {
     },
     methods:{
         recharge(){
+          if(+this.moneyNum > 0) {
             transfer({
               amount: this.moneyNum * 1000,
               fromAccount: 'TX_CNY',
               toAccount: 'MK_CNY'
             }).then(res => {
-                console.log(this.moneyNum)
-                this.text = '转入成功';
-                this.account -= (this.moneyNum * 1000)
-                this.$refs.toast.show();
-                this.moneyNum = '';
-                setTimeout(() => {
-                  this.$router.back();
-                }, 500);
+              this.text = '转入成功';
+              this.account -= (this.moneyNum * 1000)
+              this.$refs.toast.show();
+              this.moneyNum = '';
+              setTimeout(() => {
+                this.$router.back();
+              }, 500);
             })
+          } else {
+            this.text = '请输入大于0的数字';
+            this.$refs.toast.show();
+          }
         }
     },
     mounted(){

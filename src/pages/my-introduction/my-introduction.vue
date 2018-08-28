@@ -229,13 +229,15 @@ export default {
                 }
             }
             .header-button{
-                /*width: 0.9rem;*/
-                width: 20%;
-                height: 0.54rem;
-                line-height: 0.54rem;
-                padding-left: 0.2rem;
-                font-size: $font-size-small;
-                color: #2e2e2e;
+              width: 15%;
+              height: 0.54rem;
+              line-height: 0.54rem;
+              margin-left: 0.2rem;
+              font-size: 0.24rem;
+              color: #2e2e2e;
+              text-align: center;
+              border: 1px solid #dedede;
+              border-radius: 0.1rem;
             }
         }
         .container{
