@@ -173,7 +173,6 @@ export default {
     });
     this.orderCode.map((item) => {
       orderDetail({code: item}).then((res) => {
-        console.log(res);
         this.list.push({
           pic: res.product.advPic,
           productName: res.productName,

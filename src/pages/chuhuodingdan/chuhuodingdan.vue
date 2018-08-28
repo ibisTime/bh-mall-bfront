@@ -75,11 +75,12 @@
         currentIndex: +this.$route.query.index || 0,
         categorys: [
           {value: '全部',key: 'all'},
-          {value: '待支付', key: '0'},
-          {value: '待发货', key: '1||2'},
-          {value: '待收货', key: '3'},
-          {value: '已收货', key: '4'},
-          {value: '申请取消', key: '5'}],
+          // {value: '待支付', key: '0'},
+          // {value: '待发货', key: '1||2'},
+          // {value: '待收货', key: '3'},
+          // {value: '已收货', key: '4'},
+          // {value: '申请取消', key: '5'}
+          ],
         confirmText: '确定取消订单吗',
         start: 1,
         limit: 10,
@@ -101,7 +102,8 @@
       },
       check() {
         let key = this.categorys[this.index].key;
-        this.index = key === 'all' ? [] : key.split('||');
+        console.log(key);
+        this.index = key === 'all' ? [] : [key];
         // 请求订单
         this.loading = true;
         Promise.all([
@@ -124,7 +126,12 @@
           this.start++;
           res2.map((item) => {
             this.status[item.dkey] = item.dvalue;
+            this.categorys.push({
+              value: item.dvalue,
+              key: item.dkey
+            });
           });
+          console.log(this.categorys);
           res3.map((item) => {
             this.type[item.dkey] = item.dvalue;
           });
@@ -183,6 +190,7 @@
         this.currentIndex = index;
         this.start = 1;
         this.limit = 10;
+        this.list = [];
         this.getPageOrders();
       },
       goPay(code) {
@@ -342,27 +350,27 @@
             font-size: 0.3rem;
             border: 1px solid #333;
             border-radius: 0.1rem;
-            padding: 0.1rem 0.14rem;
+            padding: 0.1rem 0.24rem;
           }
           .fukuan {
             font-size: 0.3rem;
             border: 1px solid #333;
             border-radius: 0.1rem;
-            padding: 0.1rem 0.14rem;
+            padding: 0.1rem 0.24rem;
             margin-left: 0.3rem;
           }
           .shouhuo {
             font-size: 0.3rem;
             border: 1px solid #333;
             border-radius: 0.1rem;
-            padding: 0.1rem 0.14rem;
+            padding: 0.1rem 0.24rem;
             margin-left: 0.3rem;
           }
           .quxiao {
             font-size: 0.3rem;
             border: 1px solid #333;
             border-radius: 0.1rem;
-            padding: 0.1rem 0.14rem;
+            padding: 0.1rem 0.24rem;
             margin-left: 0.3rem;
           }
         }

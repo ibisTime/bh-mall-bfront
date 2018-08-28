@@ -148,12 +148,13 @@ export function getLevelSub(level) {
 }
 
 //我的下级==按照关键字
-export function getKeywordSub(keyword) {
+export function getKeywordSub(info) {
     return fetch(627320, {
-        limit: '100',
-        start: '0',
-        userId: getUserId(),
-        keyword: keyword
+      limit: '100',
+      start: '0',
+      userId: getUserId(),
+      keyword: info.keyword,
+      status: info.status || ''
     });
 }
 
@@ -859,12 +860,12 @@ export function liushuiList(info) {
   });
 }
 // 统计分析-我的出货接口
-export function myChuHuo(statusList) {
+export function myChuHuo(info) {
   return fetch(627854, {
     start: 1,
     limit: 100,
-    statusList: statusList,
-    applyUser: getUserId()
+    statusList: info.statusList,
+    applyUser: info.userId || getUserId()
   });
 }
 // 统计分析-差价利润接口

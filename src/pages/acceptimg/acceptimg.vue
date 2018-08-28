@@ -32,10 +32,11 @@ export default {
         }
     },
     mounted(){
+      let userId = this.$route.query.userId;
       this.loading = true;
       Promise.all([
         getAcceptImg('impower_pdf'),
-        getUserById(sessionStorage.getItem('userId')),
+        getUserById(userId ? userId : sessionStorage.getItem('userId')),
         getLevel()
       ]).then(([data1, data2, data3]) => {
         this.loading = false;

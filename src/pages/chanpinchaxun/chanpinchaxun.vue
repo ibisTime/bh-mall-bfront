@@ -1,6 +1,6 @@
 <template>
     <div class="buycloud">
-      <div class="item" v-for="item in list" v-show="list.length">
+      <div class="item" v-for="item in list" v-show="list.length" @click="$router.push('/chanpinchaxun/chanpinDetail?code=' + item.code)">
           <img :src="item.product.pic">
           <div class="content">
             <p>产品名称：{{item.productName}}</p>

@@ -22,6 +22,7 @@
           <p>{{detail.name}}</p>
           <span>请选择</span>
           <i @click="genghuan">X</i>
+          <p>库存：{{detail.specsList[num].number}}</p>
         </div>
       </div>
       <div class="packaging">
@@ -115,7 +116,6 @@ export default {
 
     //选择包装
     chooseSize(code, index, event) {
-      console.log(index);
       this.num = index;
       this.price = this.detail.specsList[index].price;
     },

@@ -64,6 +64,7 @@ import huopinjilu from '@/pages/yuncangzhanghu/huopinjilu'
 import woyaozhihuan from '@/pages/woyaozhihuan/woyaozhihuan'
 import shangpinliebiao from '@/pages/woyaozhihuan/shangpinliebiao'
 import chanpinchaxun from '@/pages/chanpinchaxun/chanpinchaxun'
+import chanpinDetail from '@/pages/chanpinchaxun/chanpinDetail'
 import woyaochuhuo from '@/pages/woyaochuhuo/woyaochuhuo'
 import wodedingdan from '@/pages/wodedingdan/wodedingdan'
 import chuhuodingdan from '@/pages/chuhuodingdan/chuhuodingdan'
@@ -404,6 +405,12 @@ export default new Router({
           path: '/chanpinchaxun',
           name: 'chanpinchaxun',
           component: chanpinchaxun
+      },
+      // 产品查询-详情
+      {
+        path: '/chanpinchaxun/chanpinDetail',
+        name: 'chanpinDetail',
+        component: chanpinDetail
       },
       //寄送到家
       {

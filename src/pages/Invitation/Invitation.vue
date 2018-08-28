@@ -3,13 +3,13 @@
       <div class="container" >
           <div class="top">
               <div>
-                  <!--<span>成功邀请（人）</span>-->
-                  <!--<i>12</i>-->
+                  <span>成功邀请（人）</span>
+                  <i>{{number}}</i>
                   <button @click="share">分享链接</button>
               </div>
               <div>
-                  <!--<span>提成收益（元）</span>-->
-                  <!--<i>12345</i>-->
+                  <span>提成收益（元）</span>
+                  <i>{{formatAmount(refreeAward)}}</i>
                   <button @click="changeFlag">分享二维码</button>
               </div>
           </div>
@@ -45,10 +45,10 @@
 </template>
 <script>
 //二维码插件引入
-import { inquireConfig } from "api/baohuo";
+import { inquireConfig, getStatistics } from "api/baohuo";
 import { initShare } from "common/js/weixin";
 import { getCookie } from "common/js/cookie";
-import { isLogin } from "common/js/util";
+import { isLogin, formatAmount } from "common/js/util";
 import { getUser } from "api/user";
 const QRCode = require("js-qrcode");
 export default {
@@ -67,10 +67,15 @@ export default {
         imgUrl: "http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg"
       },
       nickname: "",
-      status:''
+      status:'',
+      number: 0,
+      refreeAward: 0
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     changeFlag() {
       this.flag = !this.flag;
     },
@@ -111,6 +116,10 @@ export default {
       });
 
     }
+    getStatistics({}).then((res) => {
+      this.number = res.number;
+      this.refreeAward = res.refreeAward;
+    })
   }
 };
 </script>
@@ -126,14 +135,14 @@ export default {
     font-size: $font-size-small;
     overflow: hidden;
     .top {
-      height: 1.9rem;
+      height: 3.9rem;
       margin-top: 5.16rem;
       background-image: url("../../assets/invitationLink/juxing3.png");
       background-repeat: no-repeat;
       > div {
         float: left;
         width: 50%;
-        height: 1.9rem;
+        height: 3.9rem;
         position: relative;
         span {
           width: 100%;

@@ -14,7 +14,7 @@
         </div>
       </div>
     </div>
-    <div class="footer">
+    <div class="footer" v-show="!view">
       <div class="link">
         <a class="service" :href="'tel:' + telephone">
           <img class="img" src="../../assets/imgs/kefu@2x.png">
@@ -104,7 +104,8 @@ export default {
       total: 0,
       buyNow: false,
       price: 0,
-      telephone: null
+      telephone: null,
+      view: true
     };
   },
   methods: {
@@ -212,6 +213,7 @@ export default {
   },
   mounted() {
     this.code = this.$route.query.code;
+    this.view = !!this.$route.query.v;
     this.loading = true;
     Promise.all([
       getPercent('telephone'),

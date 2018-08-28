@@ -27,8 +27,8 @@
               </div>
               <div class="item-right">
                   <span>微信号：{{item.wxId}}</span>
-                  <span>当前等级：{{item.level}}</span>
-                  <span>当前余额：{{formatAmount(item.amount)}}</span>
+                  <span>当前等级：{{levelObj[item.level]}}</span>
+                  <span>当前余额：{{formatAmount(item.mkAmount)}}</span>
                   <span>授权时间：{{item.approveDatetime}}</span>
               </div>
           </div>
@@ -44,11 +44,12 @@ export default {
   name: 'subAgent',
   data() {
       return{
-          levelShow : false,
-          selectText:'请选择等级',
-          levelArr:[],
-          inputText:'',
-          list:[],
+        levelShow : false,
+        selectText:'请选择等级',
+        levelArr: [],    // 下拉框用
+        levelObj: {},    // 匹配用
+        inputText:'',
+        list:[],
       }
   },
   methods: {
@@ -61,57 +62,54 @@ export default {
       },
       //选择等级
       changeSelect(event) {
-          this.selectText = event.target.innerText;
-          console.dir(event.target.getAttribute('level'))
-          var level = event.target.getAttribute('level')
-
-          //根据所选等级查询我的下级
-          getLevelSub(level).then(res => {
-              res.list.map(function(item){
-                    //格式化时间
-                    item.approveDatetime = formatDate(item.approveDatetime)
-
-                    //数字等级转化文字等级
-                    getLevel(item.level).then(res => {
-                        item.level = res[0].name
-                    })
-
-                    //查询用户余额
-                    getBill(item.userId).then(res => {
-                        item.amount = res[0].amount
-                    })
-              })
-
-              this.list = res.list
+        this.selectText = event.target.innerText;
+        let level = event.target.getAttribute('level');
+        //根据所选等级查询我的下级
+        getLevelSub(level).then(res => {
+          res.list.map(function(item){
+            //格式化时间
+            item.approveDatetime = formatDate(item.approveDatetime);
+            //查询用户余额
+            getBill(item.userId).then(res => {
+              item.amount = res[0].amount
+            })
           })
+          this.list = res.list;
+        })
       },
       //根据我的下级查询我的下级
       getMysub() {
-          getKeywordSub(this.inputText).then(res => {
-              res.list.map(function(item){
-                  //格式化时间
-                  item.approveDatetime = formatDate(item.approveDatetime)
-                  //数字等级转化文字等级
-                  getLevel(item.level).then(res => {
-                      item.level = res[0].name
-                  });
-                  //查询用户余额
-                  getBill(item.userId).then(res => {
-                      item.amount = res.length ? res[0].amount : '';
-                  });
-              });
-              this.list = res.list;
+        getKeywordSub({
+          keyword: this.inputText,
+          status: '8'
+        }).then(res => {
+          res.list.map(function(item){
+            //格式化时间
+            item.approveDatetime = formatDate(item.approveDatetime);
+            //查询用户余额
+            getBill(item.userId).then(res => {
+              item.amount = res.length ? res[0].amount : '';
+            });
           });
+          this.list = res.list;
+          console.log(this.list);
+        });
       }
   },
   mounted(){
-      getUser().then(res => {
-          getAllLevel(res.level).then(res => {
-              this.levelArr = res.list
-          })
+    getUser().then(res => {
+      getAllLevel(res.level).then(res => {
+        this.levelArr = res.list;
+        let temp = {};
+        res.list.map((item) => {
+          temp[item.level] = item.name;
+        });
+        this.levelObj = temp;
+        console.log(this.levelObj);
       })
-      this.getMysub();
-      //获取全部等级
+    });
+    this.getMysub();
+    //获取全部等级
   },
   computed:{
       proList:function(){

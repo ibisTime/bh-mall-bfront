@@ -83,10 +83,10 @@
             </div>
           </div>
           <div class="model-bottom">
-              <div class="model-bottom-left fl" @click="$router.push('/acceptimg')">
+              <div class="model-bottom-left fl" @click="$router.push('/acceptimg?userId=' + userId)">
                   查看授权证书
               </div>
-              <div class="model-bottom-right fl">
+              <div class="model-bottom-right fl" @click="$router.push('/my-chuhuo?userId=' + userId)">
                   查看代理出货
               </div>
           </div>
@@ -124,6 +124,7 @@ export default {
       showInfo(event){
           this.show = !this.show;
           let userId = event.target.getAttribute('id');
+          this.userId = userId;
           getBill(userId).then(res => {
               this.amount = res.length ? res[0].amount : '';
           });

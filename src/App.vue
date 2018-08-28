@@ -6,10 +6,13 @@
 
 <script>
 import { isLogin, setUser } from "common/js/util";
+import { setCookie } from "./common/js/cookie";
+
 export default {
   name: "App",
   mounted() {
     // setUser({ userId: 'U201808261104285013162' });
+    // setCookie('isWare', 1);
     if (!isLogin()) {
       if (this.$route.path !== '/fenxiangshangcheng') {
         this.$router.push('/?userReferee=' + this.$route.query.userReferee || '');

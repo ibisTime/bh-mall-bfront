@@ -91,6 +91,7 @@ export default {
       this.index = index;
       this.start = 1;
       this.limit = 10;
+      this.list = [];
       this.getPageOrders();
     },
     changeHeight(index) {

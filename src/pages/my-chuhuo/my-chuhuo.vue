@@ -30,10 +30,12 @@
       </div>
     </div>
     <toast ref="toast" :text="toastText"></toast>
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
   import Toast from 'base/toast/toast';
+  import FullLoading from 'base/full-loading/full-loading';
   import { myChuHuo, receiveNromalOrder,cencelChuHuoOrder} from "api/baohuo";
   import { formatDate, formatImg } from "common/js/util";
   import { getUser, getUserById } from "api/user";
@@ -41,6 +43,8 @@
   export default {
     data() {
       return {
+        loading: false,
+        title: '正在加载...',
         index: "",
         list: [],
         hightShow: false,
@@ -60,28 +64,33 @@
       },
       check() {
         // 请求订单
-        myChuHuo([]).then(res => {
-          this.allAmount = res.allAmount;
-          console.log(res.allAmount);
-          if (res.page.length <= 1) {
-          }
-          res.page.forEach(function () {
-            res.applyDatetime = formatDate(res.applyDatetime);
+        this.loading = true;
+        Promise.all([
+          myChuHuo({
+            statusList: [],
+            userId: this.userId
+          }),
+          getDictList('out_order_status')
+        ]).then(([res1, res2]) => {
+          this.loading = false;
+          this.allAmount = res1.allAmount;
+          res1.page.forEach(() => {
+            res1.applyDatetime = formatDate(res.applyDatetime);
           });
-          this.list = res.page;
-        });
-        getDictList('out_order_status').then((res) => {
-          res.map((item) => {
+          this.list = res1.page;
+          res2.map((item) => {
             this.status[item.dkey] = item.dvalue;
           });
-        })
+        });
       }
     },
     mounted() {
+      this.userId = this.$route.query.userId;
       this.check();
     },
     components: {
-      Toast
+      Toast,
+      FullLoading
     }
   };
 </script>
