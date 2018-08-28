@@ -13,12 +13,12 @@
         <p>姓名：{{userInfo.realName}}</p>
         <p>微信号：{{userInfo.wxId}}</p>
         <p>手机号：{{userInfo.mobile}}</p>
-        <p>打款金额：<input type="text" v-model="padAmount"></p>
+        <p v-show="!free">打款金额：<input type="text" v-model="padAmount"></p>
         <p>等级：{{userInfo.level}}</p>
         <div class="area">
             <span>升级等级</span> <button  @click="chooseLevel" :value='level'>{{level || btntext}}</button>
             <ul :class="[panelLevelShow ? 'show' : 'hidden']" @click="selectLevel($event)">
-                <li v-for="item in levelList" v-if="item.level != 6" :level="item.level" @click="chooseLevel(item.isRealName)">{{item.name}}</li>
+                <li v-for="item in levelList" v-if="item.level != 6" :level="item.level" @click="chooseLevel(item.isRealName, item.minCharge, item.reNumber)">{{item.name}}</li>
             </ul>
         </div>
         <p v-show="isTeam">团队名称：<input type="text" v-model="myteamName"></p>
@@ -62,7 +62,7 @@ import toast from "base/toast/toast";
 import Qiniu from "base/qiniu/qiniu";
 import Toast from "base/toast/toast";
 import Loading from "base/loading/loading";
-import { getImgData, formatImg } from "common/js/util";
+import { getImgData, formatImg, formatAmount } from "common/js/util";
 import PhotoEdit from "components/photo-edit/photo-edit";
 import { getQiniuToken } from "api/general";
 import EXIF from "exif-js";   // Exif.js 提供了 JavaScript 读取图像的原始数据的功能扩展
@@ -90,9 +90,7 @@ export default {
       },
       moneyNum: "",
       pdf: "",
-      account: "",
       currentItem: null,
-      text: "",
       photos: [],
       identityPhotos: [],
       token: "",
@@ -105,7 +103,9 @@ export default {
       isIdentity: false,
       identity: '',
       myRealName: -1,
-      realName: false
+      realName: false,
+      reNumber: null,
+      free: false
     };
   },
   created() {
@@ -132,8 +132,7 @@ export default {
     changLevelShow() {
       this.panelLevelShow = !this.panelLevelShow;
     },
-    chooseLevel(isRealName) {
-      console.log(isRealName);
+    chooseLevel(isRealName, minCharge, reNumber) {
       if(this.mylevel == 1){
         return;
       }
@@ -143,13 +142,21 @@ export default {
       }else{
         this.realName = false;
       }
+      this.padAmount = formatAmount(minCharge);
+      if(this.reNumber >= reNumber) {
+        this.free = true;
+      }
+      // this.padAmount =
     },
     btnClick() {
       this.panelLevelShow = !this.panelLevelShow;
       this.btntext1 = this.level;
     },
     upgradeApplica1() {
+      let flag = true;
       if(this.photos.length === 0){
+        this.text = '请上传打款截图';
+        this.$refs.mytoast.show();
         return;
       }
       let options = {};
@@ -158,21 +165,33 @@ export default {
       options.padAmount = this.padAmount * 1000;
       options.payPdf = this.photos[0].key;
       options.idNo = this.identity;
-      console.log(this.identityPhotos[0].key);
+      this.levelList.map((item) => {
+        if(options.highLevel == item.level && options.padAmount < item.minCharge) {
+          this.text =  `该等级打款不得低于${formatAmount(item.minCharge)}元`;
+          this.$refs.mytoast.show();
+          flag = false;
+        }
+      });
+      if(this.free) {
+        options.padAmount = 0;
+      } else {
+        options.padAmount = this.padAmount * 1000;
+      }
       if(this.isIdentity) {
         options.idHand = this.identityPhotos[0].key;
       }
-      // options.idHand = this.identityPhotos[0].key || '';
-      upgradeApplica(options).then(res => {
-        if (res.isSuccess) {
-          this.text = '申请成功，待上级审核';
-          this.$refs.mytoast.show();
-          setTimeout(() => {
-            this.$router.push('/home');
-          }, 500);
-        }
-        res.isReset && alert(res.isReset);
-      });
+      if(flag) {
+        upgradeApplica(options).then(res => {
+          if (res.isSuccess) {
+            this.text = '申请成功，待上级审核';
+            this.$refs.mytoast.show();
+            setTimeout(() => {
+              this.$router.push('/home');
+            }, 500);
+          }
+          res.isReset && alert(res.isReset);
+        });
+      }
     },
     choseItem(index) {
       let item = this.photos[index];
@@ -241,7 +260,6 @@ export default {
       let len = files.length;
       let file = files[0];
       let orientation;
-      console.log(self);
       EXIF.getData(file, function() {
         orientation = EXIF.getTag(this, "Orientation");
       });
@@ -339,7 +357,7 @@ export default {
           break;
         }
       }
-      console.log(this.photos)
+      // console.log(this.photos)
     },
     upIdentityPhotos(item){
       this.identityPhotos.push(item);
@@ -387,38 +405,35 @@ export default {
     }
   },
   mounted() {
-    getUser().then(res => {
-      this.mylevel = res.level;
-      getLevel().then(info => {
-        info.map((item) => {
-          if(res.level === item.level) {
-            this.myRealName = item.isRealName;
-            res.level = item.name;
-          }
-        });
-        // this.myRealName = info[0].isRealName;
-        // res.level = info[0].name;
-        this.userInfo = res;
-        getAllLevel().then(res => {
-          this.levelList = res.list.filter(item => {
-            return item.level < this.mylevel;
-          });
-          if(!this.levelList.length) {
-            this.text = '您已是最高等级代理，无法升级';
-            this.$refs.mytoast.show();
-            setTimeout(() => {
-              this.$router.back();
-            }, 1000)
-          }
-        });
+    Promise.all([
+      getUser(),
+      getLevel(),
+      getAllLevel(),
+      getAccount(),
+      getQiniuToken()
+    ]).then(([res1, res2, res3, res4, res5]) => {
+      this.mylevel = res1.level;
+      this.reNumber = res1.reNumber;
+      res2.map((item) => {
+        if(res1.level === item.level) {
+          this.myRealName = item.isRealName;
+          res1.level = item.name;
+        }
       });
-    });
-    getAccount().then(res => {
-      this.account = res.amount;
-    });
-    getQiniuToken().then(res => {
-      this.token = res.uploadToken;
-    });
+      this.userInfo = res1;
+      this.levelList = res3.list.filter(item => {
+        return item.level < this.mylevel;
+      });
+      if(!this.levelList.length) {
+        this.text = '您已是最高等级代理，无法升级';
+        this.$refs.mytoast.show();
+        setTimeout(() => {
+          this.$router.back();
+        }, 1000)
+      }
+      this.account = res4.amount;
+      this.token = res5.uploadToken;
+    })
   },
   components: {
     Qiniu,

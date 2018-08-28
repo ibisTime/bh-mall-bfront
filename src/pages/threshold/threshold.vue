@@ -6,7 +6,7 @@
               <p class="money-balance">{{account / 1000}}</p>
           </div>
           <div class="header-bottom">
-              <div class="header-bottom-left fl" @click="$router.push('/recharge?type=MK_CNY&accountNumber=' + accountNumber)">
+              <div class="header-bottom-left fl" @click="$router.push('/recharge?type=MK_CNY')">
                   <img src="../../assets/threshold/chongzhi.png" alt="">
                   <span>充值</span>
                   <i class="line"></i>

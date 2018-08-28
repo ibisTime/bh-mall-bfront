@@ -242,7 +242,7 @@ export default {
     }
   }
   .add-bankCard {
-    font-size: 0.02rem;
+    font-size: 0.28rem;
     color: blue;
     line-height: 0.5rem;
     height: 0.5rem

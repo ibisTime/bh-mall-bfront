@@ -217,6 +217,7 @@ export default {
       getUser(),
       queryDefaultAddress()
     ]).then(([info, item, res]) => {
+      this.level = info.level;
       productDetailBySpec({
         level: info.level,
         specsCode: specsCode

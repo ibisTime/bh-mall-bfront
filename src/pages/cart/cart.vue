@@ -126,7 +126,9 @@ export default {
         list.splice(index, 1, item);
         this.list = list;
         let amount = 0;
+        let flag = true;
         this.list.forEach(d => {
+          console.log(d);
           if (!d.checked) {
             flag = false;
             return;
@@ -198,6 +200,7 @@ export default {
         list.splice(index, 1);
         this.list = list;
         this.totalAmount = amount;
+        this.editQuantity();
       })
     },
     // 购买商品

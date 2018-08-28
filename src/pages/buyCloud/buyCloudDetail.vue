@@ -227,7 +227,6 @@ export default {
         this.banners = advPic;
         this.specsList = specsList;
         this.detail = data;
-        console.log(this.detail);
         this.price = this.specsList[0].price.price;
       })
     });
@@ -244,6 +243,18 @@ export default {
 @import "../../common/scss/variable.scss";
 .buycloud {
   background-color: #f7f7f7;
+  .mask {
+    width: 100%;
+    height: 100%;
+    background-color: rgba($color: #000000, $alpha: 0.7);
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    &.show {
+      display: block;
+    }
+  }
   .goodsdetail{
     position: fixed;
     top: 0;

@@ -20,12 +20,12 @@
                 <div>
                   <p>产品名称：{{item.productName}}
                     <p>规格：{{item.specsName}}</p>
-                    <p>数量：{{prodNum[index]}}</p>
+                    <p>数量：{{item.quantity}}</p>
                     <p>价格：¥{{formatAmount(specsList[index].price * prodNum[index])}}</p>
                   </p>
                 </div>
                 <!-- <i>规格：{{item.product.specsList[0].name}}</i> -->
-                <span @click="prodectDetail(item.code, index)">我要出货</span>
+                <span @click="prodectDetail(item.specsCode, index)">我要出货</span>
             </div>
         </div>
         <div :class="['mask',flag ? 'show' : '']" @click="close"></div>
@@ -38,12 +38,13 @@
               <p>产品名称：{{detail.productName}}</p>
               <span>请选择</span>
               <i @click="close">X</i>
+              <p>库存：{{detail.quantity}}</p>
             </div>
           </div>
           <div class="packaging">
             <p>规格</p>
             <div class="select">
-              <span v-for="(item,index) in detail.specsList" :code="item.code" @click="chooseSize(index)" :class="[num === index ? 'active' : '']">{{item.specsName}}</span>
+              <span class="active">{{detail.specsName}}</span>
             </div>
           </div>
           <div class="total-money">
@@ -54,7 +55,7 @@
             </div>
             <div class="right">
               <span class="diamonds right-item" @click="add">+</span>
-              <input class="num right-item" @input="handleChange" type="number" v-model="number"></span>
+              <input class="num right-item" type="number" v-model="number">
               <span class="diamonds right-item" @click="sub">-</span>
             </div>
           </div>
@@ -107,9 +108,9 @@ export default {
     };
   },
   methods: {
-    handleChange(e) {
-      this.prodNum[this.curIndex] = this.number;
-    },
+    // handleChange(e) {
+    //   this.prodNum[this.curIndex] = this.number;
+    // },
     formatAmount(price) {
       return formatAmount(price);
     },
@@ -130,7 +131,7 @@ export default {
     },
     genghuan(index) {
       this.curIndex = index;
-      this.number = this.prodNum[index];
+      // this.number = this.prodNum[index];
       this.detail = this.list[index];
       this.changeFlag();
       this.changebuypartFlag();
@@ -138,15 +139,22 @@ export default {
     },
     //选购产品数量+1
     add() {
-      this.number++;
-      this.prodNum[this.curIndex] = this.number;
+      if(this.number < this.list[this.index].quantity) {
+        this.number++;
+      } else {
+        this.text = '已到达库存上限';
+        this.$refs.toast.show();
+      }
+
+      // this.prodNum[this.curIndex] = this.number;
     },
     // 选购产品数量-1
     sub() {
+      console.log(this.index);
       if (this.number >= 2) {
         this.number--;
       }
-      this.prodNum[this.curIndex] = this.number;
+      // this.prodNum[this.curIndex] = this.number;
     },
     checkUser(userId) {
       checkRed(userId).then(res => {
@@ -183,8 +191,8 @@ export default {
         city: this.address.city,
         province: this.address.province,
         mobile: this.address.mobile,
-        quantity: this.prodNum[0],
-        productSpecsCode: this.specsList[0].specsCode,
+        quantity: this.number,
+        productSpecsCode: this.specsCode,
         signer: this.address.receiver
       };
       cloudSend(options).then(res => {
@@ -200,6 +208,9 @@ export default {
       }).catch(() => this.loading = false);
     },
     prodectDetail(code, index) {
+      this.number = 1;
+      this.specsCode = code;
+      this.index = index;
       this.genghuan(index);
     },
     chooseSize(index) {
