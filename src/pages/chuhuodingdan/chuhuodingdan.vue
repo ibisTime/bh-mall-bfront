@@ -131,11 +131,16 @@
         }).catch(() => { this.loading = false; });
       },
       getPageOrders() {
+        let key = this.categorys[this.index].key;
+        this.index = key === 'all' ? [] : key.split('||');
+        // 请求订单
+        this.loading = true;
         queryOrderForm2({
           start: this.start,
           limit: this.limit,
           statusList: this.index
         }).then((data) => {
+          this.loading = false;
           if (data.list.length < this.limit || data.totalCount <= this.limit) {
             this.hasMore = false;
           }
@@ -176,7 +181,9 @@
       selectCategory(index) {
         this.index = index;
         this.currentIndex = index;
-        this.check();
+        this.start = 1;
+        this.limit = 10;
+        this.getPageOrders();
       },
       goPay(code) {
         if (code) {

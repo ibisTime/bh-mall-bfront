@@ -89,7 +89,9 @@ export default {
     },
     changeIndex(index) {
       this.index = index;
-      this.check();
+      this.start = 1;
+      this.limit = 10;
+      this.getPageOrders();
     },
     changeHeight(index) {
       this.heightActive = this.heightActive === index ? '' : index;
