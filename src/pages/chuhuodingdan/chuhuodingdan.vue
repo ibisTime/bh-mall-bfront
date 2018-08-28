@@ -25,15 +25,20 @@
           <div class="pic">
             <img :src="formatImg(item.pic)" alt="">
             <div class="content">
-              <p>{{item.productName}}</p>
-              <p style="padding-top:0.1rem;">规格：{{item.specsName}}</p>
-              <i>￥{{formatAmount(item.price)}}</i>
-              <span>数量：{{item.quantity}}{{item.specsName}}</span>
-              <span class="total">总价：¥{{formatAmount(item.amount)}}</span>
-              <div class="quxiao" @click="cancel(item.code)" v-if="item.status == '0' || item.status == '1'">取消</div>
-              <div class="fukuan" @click="goPay(item.code)" v-if="item.status == '0'">付款</div>
-              <div class="shouhuo" @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
-              <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3' || item.status == '4'">物流信息</div>
+              <div class="inner-cont">
+                <p>{{item.productName}}</p>
+                <i>￥{{formatAmount(item.price)}}</i>
+              </div>
+              <div class="inner-cont" style="padding-top: 0.1rem;">
+                <p style="line-height: 0.4rem;">规格：{{item.quantity}}{{item.specsName}}</p>
+                <div class="total">总价：¥{{formatAmount(item.amount)}}</div>
+              </div>
+              <div class="btn-wrap">
+                <div class="quxiao" @click="cancel(item.code)" v-if="item.status == '0' || item.status == '1'">取消</div>
+                <div class="fukuan" @click="goPay(item.code)" v-if="item.status == '0'">付款</div>
+                <div class="shouhuo" @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
+                <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3' || item.status == '4'">物流信息</div>
+              </div>
             </div>
           </div>
         </div>
@@ -255,6 +260,9 @@
         p {
           i {
             margin-left: 0.2rem;
+            &:first-child {
+              margin-left: 0;
+            }
           }
         }
         .downward {
@@ -272,95 +280,89 @@
         }
       }
       .pic {
+        display: flex;
         padding: 0.4rem 0.3rem;
+        border-bottom: 1px solid #eee;
         background-color: #fff;
         overflow: hidden;
-        border-bottom: 1px solid #eee;
+
         img {
-          float: left;
+          flex: 0 0 1.8rem;
           width: 1.8rem;
           height: 1.8rem;
         }
         .content {
-          margin-left: 2rem;
           position: relative;
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          justify-content: space-between;
+          padding-left: 0.2rem;
+
+          .inner-cont {
+            display: flex;
+          }
           p {
+            flex: 1;
+            line-height: 1.2;
             font-size: $font-size-medium-s;
             color: #333;
-            line-height: 0.4rem;
           }
           i {
-            position: absolute;
-            /*top: 1.15rem;*/
-            left: 0;
             font-size: $font-size-small;
             color: $primary-color;
           }
           span {
             width: 2.2rem;
-            line-height: 0.5rem;
-            position: absolute;
-            top: 0;
-            right: 0;
+            line-height: 0.4rem;
             font-size: $font-size-small;
             border-radius: 0.1rem;
             color: #333;
             text-align: right;
             &.status {
-              top: 0.5rem;
               color: #72a52c;
+            }
+          }
+          .btn-wrap {
+            flex: 1;
+            padding-top: 0.3rem;
+            text-align: right;
+            div {
+              float: right;
             }
           }
           .wuliu {
             font-size: 0.3rem;
-            position: absolute;
-            top: 1.15rem;
-            right: 1.2rem;
             border: 1px solid #333;
             border-radius: 0.1rem;
             padding: 0.1rem 0.14rem;
-            margin: 0.3rem 0;
           }
           .fukuan {
             font-size: 0.3rem;
-            position: absolute;
-            top: 1.15rem;
-            right: 1.2rem;
             border: 1px solid #333;
             border-radius: 0.1rem;
             padding: 0.1rem 0.14rem;
-            margin: 0.3rem 0;
+            margin-left: 0.3rem;
           }
           .shouhuo {
             font-size: 0.3rem;
-            position: absolute;
-            top: 1.15rem;
-            right: 0.2rem;
             border: 1px solid #333;
             border-radius: 0.1rem;
             padding: 0.1rem 0.14rem;
-            margin: 0.3rem 0;
+            margin-left: 0.3rem;
           }
           .quxiao {
             font-size: 0.3rem;
-            position: absolute;
-            top: 1.15rem;
-            right: 0.2rem;
             border: 1px solid #333;
             border-radius: 0.1rem;
             padding: 0.1rem 0.14rem;
-            margin: 0.3rem 0;
+            margin-left: 0.3rem;
           }
         }
       }
       .total {
-        margin: 0.8rem 0;
         text-align: right;
-        width: 2.2rem;
-        line-height: 0.5rem;
-        position: absolute;
-        top: 0;
-        right: 0;
+        line-height: 0.4rem;
         font-size: 0.24rem;
         border: none;
         text-align: right;
