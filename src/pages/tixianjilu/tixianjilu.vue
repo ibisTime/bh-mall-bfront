@@ -4,20 +4,20 @@
           <div @click="changeIndex('')" :class="[index == '' ? 'active' : '']">
               <i>全部</i>
           </div>
-          <div @click="changeIndex(3)" :class="[index == 3 ? 'active' : '']">
+          <div @click="changeIndex(1)" :class="[index == 1 ? 'active' : '']">
               <i>待审核</i>
           </div>
-          <div @click="changeIndex(4)" :class="[index == 4 ? 'active' : '']">
+          <div @click="changeIndex(5)" :class="[index == 5 ? 'active' : '']">
               <i>已完成</i>
           </div>
       </div>
       <div class="item" v-for="item in list">
           <div class="title">
               订单编号：{{item.code}}
-            <span class="active">{{tips[item.status]}}</span>
+            <span class="active">{{statusObj[item.status]}}</span>
           </div>
           <div class="content" @click="$router.push('/quxiandingdan?code=' + item.code)">
-              <p>取现金额：<i>￥{{item.amount / 1000}}</i></p>
+              <p>取现金额：<i>￥{{formatAmount(item.amount)}}</i></p>
               <p>{{item.applyDatetime}}</p>
               <img class="more" src="../../assets/imgs/more@2x.png" alt="">
           </div>
@@ -26,38 +26,46 @@
 </template>
 <script>
 import {checkRechargeBill} from 'api/baohuo'
-import {formatDate} from 'common/js/util';
+import { getDictList } from 'api/general'
+import { formatDate, formatAmount } from 'common/js/util';
 export default {
   name:'tixianjilu',
   data(){
       return{
-          index:'',
-          list:[],
-          tips:['待支付','审核失败','审核成功','支付失败','支付成功']
+        index:'',
+        list:[],
+        statusObj: {}
       }
   },
   methods:{
-      changeIndex(index) {
-            this.index = index;
-            checkRechargeBill(this.index).then(res => {
-                res.list.map(function(item){
-
-                        //格式化时间
-                        item.applyDatetime = formatDate(item.applyDatetime)
-                    })
-                this.list = res.list
-            })
-      }
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
+    changeIndex(index) {
+      this.index = index;
+      checkRechargeBill(this.index).then(res => {
+        res.list.map(function(item){
+          //格式化时间
+          item.applyDatetime = formatDate(item.applyDatetime)
+        });
+        this.list = res.list
+      })
+    }
   },
   mounted(){
-      checkRechargeBill(this.index).then(res => {
-          res.list.map(function(item){
-
-                //格式化时间
-                item.applyDatetime = formatDate(item.applyDatetime)
-            })
-          this.list = res.list
-      })
+    Promise.all([
+      getDictList('withdraw_status'),
+      checkRechargeBill(this.index)
+    ]).then(([res1, res2]) => {
+      res1.map((item) => {
+        this.statusObj[item.dkey] = item.dvalue;
+      });
+      res2.list.map(function(item){
+        //格式化时间
+        item.applyDatetime = formatDate(item.applyDatetime)
+      });
+      this.list = res2.list
+    })
   }
 }
 </script>

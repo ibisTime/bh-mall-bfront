@@ -2,8 +2,8 @@
   <div class="threshold">
       <div class="header">
           <div class="header-top">
-              <p class="now-balance">当前余额 （元）</p>
-              <p class="money-balance">{{account / 1000}}</p>
+              <p class="now-balance">门槛余额 （元）</p>
+              <p class="money-balance">{{formatAmount(account)}}</p>
           </div>
           <div class="header-bottom">
               <div class="header-bottom-left fl" @click="$router.push('/recharge?type=MK_CNY')">
@@ -26,7 +26,7 @@
               </div>
               <img :src="item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
               <div class="detail">
-                  <p class="datail-money" :style="!item.bizNote.includes('充值') && 'color: #a5ca64'">{{item.bizNote}}   {{item.transAmount / 1000}}</p>
+                  <p class="datail-money" :style="!item.bizNote.includes('充值') && 'color: #a5ca64'">{{item.bizNote}}   {{formatAmount(item.transAmount)}}</p>
                   <p class="detail-text">{{item.remark}}</p>
               </div>
               </div>
@@ -39,7 +39,7 @@
 import FullLoading from 'base/full-loading/full-loading';
 import {getBill,queryBill,getAccount} from 'api/baohuo';
 import {setCookie,getCookie} from 'common/js/cookie';
-import {formatDate} from 'common/js/util';
+import { formatDate, formatAmount } from 'common/js/util';
 export default {
   name:'threshold',
   data(){
@@ -52,6 +52,9 @@ export default {
     }
   },
   methods:{
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     goBuyCloud() {
       if(getCookie('isWare') == '1') {
         // alert('buyCloud');

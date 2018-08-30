@@ -1,10 +1,10 @@
 <template>
   <div class="recharge">
       <div class="header">
-          <div class="top">充值金额</div>
-          <span class="yuan">￥</span>
-          <input v-model="moneyNum" type="number">
-          <div class="bottom">当前余额：{{account / 1000}}</div>
+          <div class="top" v-show="status === 2">充值金额</div>
+          <span class="yuan" v-show="status === 2">￥</span>
+          <input v-model="moneyNum" type="number" v-show="status === 2">
+          <div class="bottom">当前余额：{{formatAmount(account)}}</div>
       </div>
       <div class="center">
           <div class="mode">充值方式</div>
@@ -53,68 +53,72 @@ export default {
       };
   },
   methods:{
-      handleConfirm() {
-        this.$router.push(this.url);
-      },
-      checkUser() {
-        checkRed(getUserId()).then(res => {
-          setCookie('isWare', res.isWare);
-          if (res.result == '4') {
-            this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge?type=MK_CNY');
-          } else if (res.result == "0") {
-            this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
-          } else if (res.result == '1') {
-            this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的授权单`, '/woyaochuhuo');
-          } else if (res.result == '2') {
-            this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的升级单`, '/woyaochuhuo');
-          } else if (res.result == '3') {
-            this.redirectPage(`您的门槛余额已经高于${formatAmount(res.minAmount)}元，请前去购买云仓`, '/threshold');
-          } else {
-            this.$router.push('/home');
-          }
-        });
-      },
-      redirectPage(text, url) {
-        this.confirmText = text;
-        this.$refs.confirm.show();
-        this.url = url;
-      },
-      changeStatus(status){
-          this.status = status
-      },
-      success() {
-          this.loading = false;
-          this.text = '充值成功';
-          this.$refs.toast.show(this.checkUser);
-      },
-      error(err) {
-          this.loading = false;
-          this.text = '充值失败';
-          this.$refs.toast.show();
-      },
-      cancel() {
-          this.loading = false;
-      },
-      recharge(){
-          if (this.status === 1) {
-              this.$router.push('/recharge/offine?accountNumber=' + this.accountNumber)
-          } else if(this.status === 2) {
-              this.loading = true;
-              this.title = '充值中...';
-              queryConfig(this.accountNumber,this.moneyNum * 1000).then(res => {
-                  let wxConfig = {
-                      appId: res.appId, // 公众号名称，由商户传入
-                      timeStamp: res.timeStamp, // 时间戳，自1970年以来的秒数
-                      nonceStr: res.nonceStr, // 随机串
-                      wechatPackage: res.wechatPackage,
-                      signType: res.signType, // 微信签名方式：
-                      paySign: res.paySign // 微信签名
-                  }
-                  initPay(wxConfig, this.success, this.error, this.cancel)
-              }).catch(() => { this.loading = false; })
-            // this.success();
-          }
-      }
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
+    handleConfirm() {
+      this.$router.push(this.url);
+    },
+    checkUser() {
+      checkRed(getUserId()).then(res => {
+        setCookie('isWare', res.isWare);
+        if (res.result == '4') {
+          this.redirectPage(`您需要充值门槛费${formatAmount(res.chargeAmount)}元`, '/recharge?type=MK_CNY');
+        } else if (res.result == "0") {
+          this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
+        } else if (res.result == '1') {
+          this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的授权单`, '/woyaochuhuo');
+        } else if (res.result == '2') {
+          this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的升级单`, '/woyaochuhuo');
+        } else if (res.result == '3') {
+          this.redirectPage(`您的门槛余额已经高于${formatAmount(res.minAmount)}元，请前去购买云仓`, '/threshold');
+        } else {
+          this.$router.push('/home');
+        }
+      });
+    },
+    redirectPage(text, url) {
+      this.confirmText = text;
+      this.$refs.confirm.show();
+      this.url = url;
+    },
+    changeStatus(status){
+        this.status = status
+    },
+    success() {
+        this.loading = false;
+        this.text = '充值成功';
+        this.$refs.toast.show(this.checkUser);
+    },
+    error(err) {
+        this.loading = false;
+        this.text = '充值失败';
+        this.$refs.toast.show();
+    },
+    cancel() {
+        this.loading = false;
+    },
+    recharge(){
+        if (this.status === 1) {
+            this.$router.push('/recharge/offine?accountNumber=' + this.accountNumber)
+        } else if(this.status === 2) {
+            this.loading = true;
+            this.title = '充值中...';
+            queryConfig(this.accountNumber,this.moneyNum * 1000).then(res => {
+              // alert(res.appId);
+                let wxConfig = {
+                    appId: res.appId, // 公众号名称，由商户传入
+                    timeStamp: res.timeStamp, // 时间戳，自1970年以来的秒数
+                    nonceStr: res.nonceStr, // 随机串
+                    wechatPackage: res.wechatPackage,
+                    signType: res.signType, // 微信签名方式：
+                    paySign: res.paySign // 微信签名
+                }
+                initPay(wxConfig, this.success, this.error, this.cancel)
+            }).catch(() => { this.loading = false; })
+          // this.success();
+        }
+    }
   },
   mounted(){
     let currency = this.$route.query.type;

@@ -4,7 +4,7 @@
           <div class="top">转入金额</div>
           <span class="yuan">￥</span>
           <input v-model="moneyNum" type="number">
-          <div class="bottom">当前余额：{{account / 1000}}</div>
+          <div class="bottom">当前余额：{{formatAmount(account)}}</div>
       </div>
       <div class="footer">
           <span  @click="recharge" >确定转入</span>
@@ -14,6 +14,7 @@
 </template>
 <script>
 import {transfer,queryAmount} from 'api/baohuo'
+import { formatAmount } from 'common/js/util'
 import Toast from 'base/toast/toast';
 export default {
     name:'quxian',
@@ -25,26 +26,29 @@ export default {
         }
     },
     methods:{
-        recharge(){
-          if(+this.moneyNum > 0) {
-            transfer({
-              amount: this.moneyNum * 1000,
-              fromAccount: 'TX_CNY',
-              toAccount: 'MK_CNY'
-            }).then(res => {
-              this.text = '转入成功';
-              this.account -= (this.moneyNum * 1000)
-              this.$refs.toast.show();
-              this.moneyNum = '';
-              setTimeout(() => {
-                this.$router.back();
-              }, 500);
-            })
-          } else {
-            this.text = '请输入大于0的数字';
+      formatAmount(amount) {
+        return formatAmount(amount);
+      },
+      recharge(){
+        if(+this.moneyNum > 0) {
+          transfer({
+            amount: this.moneyNum * 1000,
+            fromAccount: 'TX_CNY',
+            toAccount: 'MK_CNY'
+          }).then(res => {
+            this.text = '转入成功';
+            this.account -= (this.moneyNum * 1000)
             this.$refs.toast.show();
-          }
+            this.moneyNum = '';
+            setTimeout(() => {
+              this.$router.back();
+            }, 500);
+          })
+        } else {
+          this.text = '请输入大于0的数字';
+          this.$refs.toast.show();
         }
+      }
     },
     mounted(){
         this.accountNumber = this.$route.query.accountNumber

@@ -3,7 +3,7 @@
     <div class="header-first">
       <div class="header-top">
         <p class="now-balance">总金额</p>
-        <p class="money-balance">{{ allAmount / 1000 }}</p>
+        <p class="money-balance">{{ formatAmount(allAmount) }}</p>
       </div>
     </div>
     <div class="item clearfix" v-for="(item,index) in list">
@@ -24,7 +24,7 @@
         <div class="content">
           <p>{{item.productName}}</p>
           <p style="padding-top:0.1rem;">{{item.productSpecsName}}</p>
-          <i>￥{{item.price/1000}}</i>
+          <i>￥{{formatAmount(item.price)}}</i>
           <span>{{item.quantity}}{{item.productSpecsName}}</span><span class="status">{{item.kind == '2' ? '购买云仓' : '云仓提货'}}</span>
         </div>
       </div>
@@ -37,7 +37,7 @@
   import Toast from 'base/toast/toast';
   import FullLoading from 'base/full-loading/full-loading';
   import { myChuHuo, receiveNromalOrder,cencelChuHuoOrder} from "api/baohuo";
-  import { formatDate, formatImg } from "common/js/util";
+  import { formatDate, formatImg, formatAmount } from "common/js/util";
   import { getUser, getUserById } from "api/user";
   import { getDictList } from 'api/general';
   export default {
@@ -56,6 +56,9 @@
       };
     },
     methods: {
+      formatAmount(amount) {
+        return formatAmount(amount);
+      },
       changeHeight(index) {
         this.heightActive = this.heightActive === index ? '' : index;
       },
@@ -75,7 +78,7 @@
           this.loading = false;
           this.allAmount = res1.allAmount;
           res1.page.forEach(() => {
-            res1.applyDatetime = formatDate(res.applyDatetime);
+            res1.applyDatetime = formatDate(res1.applyDatetime);
           });
           this.list = res1.page;
           res2.map((item) => {

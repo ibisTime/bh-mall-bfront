@@ -1,42 +1,46 @@
 <template>
-    <div class="goumaishangping">
-        <div class="item" v-for="item in list">
-            <img :src="formatImg(item.pic)" alt="">
-            <div class="content">
-                <p>{{item.name}}</p>
-                <p>规格：{{item.specsName}}</p>
-                <i>￥{{item.price / 1000}}</i>
-                <span>X{{item.quantity}}</span>
-            </div>
+  <div class="goumaishangping">
+    <div class="top">
+      <div class="item" v-for="item in list">
+        <img :src="formatImg(item.pic)" alt="">
+        <div class="content">
+          <p>{{item.productName}}</p>
+          <p>规格：{{item.specsName}}</p>
+          <i>￥{{item.price / 1000}}</i>
+          <span>X{{item.quantity}}</span>
         </div>
-        <div class="word">
-            <span>卖家嘱咐：</span>
-            <input v-model="options.applyNote" type="text" placeholder="说点什么">
+      </div>
+      <div class="word">
+        <span>卖家嘱咐：</span>
+        <input v-model="options.applyNote" type="text" placeholder="说点什么">
+      </div>
+      <div class="center">
+        <div class="mode">充值方式</div>
+        <div class="chongzhi" @click="changeStatus(0)">
+          <img class="zhifu" src="../../assets/imgs/xianxiachongzhi@2x.png">
+          余额支付
+          <img :class="['xuanzhong', status == 0 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+          <img :class="['xuanzhong', status == 0 ? '' : 'show']" src="../../assets/imgs/unchoosed.png" alt="">
         </div>
-        <div class="center">
-            <div class="mode">充值方式</div>
-            <div class="chongzhi" @click="changeStatus(0)">
-                <img class="zhifu" src="../../assets/imgs/xianxiachongzhi@2x.png">
-                余额支付
-                <img :class="['xuanzhong', status == 0 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
-            </div>
-            <div class="chongzhi" @click="changeStatus(1)">
-                <img class="zhifu" src="../../assets/imgs/weixinchongzhi@2x.png">
-                微信支付
-                <img :class="['xuanzhong', status == 1 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
-            </div>
+        <div class="chongzhi" @click="changeStatus(1)">
+          <img class="zhifu" src="../../assets/imgs/weixinchongzhi@2x.png">
+          微信支付
+          <img :class="['xuanzhong', status == 1 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+          <img :class="['xuanzhong', status == 1 ? '' : 'show']" src="../../assets/imgs/unchoosed.png" alt="">
         </div>
-        <div class="footer">
-            <div class="f-left">
-                <span class="price">￥{{formatAmount(totalAmount)}}</span>
-                <span class="total">总计：</span>
-            </div>
-            <div class="f-right" @click="buy">确认购买</div>
-        </div>
-        <full-loading :title="title" v-show="loading"></full-loading>
-        <confirm ref="confirm" :text="confirmText" :confirmBtnText="confirmBtnText" :isAlert="isAlert" @confirm="handleConfirm"></confirm>
-        <toast ref="toast" :text="text"></toast>
+      </div>
     </div>
+    <div class="footer">
+        <div class="f-left">
+            <span class="price">￥{{formatAmount(totalAmount)}}</span>
+            <span class="total">总计：</span>
+        </div>
+        <div class="f-right" @click="buy">确认购买</div>
+    </div>
+    <full-loading :title="title" v-show="loading"></full-loading>
+    <confirm ref="confirm" :text="confirmText" :confirmBtnText="confirmBtnText" :isAlert="isAlert" @confirm="handleConfirm"></confirm>
+    <toast ref="toast" :text="text"></toast>
+  </div>
 </template>
 <script>
 import {
@@ -222,91 +226,95 @@ export default {
   height: 100%;
   background-color: #f7f7f7;
   .top {
-    height: 1.8rem;
-    padding: 0.3rem 0.8rem;
-    background-color: #fff;
-    position: relative;
-    img {
-      width: 0.3rem;
-      position: absolute;
-      top: 50%;
-      right: 0.3rem;
-      transform: translateY(-50%);
-      &.left {
-        left: 0.28rem;
+    margin-bottom: 1rem;
+    .item {
+      margin-top: 0.2rem;
+      padding: 0.2rem 0.3rem;
+      background-color: #fff;
+      overflow: hidden;
+      img {
+        float: left;
+        width: 1.8rem;
+        height: 1.8rem;
       }
-      &.right {
-        width: 0.2rem;
+      .content {
+        margin-left: 2rem;
+        position: relative;
+        p {
+          font-size: $font-size-medium-s;
+          color: #333;
+          line-height: 0.4rem;
+        }
+        i {
+          position: absolute;
+          top: 1.15rem;
+          left: 0;
+          font-size: $font-size-small;
+          color: $primary-color;
+        }
+        span {
+          width: 1.2rem;
+          line-height: 0.5rem;
+          position: absolute;
+          top: 1rem;
+          right: 0;
+          font-size: $font-size-small;
+          border-radius: 0.1rem;
+          color: #333;
+          text-align: center;
+        }
+        .guige {
+          margin-top: 0.2rem;
+          font-size: $font-size-small;
+          color: rgb(153, 153, 153);
+        }
       }
     }
-    .name-mobile {
-      position: relative;
-      i {
-        position: absolute;
-        left: 2.7rem;
-      }
-    }
-    p {
+    .word {
+      margin-top: 0.2rem;
       font-size: $font-size-medium;
       color: #333;
-    }
-  }
-  .item {
-    margin-top: 0.2rem;
-    padding: 0.2rem 0.3rem;
-    background-color: #fff;
-    overflow: hidden;
-    img {
-      float: left;
-      width: 1.8rem;
-      height: 1.8rem;
-    }
-    .content {
-      margin-left: 2rem;
-      position: relative;
-      p {
-        font-size: $font-size-medium-s;
-        color: #333;
-        line-height: 0.4rem;
-      }
-      i {
-        position: absolute;
-        top: 1.15rem;
-        left: 0;
-        font-size: $font-size-small;
-        color: $primary-color;
-      }
+      background-color: #fff;
+      line-height: 0.9rem;
       span {
-        width: 1.2rem;
-        line-height: 0.5rem;
-        position: absolute;
-        top: 1rem;
-        right: 0;
-        font-size: $font-size-small;
-        border-radius: 0.1rem;
-        color: #333;
-        text-align: center;
+        float: left;
+        width: 1.8rem;
+        text-align: right;
       }
-      .guige {
-        margin-top: 0.2rem;
-        font-size: $font-size-small;
-        color: rgb(153, 153, 153);
+      input {
+        // margin-left: 1.8rem;
       }
     }
-  }
-  .word {
-    margin-top: 0.2rem;
-    font-size: $font-size-medium;
-    color: #333;
-    background-color: #fff;
-    line-height: 0.9rem;
-    span {
-      float: left;
-      width: 1.8rem;
-      text-align: right;
-    }
-    input {
-      // margin-left: 1.8rem;
+    .center {
+      margin-top: 0.2rem;
+      background-color: #fff;
+      .mode {
+        line-height: 0.6rem;
+        padding-left: 0.3rem;
+        color: #999;
+        font-size: $font-size-small;
+      }
+      .chongzhi {
+        line-height: 1rem;
+        padding: 0 0.3rem;
+        font-size: $font-size-medium-x;
+        border-top: 1px solid #eee;
+        .zhifu {
+          width: 0.5rem;
+          margin-right: 0.2rem;
+          vertical-align: sub;
+        }
+        .xuanzhong {
+          width: 0.4rem;
+          float: right;
+          margin-top: 0.5rem;
+          transform: translateY(-50%);
+          display: none;
+          &.show {
+            display: block;
+          }
+        }
+      }
     }
   }
   .footer {
@@ -342,35 +350,5 @@ export default {
     }
   }
 }
-.center {
-  margin-top: 0.2rem;
-  background-color: #fff;
-  .mode {
-    line-height: 0.6rem;
-    padding-left: 0.3rem;
-    color: #999;
-    font-size: $font-size-small;
-  }
-  .chongzhi {
-    line-height: 1rem;
-    padding: 0 0.3rem;
-    font-size: $font-size-medium-x;
-    border-top: 1px solid #eee;
-    .zhifu {
-      width: 0.5rem;
-      margin-right: 0.2rem;
-      vertical-align: sub;
-    }
-    .xuanzhong {
-      width: 0.4rem;
-      float: right;
-      margin-top: 0.5rem;
-      transform: translateY(-50%);
-      display: none;
-      &.show {
-        display: block;
-      }
-    }
-  }
-}
+
 </style>

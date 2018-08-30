@@ -64,50 +64,48 @@ export default {
 <style lang="scss" scoped>
 @import "../../common/scss/variable.scss";
 @import "../../common/scss/base.scss";
-    .sucaichaxun{
-        background-color: #f7f7f7;
-        .header{
-            background-color: #fff;
-            >div{
-                float: left;
-                width: 100%;
-                height: 0.9rem;
-                position: relative;
-                i{
-                    font-size: $font-size-medium;
-                    color:#333;
-                    height: 0.9rem;
-                    line-height: 0.9rem;
-                    position: absolute;
-                    left: 50%;
-                    transform: translateX(-50%);
-                }
-                &.active{
-                    i{
-                        color: $primary-color;
-                        border-bottom: 0.06rem solid $primary-color;
-                    }
-                }
-            }
+  .sucaichaxun{
+    background-color: #f7f7f7;
+    .header{
+      background-color: #fff;
+      >div{
+        float: left;
+        width: 100%;
+        height: 0.9rem;
+        position: relative;
+        i{
+          font-size: $font-size-medium;
+          color:#333;
+          height: 0.9rem;
+          line-height: 0.9rem;
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
         }
-        .container{
-            // padding: 0.3rem;
-            overflow: hidden;
-            background-color: #fff;
-            .item{
-                float: left;
-                margin-top: 0.3rem;
-                margin-left: 0.3rem;
-                >img{
-                    width: 100%;
-                }
-                p{
-                    margin-top: 0.3rem;
-                    font-size: $font-size-medium-s;
-                    color: #333;
-                    text-align: center;
-                }
-            }
+        &.active{
+          i{
+            color: $primary-color;
+            border-bottom: 0.06rem solid $primary-color;
+          }
         }
+      }
     }
+    .container{
+      overflow: hidden;
+      background-color: #fff;
+      .item{
+        float: left;
+        margin: 0.3rem;
+        >img{
+          width: 100%;
+        }
+        p{
+          margin-top: 0.3rem;
+          font-size: $font-size-medium-s;
+          color: #333;
+          text-align: center;
+        }
+      }
+    }
+  }
 </style>

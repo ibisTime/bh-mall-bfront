@@ -4,16 +4,17 @@
           <div class="top">转入金额</div>
           <span class="yuan">￥</span>
           <input v-model="moneyNum" type="number">
-          <div class="bottom">当前余额：{{account / 1000}}</div>
+          <div class="bottom">当前余额：{{formatAmount(account)}}</div>
       </div>
       <div class="footer">
-          <span  @click="recharge" >确定转入</span>
+          <span @click="recharge" >确定转入</span>
       </div>
       <toast ref="toast" :text="text"></toast>
   </div>
 </template>
 <script>
 import {transfer,queryAmount} from 'api/baohuo'
+import { formatAmount } from 'common/js/util'
 import Toast from 'base/toast/toast';
 export default {
     name:'quxian',
@@ -25,22 +26,25 @@ export default {
         }
     },
     methods:{
-        recharge(){
-            transfer({
-              amount: this.moneyNum * 1000,
-              fromAccount: 'C_CNY',
-              toAccount: 'MK_CNY'
-            }).then(res => {
-                console.log(this.moneyNum)
-                this.text = '转入成功';
-                this.account -= (this.moneyNum * 1000)
-                this.$refs.toast.show();
-                this.moneyNum = '';
-                setTimeout(() => {
-                  this.$router.back();
-                }, 500);
-            })
-        }
+      formatAmount(amount) {
+        return formatAmount(amount);
+      },
+      recharge(){
+          transfer({
+            amount: this.moneyNum * 1000,
+            fromAccount: 'C_CNY',
+            toAccount: 'MK_CNY'
+          }).then(res => {
+              console.log(this.moneyNum)
+              this.text = '转入成功';
+              this.account -= (this.moneyNum * 1000)
+              this.$refs.toast.show();
+              this.moneyNum = '';
+              setTimeout(() => {
+                this.$router.back();
+              }, 500);
+          })
+      }
     },
     mounted(){
         this.accountNumber = this.$route.query.accountNumber

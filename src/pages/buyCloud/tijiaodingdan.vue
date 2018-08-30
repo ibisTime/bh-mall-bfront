@@ -30,14 +30,16 @@
         <div class="center">
             <div class="mode">充值方式</div>
             <div class="chongzhi" @click="changeStatus(0)">
-                <img class="zhifu" src="../../assets/imgs/xianxiachongzhi@2x.png">
-                余额支付
-                <img :class="['xuanzhong', status == 0 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+              <img class="zhifu" src="../../assets/imgs/xianxiachongzhi@2x.png">
+              余额支付
+              <img :class="['xuanzhong', status == 0 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+              <img :class="['xuanzhong', status == 0 ? '' : 'show']" src="../../assets/imgs/unchoosed.png" alt="">
             </div>
             <div class="chongzhi" @click="changeStatus(1)">
-                <img class="zhifu" src="../../assets/imgs/weixinchongzhi@2x.png">
-                微信支付
-                <img :class="['xuanzhong', status == 1 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+              <img class="zhifu" src="../../assets/imgs/weixinchongzhi@2x.png">
+              微信支付
+              <img :class="['xuanzhong', status == 1 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+              <img :class="['xuanzhong', status == 1 ? '' : 'show']" src="../../assets/imgs/unchoosed.png" alt="">
             </div>
         </div>
         <div class="footer" v-if="thingInfo.specs">
@@ -202,17 +204,6 @@ export default {
     setCookie("yuncangshuliang", this.number);
     setCookie("yuncangcode", this.code);
     this.loading = true;
-    // console.log(info);
-    // Promise.all([
-    //   productDetailBySpec(this.info),
-    //   queryDefaultAddress()
-    // ]).then(([item, res]) => {
-    //   this.loading = false;
-    //   item.pic = formatImg(item.pic);
-    //   this.thingInfo = item;
-    //   this.productSpecsCode = item.specs.code;
-    //   this.address = res.length ? res[0] : {};
-    // }).catch(() => this.loading = false);
     Promise.all([
       getUser(),
       queryDefaultAddress()

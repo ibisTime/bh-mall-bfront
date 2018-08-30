@@ -184,7 +184,6 @@ export default {
   methods: {
     apply() {
       this.$validator.validateAll().then((result) => {
-        console.log(result);
         if (result) {
           if (!this.teamName || !this.options.applyLevel) {
             this.text = '等级或团队信息未填写';
@@ -275,7 +274,6 @@ export default {
       // } else {
       //   this.teamName = '';
       // }
-      // console.log(this.options.applyLevel);
       if (this.options.applyLevel != '1') {
         this.teamName = this.userInfo.toTeamName;
       } else {

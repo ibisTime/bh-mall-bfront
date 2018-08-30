@@ -4,7 +4,7 @@
         <p><span>微信：</span> <i>{{info.wxId}}</i></p>
         <p><span>当前等级：</span> <i>{{level}}</i></p>
         <p><span>当前上级：</span> <i>{{highUserName}}</i></p>
-        <p><span>推荐人：</span> <i>{{userRefreeName}}</i></p>
+        <p><span>推荐人：</span> <i>{{userRefreeName ? userRefreeName : '无'}}</i></p>
       </div>
       <div class="blank"></div>
       <div class="content">
@@ -14,7 +14,7 @@
             <i></i>
             <div class="detail">
                 <p class="username">{{item.realName}}</p>
-                <p>{{item.applyDatetime}}</p>
+                <p>{{item.applyDatetime ? item.applyDatetime : item.approveDatetime}}</p>
                 <p>推荐人：{{item.userReferrerName ? item.userReferrerName : '无' }}</p>
                 <p>操作人：{{item.approveName ? item.approveName : '无' }}</p>
                 <span class="tip">{{status[item.status]}}</span>

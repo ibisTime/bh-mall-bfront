@@ -54,7 +54,6 @@ export default {
   },
   mounted() {
     this.address = this.$route.query.address;
-    // console.log(this.address);
     queryAddress().then(res => {
       this.list = res;
     });

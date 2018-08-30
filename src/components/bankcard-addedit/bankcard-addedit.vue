@@ -142,32 +142,8 @@
         }
       },
       saveBankCard() {
-        console.log('999');
-        // if (this._valid()) {
-        //   console.log('888');
-        //   // this.setting = true;
-        //   let param = {
-        //     bankcardNumber: this.bankcardNumber,
-        //     bankCode: this.bankName.bankCode,
-        //     bankName: this.bankName.bankName,
-        //     subbranch: this.subbranch,
-        //     bindMobile: this.bindMobile,
-        //     realName: this.realName
-        //   };
-        //   if (this.$route.params.id) {
-        //     param.code = this.$route.params.id;
-        //     this._editBankCard(param);
-        //   } else {
-        //     console.log('999');
-            
-        //     this._addBankCard(param);
-        //   }
-        // }
         this.$validator.validateAll().then((result) => {
-          console.log(result);
           if(result) {
-            console.log('888');
-            // this.setting = true;
             let param = {
               bankcardNumber: this.bankcardNumber,
               bankCode: this.bankName.bankCode,
@@ -180,13 +156,11 @@
               param.code = this.$route.params.id;
               this._editBankCard(param);
             } else {
-              console.log('999');
-              
               this._addBankCard(param);
             }
           }
         })
-        
+
       },
       _addBankCard(param) {
         addBankCard(param).then((code) => {

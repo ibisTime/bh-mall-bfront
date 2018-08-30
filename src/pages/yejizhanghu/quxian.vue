@@ -20,7 +20,7 @@
             <div class="top">取现金额</div>
             <span class="yuan">￥</span>
             <input v-model="options.account" type="number">
-            <div class="bottom">当前余额：{{account / 1000}}</div>
+            <div class="bottom">当前余额：{{formatAmount(account)}}</div>
         </div>
         <div class="servicCharge">
             <i>本次提现手续费：</i><span>{{servicCharge}}元</span>
@@ -39,6 +39,7 @@
 </template>
 <script>
 import { getCookie } from "common/js/cookie";
+import { formatAmount } from "common/js/util";
 import {
   queryAmount,
   queryBankCard,
@@ -67,6 +68,9 @@ export default {
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     recharge() {
       if(!this.options.payCardNo) {
         this.text = "请选择银行卡";

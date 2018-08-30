@@ -47,6 +47,7 @@
         提交订单
       </div>
     </div>
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
@@ -61,10 +62,13 @@ import { getUser, getUserById } from "api/user";
 import { formatImg, formatAmount } from "common/js/util";
 import { setCookie, getCookie } from "common/js/cookie";
 import NoResult from 'base/no-result/no-result';
+import FullLoading from 'base/full-loading/full-loading';
 
 export default {
   data() {
     return {
+      loading: false,
+      title: '正在加载...',
       tipshow: false,
       buypartFlag: false,
       flag: false,
@@ -131,7 +135,9 @@ export default {
       this.options.code = code;
       //保存this
       let self = this;
+      this.loading = true;
       neigouProductDetail(code).then(res => {
+        this.loading = false;
         res.pic = formatImg(res.pic);
         self.detail = res;
         this.price = this.detail.specsList[0].price;
@@ -154,15 +160,24 @@ export default {
   },
   mounted() {
     //商品列表查询
+    this.loading = true;
     neigouProduct('2').then(res => {
-      res.list.map(function(item) {
+      this.loading = false;
+      res.list && res.list.map(function(item) {
         item.pic = formatImg(item.pic);
       });
       this.list = res.list;
+      res.list && neigouProductDetail(res.list[0].code).then(res => {
+        this.loading = false;
+        res.pic = formatImg(res.pic);
+        this.detail = res;
+        this.price = this.detail.specsList[0].price;
+      });
     });
   },
   components: {
-    NoResult
+    NoResult,
+    FullLoading
   }
 };
 </script>

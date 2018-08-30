@@ -1,33 +1,35 @@
 <template>
   <div class="check">
-      <div class="header clearfix">
-          <div @click="changeIndex(6)" :class="[index == 6 ? 'active' : '']">
-              <i>审核授权</i>
-          </div>
-          <div @click="changeIndex(12)" :class="[index == 12 ? 'active' : '']">
-              <i>审核升级</i>
-          </div>
-          <div @click="changeIndex(10)" :class="[index == 10 ? 'active' : '']">
-              <i>审核退出</i>
-          </div>
+    <div class="header clearfix">
+      <div @click="changeIndex(6)" :class="[index == 6 ? 'active' : '']">
+        <i>审核授权</i>
       </div>
-      <div :class="[index == 6 ? 'show' : '', 'item']" v-for="(item,key) in data1" :key="item.key"   @click="$router.push('/check/checkdispose?index=6&id=' + item.userId);">
-          <p>姓名：{{item.realName}} <i class="tip">{{item.applyLevel}}</i></p>
-          <p><span>微信号：{{item.wxId}}</span> <i class="tel">手机号：{{item.mobile}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
-          <p>区域：<i>{{item.province}}</i> <i>{{item.city}}</i> <i>{{item.area}}</i></p>
+      <div @click="changeIndex(12)" :class="[index == 12 ? 'active' : '']">
+        <i>审核升级</i>
       </div>
-      <div :class="[index == 12 ? 'show' : '', 'item']" v-for="(item,key) in data2" :key="item.key"   @click="$router.push('/check/checkdispose?index=12&id=' + item.userId);">
-          <p>姓名：{{item.realName}}</p>
-          <p><i>{{item.level}}</i> <img class="shengji" src="../../assets/imgs/shengji@2x.png" alt=""> <i>{{item.applyLevel}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
-          <p><span>微信号：{{item.user ? item.user.wxId : ''}}</span> <i class="tel">手机号：{{item.user ? item.user.mobile : ''}}</i> </p>
+      <div @click="changeIndex(10)" :class="[index == 10 ? 'active' : '']">
+        <i>审核退出</i>
       </div>
-      <div :class="[index == 10 ? 'show' : '', 'item']" v-for="(item,key) in data3" :key="item.key"   @click="$router.push('/check/checkdispose?index=8&id=' + item.userId);">
-          <p>姓名：{{item.realName}} <i class="tip">{{item.applyLevel}}</i></p>
-          <p><span>微信号：{{item.wxId}}</span> <i class="tel">手机号：{{item.mobile}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
-      </div>
+    </div>
+    <div :class="[index == 6 ? 'show' : '', 'item']" v-for="(item,key) in data1" :key="item.key"   @click="$router.push('/check/checkdispose?index=6&id=' + item.userId)">
+      <p>姓名：{{item.realName}} <i class="tip">{{levelObj[item.applyLevel]}}</i></p>
+      <p><span>微信号：{{item.wxId}}</span> <i class="tel">手机号：{{item.mobile}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
+      <p>区域：<i>{{item.province}}</i> <i>{{item.city}}</i> <i>{{item.area}}</i></p>
+    </div>
+    <div :class="[index == 12 ? 'show' : '', 'item']" v-for="(item,key) in data2" :key="item.key"   @click="$router.push('/check/checkdispose?index=12&id=' + item.userId)">
+      <p>姓名：{{item.realName}}</p>
+      <p><i>{{levelObj[item.level]}}</i> <img class="shengji" src="../../assets/imgs/shengji@2x.png" alt=""> <i>{{levelObj[item.applyLevel]}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
+      <p><span>微信号：{{item.user ? item.user.wxId : ''}}</span> <i class="tel">手机号：{{item.user ? item.user.mobile : ''}}</i> </p>
+    </div>
+    <div :class="[index == 10 ? 'show' : '', 'item']" v-for="(item,key) in data3" :key="item.key"   @click="$router.push('/check/checkdispose?index=8&id=' + item.userId)">
+      <p>姓名：{{item.realName}} <i class="tip">{{levelObj[item.applyLevel]}}</i></p>
+      <p><span>微信号：{{item.wxId}}</span> <i class="tel">手机号：{{item.mobile}}</i> <img class="tiaozhuang" src="../../assets/imgs/more@2x.png" alt=""></p>
+    </div>
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
+import FullLoading from 'base/full-loading/full-loading';
 import { getLevel, agent, upgradeList } from "api/baohuo";
 export default {
   name: "check",
@@ -36,34 +38,24 @@ export default {
       index: 6,
       data1: [],
       data2: [],
-      data3: []
+      data3: [],
+      loading: false,
+      title: '正在加载...',
+      levelObj: {}
     };
   },
   methods: {
     changeIndex(index) {
       this.index = index;
+      this.loading = true;
       if(index === 12) {
         upgradeList(index).then((res) => {
-          res.list.map(function(item) {
-            getLevel(item.applyLevel).then(res => {
-              item.applyLevel = res[0].name;
-            });
-            getLevel(item.level).then(info => {
-              item.level = info[0].name;
-            });
-          });
+          this.loading = false;
           this.data2 = res.list;
         })
       } else {
         agent(index).then(res => {
-          res.list.map(function(item) {
-            getLevel(item.applyLevel).then(res => {
-              item.applyLevel = res[0].name;
-            });
-            getLevel(item.level).then(info => {
-              item.level = info[0].name;
-            });
-          });
+          this.loading = false;
           if (index === 6) {
             this.data1 = res.list;
           } else if (index === 10) {
@@ -74,17 +66,20 @@ export default {
     }
   },
   mounted() {
-    agent(6).then(res => {
-      res.list.map(function(item) {
-        getLevel(item.applyLevel).then(res => {
-          item.applyLevel = res[0].name;
-        });
-        getLevel(item.level).then(info => {
-          item.level = info[0].name;
-        });
-      });
-      this.data1 = res.list;
+    this.loading = true;
+    Promise.all([
+      agent(6),
+      getLevel()
+    ]).then(([res1, res2]) => {
+      this.loading = false;
+      this.data1 = res1.list;
+      res2.map((item) => {
+        this.levelObj[item.level] = item.name;
+      })
     });
+  },
+  components: {
+    FullLoading
   }
 };
 </script>

@@ -20,11 +20,13 @@
           <img class="zhifu" src="../../assets/imgs/xianxiachongzhi@2x.png">
           余额支付
           <img :class="['xuanzhong', status == 0 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+          <img :class="['xuanzhong', status == 0 ? '' : 'show']" src="../../assets/imgs/unchoosed.png" alt="">
         </div>
         <div class="chongzhi" @click="changeStatus(1)">
           <img class="zhifu" src="../../assets/imgs/weixinchongzhi@2x.png">
           微信支付
           <img :class="['xuanzhong', status == 1 ? 'show' : '']" src="../../assets/imgs/xuanzhong@2x.png" alt="">
+          <img :class="['xuanzhong', status == 1 ? '' : 'show']" src="../../assets/imgs/unchoosed.png" alt="">
         </div>
       </div>
     </div>
@@ -190,30 +192,6 @@
           this.totalAmount += res.quantity * res.price;
         })
       });
-      // console.log(list[0]);
-      //获取用户等级
-      // let level = getCookie("level");
-      // let code = this.$route.query.code;
-      //
-      // this.code = code;
-      // let number = this.$route.query.number;
-      // let specsCode = this.$route.query.specsCode;
-      // this.number = number;
-      // setCookie("yuncangshuliang", this.number);
-      // setCookie("yuncangcode", this.code);
-      // let info = {
-      //   level: level,
-      //   specsCode: specsCode
-      // };
-      // this.loading = true;
-      // Promise.all([
-      //   productDetailBySpec(info),
-      // ]).then((item) => {
-      //   this.loading = false;
-      //   item.pic = formatImg(item.pic);
-      //   this.thingInfo = item;
-      //   this.productSpecsCode = item.specs.code;
-      // }).catch(() => this.loading = false);
     },
     components: {
       Toast,

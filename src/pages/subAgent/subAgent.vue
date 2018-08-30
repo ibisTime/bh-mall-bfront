@@ -92,7 +92,6 @@ export default {
             });
           });
           this.list = res.list;
-          console.log(this.list);
         });
       }
   },
@@ -105,7 +104,6 @@ export default {
           temp[item.level] = item.name;
         });
         this.levelObj = temp;
-        console.log(this.levelObj);
       })
     });
     this.getMysub();

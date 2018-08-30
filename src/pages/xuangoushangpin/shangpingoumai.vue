@@ -91,6 +91,19 @@ export default {
     changeStatus(status) {
       this.status = status;
     },
+    success() {
+      this.loading = false;
+      this.text = '充值成功';
+      this.$refs.toast.show(this.checkUser);
+    },
+    error(err) {
+      this.loading = false;
+      this.text = '充值失败';
+      this.$refs.toast.show();
+    },
+    cancel() {
+      this.loading = false;
+    },
     buy() {
       if(this.payType === '2') {
         // 云仓订单支付
@@ -154,7 +167,9 @@ export default {
           quantity: this.number,
           applyNote: this.applyNote
         };
+        alert(3);
         palceOrder(options).then(res => {
+          alert(2);
           let codeList = res;
           payment(codeList, this.status).then(res => {
             if (res.isSuccess && this.status === 0) {
@@ -164,6 +179,7 @@ export default {
                 this.$router.back();
               }, 500);
             } else if (this.status === 1) {
+              alert(1);
               let wxConfig = {
                 appId: res.appId, // 公众号名称，由商户传入
                 timeStamp: res.timeStamp, // 时间戳，自1970年以来的秒数

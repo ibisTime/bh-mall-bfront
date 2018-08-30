@@ -21,7 +21,7 @@
                   <p>产品名称：{{item.productName}}
                     <p>规格：{{item.specsName}}</p>
                     <p>数量：{{item.quantity}}</p>
-                    <p>价格：¥{{formatAmount(specsList[index].price * prodNum[index])}}</p>
+                    <p>价格：¥{{formatAmount(item.amount)}}</p>
                   </p>
                 </div>
                 <!-- <i>规格：{{item.product.specsList[0].name}}</i> -->
@@ -51,7 +51,7 @@
             <div class="left">
               <i class="text">合计：</i>
               <i class="symbol">￥</i>
-              <i class="sum">{{formatAmount(specsList[curIndex].price * number)}}</i>
+              <i class="sum">{{formatAmount(detail.price * number)}}</i>
             </div>
             <div class="right">
               <span class="diamonds right-item" @click="add">+</span>
@@ -108,9 +108,6 @@ export default {
     };
   },
   methods: {
-    // handleChange(e) {
-    //   this.prodNum[this.curIndex] = this.number;
-    // },
     formatAmount(price) {
       return formatAmount(price);
     },
@@ -150,7 +147,6 @@ export default {
     },
     // 选购产品数量-1
     sub() {
-      console.log(this.index);
       if (this.number >= 2) {
         this.number--;
       }
@@ -212,10 +208,6 @@ export default {
       this.specsCode = code;
       this.index = index;
       this.genghuan(index);
-    },
-    chooseSize(index) {
-      this.num = index;
-      this.specsList[this.curIndex] = this.detail.specsList[index];
     }
   },
   mounted() {

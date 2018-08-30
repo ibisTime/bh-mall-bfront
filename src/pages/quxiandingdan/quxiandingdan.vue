@@ -5,13 +5,13 @@
                 <span>订单编号：{{info.code}}</span>
             </p>
             <p>
-                <span>取现金额：{{info.amount}}</span>
+                <span>取现金额：{{formatAmount(info.amount)}}</span>
             </p>
             <p>
                 <span>申请时间：{{info.applyDatetime}}</span>
             </p>
             <p>
-                <span>状态：{{tips[info.status]}}</span>
+                <span>状态：{{statusObj[info.status]}}</span>
             </p>
             <p>到账银行卡信息：</p>
             <p>银行：{{info.payCardInfo}}</p>
@@ -21,24 +21,33 @@
 </template>
 <script>
 import {checkRechargeBillDetail} from 'api/baohuo'
-import {formatDate} from 'common/js/util';
+import { getDictList } from 'api/general'
+import {formatDate, formatAmount} from 'common/js/util';
 export default {
     name:'xixiandetail',
     data(){
-        return{
-            info:{},
-            tips:['待支付','审核失败','审核成功','支付失败','支付成功'],
-        }
+      return{
+        info:{},
+        statusObj: {}
+      }
     },
     methods:{
-        
+      formatAmount(amount) {
+        return formatAmount(amount);
+      }
     },
     mounted(){
-        let code = this.$route.query.code
-        checkRechargeBillDetail(code).then(res => {
-            res.applyDatetime = formatDate(res.applyDatetime)
-            this.info = res
-        })
+      let code = this.$route.query.code;
+      Promise.all([
+        getDictList('withdraw_status'),
+        checkRechargeBillDetail(code)
+      ]).then(([res1, res2]) => {
+        res1.map((item) => {
+          this.statusObj[item.dkey] = item.dvalue;
+        });
+        res2.applyDatetime = formatDate(res2.applyDatetime)
+        this.info = res2
+      });
     },
 }
 </script>
@@ -136,6 +145,6 @@ export default {
         border-bottom: 1px dashed #dedede;
     }
 }
-  
+
 }
 </style>

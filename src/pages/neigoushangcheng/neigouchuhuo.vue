@@ -18,7 +18,7 @@
             <img :src="item.product.pic" alt="">
             <div class="content">
                 <div><p>产品名称：{{item.productName}}<p>数量：{{item.quantity}}</p><p>价格：{{item.product.price / 1000}}</p></p></div>
-                
+
                 <!-- <i>规格：{{item.product.specsList[0].name}}</i> -->
                 <span @click="prodectDetail(item.code)">我要出货</span>
             </div>
@@ -140,7 +140,6 @@ export default {
       getCloudDetail(code).then(res => {
         res[0].product.pic = formatImg(res[0].product.pic);
         self.detail = res[0];
-        console.log(self.detail);
       });
     }
   },

@@ -102,7 +102,6 @@
       },
       check() {
         let key = this.categorys[this.index].key;
-        console.log(key);
         this.index = key === 'all' ? [] : [key];
         // 请求订单
         this.loading = true;
@@ -131,7 +130,6 @@
               key: item.dkey
             });
           });
-          console.log(this.categorys);
           res3.map((item) => {
             this.type[item.dkey] = item.dvalue;
           });
@@ -139,7 +137,7 @@
       },
       getPageOrders() {
         let key = this.categorys[this.index].key;
-        this.index = key === 'all' ? [] : key.split('||');
+        this.index = key === 'all' ? [] : [key];
         // 请求订单
         this.loading = true;
         queryOrderForm2({

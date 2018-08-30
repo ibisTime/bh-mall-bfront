@@ -149,13 +149,6 @@ export default {
               getUserByMobile(mobile).then(user => {
                 let leftLevel = this.userInfo.toLevel || 0;
                 let rightLevel = user.level;
-                // console.log(rightLevel);
-                // if(rightLevel === '1') {
-                //   console.log(2);
-                //   this.text = '介绍人不能为最高等级代理';
-                //   this.$refs.toast.show();
-                //   return;
-                // }
                 let list = this.allLevelList.filter(l => l.level >= leftLevel && l.level < rightLevel);
                 this.getRealParam(list);
               }).catch(() => {
@@ -222,11 +215,9 @@ export default {
               this.loading = true;
               this.title = '提交中...';
               // isRealName(this.userId).then(res => {
-              //     console.log(this.isRealNameShow);
                   if(this.isRealNameShow) {
                       // 需要实名
                       if(this.idNo && this.photos3.length && this.photos3[0].key) {
-                          // console.log(this.photos3[0].key);
                           supplyInfo({
                             idKind: '1',
                             idNo: this.idNo,

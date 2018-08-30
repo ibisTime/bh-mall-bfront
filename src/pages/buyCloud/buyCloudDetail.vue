@@ -39,7 +39,7 @@
           <p>{{detail.name}}</p>
           <span>请选择</span>
           <i @click="genghuan">X</i>
-          <p>库存：{{detail.specsList[num].stockNumber}}</p>
+          <p>库存：{{detail.specsList ? detail.specsList[num].stockNumber : 0}}</p>
         </div>
       </div>
       <div class="packaging">

@@ -150,15 +150,6 @@ export default {
         })
       })
     })
-        // getStructure(userId).then(res => {
-        //     console.log(res)
-        //     this.lists = res.list
-        //     res.list.map(function(item){
-        //         getLevel(item.level).then(res => {
-        //             item.level = res[0].name
-        //         })
-        //     })
-        // })
   },
   components: {
     NoResult

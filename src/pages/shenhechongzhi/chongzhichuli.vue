@@ -2,11 +2,11 @@
   <div class="chongzhichuli">
     <div class="header">
       <span class="title">充值金额（元）</span>
-      <i class="num">{{info.amount / 1000}}</i>
+      <i class="num">{{formatAmount(info.amount)}}</i>
     </div>
     <div class="content">
       <p>订单编号 <span>{{info.code}}</span></p>
-      <p>充值金额 <span>{{info.amount / 1000}}</span></p>
+      <p>充值金额 <span>{{formatAmount(info.amount)}}</span></p>
       <p>打款凭证 <img :src="info.chargePdf | formatImg" /></p>
       <p>申请时间 <span>{{info.applyDatetime}}</span></p>
       <p>状态 <span>{{tips[info.status]}}</span></p>
@@ -20,12 +20,14 @@
       <img src="../../assets/imgs/buyimg.png">
     </div>
     <toast ref="toast" :text="toastText"></toast>
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
 import Toast from 'base/toast/toast';
+import FullLoading from 'base/full-loading/full-loading';
 import { queryIndentDetail, checkRecharge, checkRechargeNo } from "api/baohuo";
-import { formatDate } from "common/js/util";
+import { formatDate, formatAmount } from "common/js/util";
 import { commonMixin } from 'common/js/mixin';
 
 export default {
@@ -33,6 +35,8 @@ export default {
   mixins: [commonMixin],
   data() {
     return {
+      loading: false,
+      title: '正在加载...',
       show: false,
       info: {},
       index: 4,
@@ -50,6 +54,9 @@ export default {
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     formatImg(img) {
       return formatImg(img);
     },
@@ -93,13 +100,16 @@ export default {
     let code = this.$route.query.code;
     this.code = code;
     this.index = this.$route.query.index;
+    this.loading = true;
     queryIndentDetail(code).then(res => {
+      this.loading = false;
       res.applyDatetime = formatDate(res.applyDatetime);
       this.info = res;
     });
   },
   components: {
-    Toast
+    Toast,
+    FullLoading
   }
 };
 </script>
@@ -146,6 +156,7 @@ export default {
     }
     img {
       width: 100%;
+      margin-top: 0.2rem;
     }
   }
   .buttons {

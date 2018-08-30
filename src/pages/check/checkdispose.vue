@@ -1,52 +1,55 @@
 <template>
-    <div class="checkdispose">
-        <div class="checkdispose-top">
-            <p>姓名：{{userinfo.realName}}
-                <i class="tip" @click="$router.push('/journal?id=' + userinfo.userId + '&name=' + userinfo.realName);">流转日志</i>
-            </p>
-            <p>
-                <span>微信号：{{userinfo.user.wxId}}</span>
-            </p>
-            <p>
-                <span>手机号：{{userinfo.user.mobile}}</span>
-            </p>
-            <p v-show="userinfo.idNo">
-                <span>身份证号：{{userinfo.idNo}}</span>
-            </p>
-            <p v-show="userinfo.idHand">
-                <span>身份证照片：</span>
-            </p>
-            <p style="padding: 0 0.3rem;" v-show="userinfo.idHand"><img style="max-width: 100%;float:none;" :src="formatImg(userinfo.idHand)"/><p>
-            <p>区域：
-                <i>{{userinfo.user.province}}</i>
-                <i>{{userinfo.user.city}}</i>
-                <i>{{userinfo.user.area}}</i>
-            </p>
-        </div>
-        <div class="checkdispose-bottom">
-            <p>意向等级：<i>{{userinfo.applyLevel}}</i></p>
-            <p>该等级政策：</p>
-            <p>1.授权单金额：{{formatAmount(levelInfo.amount)}}</p>
-            <p>2.门槛费：{{formatAmount(levelInfo.minCharge)}}</p>
-            <p>3.红线金额：{{formatAmount(levelInfo.redAmount)}}</p>
-            <p>4.门槛可有余额：{{formatAmount(levelInfo.minSurplus)}}</p>
-            <p>5.授权单是否允许自发：{{getBool(levelInfo.isSend)}}</p>
-            <p>6.是否启用云仓：{{getBool(levelInfo.isWare)}}</p>
-        </div>
-        <div class="checkdispose-bottom">
-            <textarea placeholder="审核说明" :value="approveNote" style="width: 100%;" rows="3"></textarea>
-        </div>
-        <div class="footer">
-            <span class="footer-check" @click="pass">通过</span>
-            <span class="footer-back" @click="unpass">不通过</span>
-        </div>
-        <toast ref="mytoast" :text="text"></toast>
-        <confirm ref="confirm" :text="confirmText" @confirm="handleConfirm"></confirm>
+  <div class="checkdispose">
+    <div class="checkdispose-top">
+      <p>姓名：{{userinfo.realName}}
+        <i class="tip" @click="$router.push('/journal?id=' + userinfo.userId + '&name=' + userinfo.realName);">流转日志</i>
+      </p>
+      <p>
+        <span>微信号：{{userinfo.user ? userinfo.user.wxId : userinfo.wxId}}</span>
+      </p>
+      <p>
+        <span>手机号：{{userinfo.user ? userinfo.user.mobile : userinfo.mobile}}</span>
+      </p>
+      <p v-show="userinfo.idNo">
+        <span>身份证号：{{userinfo.idNo}}</span>
+      </p>
+      <p v-show="userinfo.idHand">
+        <span>身份证照片：</span>
+      </p>
+      <p style="padding: 0 0.3rem;" v-show="userinfo.idHand"><img style="max-width: 100%;float:none;" :src="formatImg(userinfo.idHand)"/><p>
+      <p v-show="userinfo.idHand">
+        <span>打款照片：</span>
+      </p>
+      <p style="padding: 0 0.3rem;" v-show="userinfo.payPdf"><img style="max-width: 100%;float:none;" :src="formatImg(userinfo.payPdf)"/><p>
+      <p>区域：
+        <i>{{userinfo.user ? userinfo.user.province : userinfo.province}}</i>
+        <i>{{userinfo.user ? userinfo.user.city : userinfo.city}}</i>
+        <i>{{userinfo.user ? userinfo.user.area : userinfo.area}}</i>
+      </p>
     </div>
+    <div class="checkdispose-bottom">
+      <p>意向等级：<i>{{userinfo.applyLevel}}</i></p>
+      <p>该等级政策：</p>
+      <p>1.授权单金额：{{formatAmount(levelInfo.amount)}}</p>
+      <p>2.门槛费：{{formatAmount(levelInfo.minCharge)}}</p>
+      <p>3.红线金额：{{formatAmount(levelInfo.redAmount)}}</p>
+      <p>4.门槛可有余额：{{formatAmount(levelInfo.minSurplus)}}</p>
+      <p>5.是否启用云仓：{{getBool(levelInfo.isWare)}}</p>
+    </div>
+    <div class="checkdispose-bottom">
+      <textarea placeholder="审核说明" :value="approveNote" style="width: 100%;" rows="3"></textarea>
+    </div>
+    <div class="footer">
+      <span class="footer-check" @click="pass">通过</span>
+      <span class="footer-back" @click="unpass">不通过</span>
+    </div>
+    <toast ref="mytoast" :text="text"></toast>
+    <confirm ref="confirm" :text="confirmText" @confirm="handleConfirm"></confirm>
+  </div>
 
 </template>
 <script>
-import { accredit, upgrade, accreditCancel, getLevel, shouquandanDetail } from 'api/baohuo';
+import { accredit, upgrade, accreditCancel, getLevel, shouquandanDetail, shouquandanDetail1111 } from 'api/baohuo';
 import { formatImg, formatAmount } from 'common/js/util';
 import Toast from 'base/toast/toast';
 import Confirm from 'base/confirm/confirm';
@@ -138,25 +141,46 @@ export default {
   mounted(){
       this.userId = this.$route.query.id;
       this.index = this.$route.query.index;
-      shouquandanDetail({
-        userId: this.userId
-      }).then(res => {
-        this.userinfo = res;
-        getLevel().then(info => {
-          let levelArr = [];
-          info.map((item) => {
-            if(res.applyLevel === item.level) {
-              this.levelInfo = item;
-              this.userinfo.applyLevel = item.name;
-            }
-            levelArr.push({
-              level: item.level,
-              name: item.name
+      if(this.index == 12) {
+        shouquandanDetail({
+          userId: this.userId
+        }).then(res => {
+          this.userinfo = res;
+          getLevel().then(info => {
+            let levelArr = [];
+            info.map((item) => {
+              if(res.applyLevel === item.level) {
+                this.levelInfo = item;
+                this.userinfo.applyLevel = item.name;
+              }
+              levelArr.push({
+                level: item.level,
+                name: item.name
+              });
             });
+            this.levelArr = levelArr;
           });
-          this.levelArr = levelArr;
         });
-      });
+      } else {
+        shouquandanDetail1111(this.userId).then(res => {
+          this.userinfo = res;
+          getLevel().then(info => {
+            let levelArr = [];
+            info.map((item) => {
+              if(res.applyLevel === item.level) {
+                this.levelInfo = item;
+                this.userinfo.applyLevel = item.name;
+              }
+              levelArr.push({
+                level: item.level,
+                name: item.name
+              });
+            });
+            this.levelArr = levelArr;
+          });
+        });
+      }
+
   },
   components: {
       Toast,

@@ -3,7 +3,7 @@
       <div class="header">
           <div class="header-top">
               <p class="now-balance">当前余额 （元）</p>
-              <p class="money-balance">{{account / 1000}}</p>
+              <p class="money-balance">{{formatAmount(account)}}</p>
           </div>
           <div class="header-bottom">
               <div class="header-bottom-left fl" @click="$router.push('/weidianzhanghu/quxianWeiDian?accountNumber=' + accountNumber)">
@@ -26,7 +26,7 @@
               </div>
               <img :src="item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
               <div class="detail">
-                  <p class="datail-money">{{item.transAmount / 1000}}</p>
+                  <p class="datail-money">{{formatAmount(item.transAmount)}}</p>
                   <p class="detail-text">{{item.remark}}</p>
               </div>
               </div>
@@ -37,7 +37,7 @@
 <script>
 import { queryBill, getCaccount } from "api/baohuo";
 import { setCookie, getCookie } from "common/js/cookie";
-import { formatDate } from "common/js/util";
+import { formatDate, formatAmount } from "common/js/util";
 export default {
   name: "yejizhanghu",
   data() {
@@ -47,7 +47,11 @@ export default {
       accountNumber: ""
     };
   },
-  methods: {},
+  methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    }
+  },
   mounted() {
     //获取用户C端账户
     getCaccount({

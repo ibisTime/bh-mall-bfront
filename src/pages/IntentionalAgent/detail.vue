@@ -17,10 +17,13 @@
             </p>
         </div>
         <div class="detail-bottom">
-            <p>意向等级：<i>{{userinfo.applyLevel}}</i></p>
-            <p>该等级政策：</p>
-            <p>门槛费用： {{formatAmount(userinfo.minCharge)}}</p>
-            <p>云仓红线：{{formatAmount(userinfo.redAmount)}}</p>
+          <p>意向等级：<i>{{userinfo.applyLevel}}</i></p>
+          <p>该等级政策：</p>
+          <p>1.授权单金额：{{formatAmount(levelInfo.amount)}}</p>
+          <p>2.门槛费：{{formatAmount(levelInfo.minCharge)}}</p>
+          <p>3.红线金额：{{formatAmount(levelInfo.redAmount)}}</p>
+          <p>4.门槛可有余额：{{formatAmount(levelInfo.minSurplus)}}</p>
+          <p>5.是否启用云仓：{{getBool(levelInfo.isWare)}}</p>
         </div>
         <div :class="['choose']" v-show="index === '0'">
             <span class="item"  @click="changSubShow">
@@ -37,9 +40,9 @@
             </span>
         </div>
         <div :class="[maskShow ? 'show' : '','mask']" @click="changSubShow"></div>
-        <div :class="[panelLevelShow ? 'show' : '','panel']" @click="chooseUser($event)">
-            <i v-for="item in list" :id="item.userId" v-show="list.length">{{item.realName}}</i>
-            <i v-show="!list.length">无内容</i>
+        <div :class="[panelLevelShow ? 'show' : '','panel']">
+            <i v-for="item in list" :id="item.userId" v-show="list.length" @click="chooseUser(item.userId)">{{item.realName}}</i>
+            <i v-show="!list.length" @click="chooseUser('')">无内容</i>
         </div>
         <toast ref="mytoast" :text="text"></toast>
     </div>
@@ -70,7 +73,8 @@ export default {
       },
       maskShow: false,
       panelLevelShow: false,
-      list: []
+      list: [],
+      levelInfo: {}
     };
   },
   methods: {
@@ -92,6 +96,13 @@ export default {
     //             }
     //     })
     // },
+    getBool(val) {
+      const dict = {
+        0: '否',
+        1: '是'
+      };
+      return dict[val];
+    },
     accept() {
       acceptAgent(this.options.userId).then(res => {
         if (res.isSuccess) {
@@ -118,21 +129,36 @@ export default {
       });
     },
     changSubShow() {
-      this.maskShow = !this.maskShow;
-      this.panelLevelShow = !this.panelLevelShow;
+      if(this.list.length) {
+        this.maskShow = !this.maskShow;
+        this.panelLevelShow = !this.panelLevelShow;
+      } else {
+        this.text = "您暂无下级代理，无法向下分配";
+        this.$refs.mytoast.show();
+      }
     },
-    chooseUser(event) {
+    chooseUser(userId) {
+      console.log(userId);
       // this.changLevelShow()
-      this.options.toUserId = event.target.getAttribute("id");
-      allotAgent(this.options).then(res => {
-        if (res.isSuccess) {
-          this.text = "向下分配成功";
-          this.$refs.mytoast.show();
-        } else {
-          this.text = "向下分配失败";
-          this.$refs.mytoast.show();
-        }
-      });
+      // this.options.toUserId = event.target.getAttribute("id");
+      if(userId) {
+        this.options.toUserId = userId;
+        allotAgent(this.options).then(res => {
+          if (res.isSuccess) {
+            this.text = "向下分配成功";
+            this.$refs.mytoast.show();
+            setTimeout(() => {
+              this.$router.back();
+            }, 500)
+          } else {
+            this.text = "向下分配失败";
+            this.$refs.mytoast.show();
+          }
+        });
+      } else {
+        this.text = "您暂无下级代理，无法向下分配";
+        this.$refs.mytoast.show();
+      }
     }
   },
   mounted() {
@@ -147,6 +173,7 @@ export default {
         res1.applyLevel = info[0].name;
         res1.minCharge = info[0].minCharge;
         res1.redAmount = info[0].redAmount;
+        this.levelInfo = info[0];
         this.userinfo = res1;
       });
       this.list = res2.list;

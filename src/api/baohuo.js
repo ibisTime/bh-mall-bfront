@@ -268,6 +268,12 @@ export function agent(status) {
         limit: 100,
     });
 }
+// 详情查授权单，退出单
+export function shouquandanDetail1111(userId) {
+  return fetch(627287, {
+    userId
+  });
+}
 // 分页查升级单
 export function upgradeList(status) {
   return fetch(627305, {
@@ -687,6 +693,7 @@ export function queryYunOrder(info) {
     start: info.start || 1,
     limit: info.limit || 100,
     status: info.status || '',
+    applyUser: info.applyUser || ''
   });
 }
 //分页查询内购商城理订单
@@ -843,7 +850,6 @@ export function getStatistics(info) {
   return fetch(627852, {
     start: 1,
     limit: 1000,
-    userId: getUserId(),
     introducer: info.introducer || '',
     referrer: info.referrer || '',
     keyword: info.keyword || '',

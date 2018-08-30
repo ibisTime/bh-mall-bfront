@@ -2,7 +2,7 @@
   <div class="subAgent">
     <div class="header-first">
       <div class="header-top">
-        <p class="now-balance">总介绍人数</p>
+        <p class="now-balance">总推荐人数</p>
         <p class="money-balance">{{number}}</p>
       </div>
     </div>

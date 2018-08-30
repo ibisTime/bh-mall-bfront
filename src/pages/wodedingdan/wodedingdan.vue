@@ -1,18 +1,23 @@
 <template>
   <div class="intentionalAgent">
-    <div class="header clearfix">
-        <div @click="changeIndex('')" :class="[index == '' ? 'active' : '']">
-            <i>全部</i>
-        </div>
-        <div @click="changeIndex('0')" :class="[index == '0' ? 'active' : '']">
-            <i>待支付</i>
-        </div>
-        <div @click="changeIndex('1')" :class="[index == '1' ? 'active' : '']">
-            <i>已收货</i>
-        </div>
-        <div @click="changeIndex('2')" :class="[index == '2' ? 'active' : '']">
-            <i class="width">申请取消</i>
-        </div>
+    <!--<div class="header clearfix">-->
+        <!--<div @click="changeIndex('')" :class="[index == '' ? 'active' : '']">-->
+            <!--<i>全部</i>-->
+        <!--</div>-->
+        <!--<div @click="changeIndex('0')" :class="[index == '0' ? 'active' : '']">-->
+            <!--<i>待支付</i>-->
+        <!--</div>-->
+        <!--<div @click="changeIndex('1')" :class="[index == '1' ? 'active' : '']">-->
+            <!--<i>已收货</i>-->
+        <!--</div>-->
+        <!--<div @click="changeIndex('2')" :class="[index == '2' ? 'active' : '']">-->
+            <!--<i class="width">申请取消</i>-->
+        <!--</div>-->
+    <!--</div>-->
+    <div class="category-wrapper">
+      <category-scroll :currentIndex="currentIndex"
+                       :categorys="categorys"
+                       @select="selectCategory"></category-scroll>
     </div>
     <div class="orders-content">
       <scroll :data="list"
@@ -58,8 +63,9 @@ import Toast from 'base/toast/toast';
 import FullLoading from 'base/full-loading/full-loading';
 import Confirm from 'base/confirm/confirm';
 import Scroll from 'base/scroll/scroll';
+import CategoryScroll from 'base/category-scroll/category-scroll';
 import { queryYunOrder, receiveNromalOrder, cencelCloudOrder} from "api/baohuo";
-import { formatDate, formatImg, formatAmount } from "common/js/util";
+import { formatDate, formatImg, formatAmount, getUserId } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 import { getDictList } from 'api/general';
 export default {
@@ -77,7 +83,16 @@ export default {
       confirmText: '确定取消订单吗',
       start: 1,
       limit: 10,
-      hasMore: true
+      hasMore: true,
+      categorys: [
+        {value: '全部',key: 'all'},
+        // {value: '待支付', key: '0'},
+        // {value: '待发货', key: '1||2'},
+        // {value: '待收货', key: '3'},
+        // {value: '已收货', key: '4'},
+        // {value: '申请取消', key: '5'}
+      ],
+      currentIndex: +this.$route.query.index || 0
     };
   },
   methods: {
@@ -87,13 +102,9 @@ export default {
     formatDate(date) {
       return formatDate(date);
     },
-    changeIndex(index) {
-      this.index = index;
-      this.start = 1;
-      this.limit = 10;
-      this.list = [];
-      this.getPageOrders();
-    },
+    // changeIndex(index) {
+    //
+    // },
     changeHeight(index) {
       this.heightActive = this.heightActive === index ? '' : index;
     },
@@ -101,18 +112,19 @@ export default {
       return formatImg(img);
     },
     getPageOrders() {
-      let params;
-      if(this.index == '') {
-        params = '';
+      let status;
+      if(this.index == 0) {
+        status = '';
       } else {
-        params = this.index;
+        status = this.categorys[this.index].key;
       }
       this.loading = true;
       Promise.all([
         queryYunOrder({
           start: this.start,
           limit: this.limit,
-          status: params
+          status: status,
+          applyUser: getUserId()
         }),
         getDictList('in_order_status')
       ]).then(([res1, res2]) => {
@@ -165,16 +177,37 @@ export default {
       if (index) {
         this.$router.push("/xuangoushangpin/shangpingoumai?pay=" + 2 + '&code=' + index);
       }
+    },
+    selectCategory(index) {
+      this.index = index;
+      this.currentIndex = index;
+      this.start = 1;
+      this.limit = 10;
+      this.list = [];
+      this.getPageOrders();
+    },
+    getCategory() {
+      getDictList('in_order_status').then((res) => {
+        res.map((item) => {
+          this.status[item.dkey] = item.dvalue;
+          this.categorys.push({
+            value: item.dvalue,
+            key: item.dkey
+          });
+        });
+      });
+      this.getPageOrders();
     }
   },
   mounted() {
-    this.getPageOrders();
+    this.getCategory();
   },
   components: {
     Toast,
     FullLoading,
     Confirm,
-    Scroll
+    Scroll,
+    CategoryScroll
   }
 };
 </script>

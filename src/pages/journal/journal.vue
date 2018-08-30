@@ -1,12 +1,12 @@
 <template>
   <div class="journal">
-    <div class="item" v-for="item in list.logList" v-show="list.logList">
+    <div class="item" v-for="item in list.logList" v-show="list.logList.length">
       <p>操作人：{{name}}</p>
-      <p>操作类型：{{logType[item.type]}}</p>
+      <p>操作类型：{{logType[item.type] ? logType[item.type] : '无'}}</p>
       <p>流转时间：{{item.approveDatetime ? formatDate(item.approveDatetime) : formatDate(item.applyDatetime)}}</p>
-      <p>备注：{{item.remark}}</p>
+      <p>备注：{{item.remark ? item.remark : '无' }}</p>
     </div>
-    <no-result v-show="!list.logList" title="暂无流转日志"></no-result>
+    <no-result v-show="!list.logList.length" title="暂无流转日志"></no-result>
   </div>
 </template>
 <script>

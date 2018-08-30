@@ -2,8 +2,8 @@
   <div class="threshold">
     <div class="header">
       <div class="header-top">
-        <p class="now-balance">当前余额 （元）</p>
-        <p class="money-balance">{{account / 1000}}</p>
+        <p class="now-balance">业绩余额 （元）</p>
+        <p class="money-balance">{{formatAmount(account)}}</p>
       </div>
       <div class="header-bottom">
         <div class="header-bottom-left fl" @click="$router.push('/recharge?type=TX_CNY&accountNumber=' + accountNumber)">
@@ -31,7 +31,7 @@
         </div>
         <img :src="item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
         <div class="detail">
-          <p class="datail-money">{{item.transAmount / 1000}}</p>
+          <p class="datail-money" :style="!item.bizNote.includes('充值') && 'color: #a5ca64'">{{item.bizNote}}   {{formatAmount(item.transAmount)}}</p>
           <p class="detail-text">{{item.remark}}</p>
         </div>
         </div>
@@ -44,7 +44,7 @@
 import FullLoading from 'base/full-loading/full-loading';
 import { getPerformance, queryBill } from "api/baohuo";
 import { setCookie, getCookie } from "common/js/cookie";
-import { formatDate } from "common/js/util";
+import { formatDate, formatAmount } from "common/js/util";
 export default {
   name: "yejizhanghu",
   data() {
@@ -56,7 +56,11 @@ export default {
       loading: false
     };
   },
-  methods: {},
+  methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    }
+  },
   mounted() {
     //获取用户业绩账户
     this.loading = true;
@@ -143,18 +147,26 @@ export default {
     }
   }
   .item {
-    height: 1.4rem;
-    border-bottom: 1px solid #eee;
+    /*height: 1.4rem;*/
+    /*border-bottom: 1px solid #eee;*/
+    /*position: relative;*/
     position: relative;
+    padding: 0.2rem 0.3rem;
+    border-bottom: 1px solid #eee;
     .center {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
+      /*<!--position: absolute;-->*/
+      /*<!--top: 50%;-->*/
+      /*<!--transform: translateY(-50%);-->*/
+      display: flex;
+      width: 100%;
+      align-items: center;
       .item-time {
-        display: inline-block;
-        width: 1.23rem;
-        margin-left: 0.3rem;
-        text-align: center;
+        /*display: inline-block;*/
+        /*width: 1.23rem;*/
+        /*margin-left: 0.3rem;*/
+        /*text-align: center;*/
+        flex: 0 0 0.84rem;
+
         .day {
           font-size: $font-size-medium-xx;
           color: #333;
@@ -169,13 +181,18 @@ export default {
         width: 0.72rem;
       }
       .detail {
-        display: inline-block;
+        /*display: inline-block;*/
+        padding-left: 0.2rem;
         .datail-money {
+          /*<!--font-size: $font-size-large-s;-->*/
+          /*<!--color: #fe8472;-->*/
+          line-height: 1.1;
           font-size: $font-size-large-s;
           color: #fe8472;
         }
         .detail-text {
-          margin-top: 0.22rem;
+          /*margin-top: 0.22rem;*/
+          margin-top: 0.1rem;
           font-size: $font-size-small;
           color: #333;
         }

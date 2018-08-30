@@ -15,7 +15,7 @@
           <p>订单编号：{{item.code}}<i class="tip">{{tips[item.status]}}</i></p>
           <p>申请人姓名：{{item.accountName}}  </p>
           <p>等级：{{item.level}}</p>
-          <p>充值金额：<span>￥{{item.amount / 1000}}</span><img src="../../assets/imgs/more@2x.png" alt=""></p>
+          <p>充值金额：<span>￥{{formatAmount(item.amount)}}</span><img src="../../assets/imgs/more@2x.png" alt=""></p>
           <p>申请时间：{{item.applyDatetime}}</p>
       </div>
     <full-loading :title="title" v-show="loading"></full-loading>
@@ -23,7 +23,7 @@
 </template>
 <script>
 import { intentional, queryIndent, getLevel } from "api/baohuo";
-import { formatDate } from "common/js/util";
+import { formatDate, formatAmount } from "common/js/util";
 import FullLoading from 'base/full-loading/full-loading';
 export default {
   name: "IntentionalAgent",
@@ -45,6 +45,9 @@ export default {
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     changeIndex(index) {
       this.index = index;
       this.loading = true;

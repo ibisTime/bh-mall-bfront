@@ -1,129 +1,137 @@
 <template>
-    <div class="woyaozhihuan">
-        <div class="goods">
-            <div class="top  clearfix"  @click="$router.push('/woyaozhihuan/shangpinliebiao?flag=2');">
-                云仓商品
-            <span class="downward">></span>
-            </div>
-            <div :class="['pic',cloudDetailFlag ? 'show' : '']">
-                <img :src="cloudDetailPic">
-                <div class="content">
-                    <p>{{cloudDetail.product.name}}</p>
-                    <!--
-                    <i>￥{{cloudDetail.specsList[count].price / 1000 * cloudDetail.specsList[count].number}}</i>
-                    -->
-                    <i>￥{{cloudDetail.specsList[count].price / 1000 * initNum}}</i>
-                    <div class="guige">
-                        <!--
-                        <span>{{cloudDetail.specsList[count].number}}{{cloudDetail.specsList[count].name}}</span>
-                        -->
-                        <span>{{initNum}}{{cloudDetail.specsList[count].specsName}}</span>
-                    </div>
-                    <button class="huan" @click="_genghuan">更换规格</button>
-                </div>
-            </div>
+  <div class="woyaozhihuan">
+    <div class="goods">
+      <div class="top  clearfix"  @click="$router.push('/woyaozhihuan/shangpinliebiao?flag=2');">
+        云仓商品
+      <span class="downward">></span>
+      </div>
+      <div :class="['pic',cloudDetailFlag ? 'show' : '']">
+        <img :src="cloudDetailPic">
+        <div class="content">
+          <p>{{cloudDetail.product.name}}</p>
+          <!--
+          <i>￥{{cloudDetail.specsList[count].price / 1000 * cloudDetail.specsList[count].number}}</i>
+          -->
+          <i>￥{{cloudDetail.specsList[count].price / 1000 * initNum}}</i>
+          <div class="guige">
+            <!--
+            <span>{{cloudDetail.specsList[count].number}}{{cloudDetail.specsList[count].name}}</span>
+            -->
+            <span>{{initNum}}{{cloudDetail.specsName}}</span>
+          </div>
+          <button class="huan" @click="_genghuan">更换数量</button>
         </div>
-        <div class="goods">
-            <div class="top  clearfix"  @click="$router.push('/woyaozhihuan/shangpinliebiao?flag=1');">
-                库存商品
-                <span class="downward">></span>
-            </div>
-            <div :class="['pic',detailFlag ? 'show' :'']">
-                <img :src="detailPic">
-                <div class="content">
-                    <p>{{detail.name}}</p>
-                    <i>￥{{detail.specsList[num].price.price / 1000 * detail.specsList[num].number}}</i>
-                    <div class="guige">
-                        <span>{{detail.specsList[num].number}}{{detail.specsList[num].name}}</span>
-                    </div>
-                    <button class="huan" @click="genghuan">更换规格</button>
-                </div>
-            </div>
-            <div class="total clearfix">
-                <span>置换总价</span>
-                <span class="color">￥{{money / 1000}}</span>
-            </div>
-        </div>
-        <div class="btn" @click="requestNode">确认置换</div>
-        <div :class="['mask',flag ? 'show' : '']" @click="changeFlag"></div>
-        <div :class="['buypart',buypartFlag ? 'show' : '']">
-            <div class="title">
-                <div class="title-pic">
-                    <img :src="detailPic" alt="">
-                </div>
-                <div class="title-right">
-                    <p>{{detail.name}}</p>
-                    <span>请选择</span>
-                    <i @click="genghuan">X</i>
-                </div>
-            </div>
-            <div class="packaging">
-                <p>规格</p>
-                <div class="select">
-                    <span
-                      v-for="(item,index) in detail.specsList"
-                      :code="item.code"
-                      @click="chooseSize(item,index)"
-                      :class="[num === index ? 'active' : '']"
-                      >{{item.name}}</span>
-                </div>
-            </div>
-            <div class="total-money">
-                <div class="left">
-                    <i class="text">合计：</i>
-                    <i class="symbol">￥</i>
-                    <i class="sum">{{detail.specsList[num].price.price / 1000 * detail.specsList[num].number}}</i>
-                </div>
-                <div class="right">
-                    <span class="num">{{detail.specsList[num].number}}</span>
-                </div>
-            </div>
-            <div class="buypart-bottom" @click="certain(num)">
-                确认
-            </div>
-        </div>
-        <div :class="['buypart',cloudFlag ? 'show' : '']">
-            <div class="title">
-                <div class="title-pic">
-                    <img :src="cloudDetailPic">
-                </div>
-                <div class="title-right">
-                    <p>{{cloudDetail.productName}}</p>
-                    <span>请选择</span>
-                    <i @click="_genghuan">X</i>
-                </div>
-            </div>
-            <div class="packaging">
-                <p>规格</p>
-                <div class="select">
-                    <span
-                      v-for="(item,index) in cloudDetail.specsList"
-                      :code="item.code"
-                      @click="_chooseSize(item, index)"
-                      :class="[count === index ? 'active' : '']"
-                      >{{item.specsName}}</span>
-                </div>
-            </div>
-            <div class="total-money">
-                <div class="left">
-                    <i class="text">合计：</i>
-                    <i class="symbol">￥</i>
-                    <!--<i class="sum">{{cloudDetail.specsList[count].price.price / 1000 * cloudDetail.specsList[count].number}}</i>-->
-                    <i class="sum">{{cloudDetail.specsList[count].price / 1000 * initNum}}</i>
-                </div>
-                <div class="right">
-                    <span class="diamonds right-item" @click="_add">+</span>
-                    <!--<input class="num right-item" v-model="cloudDetail.specsList[count].number"></span>-->
-                    <input class="num right-item" v-model="initNum">
-                    <span class="diamonds right-item" @click="_sub">-</span>
-                </div>
-            </div>
-            <div class="buypart-bottom" @click="_certain">
-                确认
-            </div>
-        </div>
-        <toast ref="mytoast" :text="text"></toast>
+      </div>
     </div>
+    <div class="goods">
+      <div class="top  clearfix"  @click="$router.push('/woyaozhihuan/shangpinliebiao?flag=1');">
+        库存商品
+        <span class="downward">></span>
+      </div>
+      <div :class="['pic',detailFlag ? 'show' :'']">
+        <img :src="detailPic">
+        <div class="content">
+          <p>{{detail.name}}</p>
+          <!--<i>￥{{detail.specsList[num].price.price / 1000 * detail.specsList[num].number}}</i>-->
+          <div class="guige">
+            <span>可换{{canChangeQuantity}}{{detail.specsList[num].name}}</span>
+          </div>
+          <button class="huan" @click="genghuan">更换规格</button>
+        </div>
+      </div>
+      <div class="total clearfix">
+        <span>置换总价</span>
+        <span class="color">￥{{money / 1000}}</span>
+      </div>
+    </div>
+    <div class="btn" @click="requestNode">确认置换</div>
+    <div :class="['mask',flag ? 'show' : '']" @click="changeFlag"></div>
+    <div :class="['buypart',buypartFlag ? 'show' : '']">
+      <div class="title">
+        <div class="title-pic">
+          <img :src="detailPic" alt="">
+        </div>
+        <div class="title-right">
+          <p>{{detail.name}}</p>
+          <span>请选择</span>
+          <i @click="genghuan">X</i>
+        </div>
+      </div>
+      <div class="packaging">
+        <p>规格</p>
+        <div class="select">
+          <span
+            v-for="(item,index) in detail.specsList"
+            :code="item.code"
+            @click="chooseSize(item,index)"
+            :class="[num === index ? 'active' : '']"
+            >{{item.name}}</span>
+        </div>
+      </div>
+      <div class="total-money">
+        <div class="left">
+          <i class="text">可换：</i>
+          <i class="symbol">{{canChangeQuantity}}</i>
+          <!--<i class="symbol">￥</i>-->
+          <!--<i class="sum">{{detail.specsList[num].price.price / 1000 * detail.specsList[num].number}}</i>-->
+        </div>
+        <!--<div class="right">-->
+          <!--<span class="num">{{detail.specsList[num].number}}</span>-->
+        <!--</div>-->
+      </div>
+      <div class="buypart-bottom" @click="certain(num)">
+        确认
+      </div>
+    </div>
+    <div :class="['buypart',cloudFlag ? 'show' : '']">
+      <div class="title">
+        <div class="title-pic">
+          <img :src="cloudDetailPic">
+        </div>
+        <div class="title-right">
+          <p>{{cloudDetail.productName}}</p>
+          <span>请选择</span>
+          <p>库存{{cloudDetail.quantity}}</p>
+          <i @click="_genghuan">X</i>
+        </div>
+      </div>
+      <div class="packaging">
+        <p>规格</p>
+        <div class="select">
+          <!--<span-->
+            <!--v-for="(item,index) in cloudDetail.specsList"-->
+            <!--:code="item.code"-->
+            <!--@click="_chooseSize(item, index)"-->
+            <!--:class="[count === index ? 'active' : '']"-->
+            <!--&gt;{{item.specsName}}</span>-->
+          <span
+            :code="cloudDetail.specsCode"
+            @click="_chooseSize(item, index)"
+            :class="'active'"
+          >{{cloudDetail.specsName}}</span>
+        </div>
+      </div>
+      <div class="total-money">
+        <div class="left">
+          <i class="text">合计：</i>
+          <i class="symbol">￥</i>
+          <!--<i class="sum">{{cloudDetail.specsList[count].price.price / 1000 * cloudDetail.specsList[count].number}}</i>-->
+          <i class="sum">{{cloudDetail.specsList[count].price / 1000 * initNum}}</i>
+        </div>
+        <div class="right">
+          <span class="diamonds right-item" @click="_add">+</span>
+          <!--<input class="num right-item" v-model="cloudDetail.specsList[count].number"></span>-->
+          <input class="num right-item" v-model="initNum">
+          <span class="diamonds right-item" @click="_sub">-</span>
+        </div>
+      </div>
+      <div class="buypart-bottom" @click="_certain">
+        确认
+      </div>
+    </div>
+    <toast ref="mytoast" :text="text"></toast>
+    <full-loading :title="title" v-show="loading"></full-loading>
+  </div>
 </template>
 <script>
 import {
@@ -134,12 +142,15 @@ import {
   queryMoney
 } from "api/baohuo";
 import { getUser, getUserById } from "api/user";
-import { setCookie, getCookie } from "common/js/cookie.js";
+import { setCookie, getCookie, delCookie } from "common/js/cookie.js";
 import { formatDate, formatImg } from "common/js/util";
 import toast from "base/toast/toast";
+import FullLoading from 'base/full-loading/full-loading';
 export default {
   data() {
     return {
+      loading: false,
+      title: '正在加载...',
       flag: false,
       buypartFlag: false,
       cloudFlag: false,
@@ -155,11 +166,6 @@ export default {
           { name: '0' }
         ]
       },
-      // cloudDetail: {
-      //   specsList: [
-      //     { price: 0 }
-      //   ]
-      // },
       cloudDetail: {
         name: '产品名称',
         product: {
@@ -180,27 +186,27 @@ export default {
       detailFlag: true,
       cloudDetailFlag: true,
       text: "",
-      initNum: 1
+      initNum: 1,
+      detailIdx: 0,
+      canChangeQuantity: 0
     };
   },
   methods: {
     //提交置换
     requestNode() {
-      // console.log(this.changeSpecsCode);
-      // console.log(this.productSpecsCode);
-      console.log(this.cloudDetail);
-      console.log(this.detail);
       let options = {
         changeSpecsCode: this.changeSpecsCode || this.detail.specsList[0].price.specsCode,
         // productSpecsCode: this.cloudDetail.productSpecsCode,
-        productSpecsCode: this.productSpecsCode || this.cloudDetail.specsList[0].specsCode,
+        productSpecsCode: this.productSpecsCode || this.cloudDetail.specsCode,
         // quantity: this.cloudDetail.specsList[this.count].number
         quantity: this.initNum
       };
+      this.loading = true;
       requestNode(options).then(res => {
+        this.loading = false;
         this.text = "提交成功";
         this.$refs.mytoast.show(this.tiaozhuan);
-      });
+      }).catch(() => { this.loading = false });
     },
     tiaozhuan() {
       this.$router.push("/home");
@@ -210,7 +216,7 @@ export default {
       if (this.cloudDetail.name !== "") {
         let options = {
           changeSpecsCode: this.changeSpecsCode,
-          productSpecsCode: this.cloudDetail.specsList[this.count].specsCode,
+          productSpecsCode: this.cloudDetail.specsCode,
           // quantity: this.cloudDetail.specsList[this.count].number
           quantity: this.initNum
         };
@@ -219,9 +225,13 @@ export default {
           this.$refs.mytoast.show();
           return
         }
+        this.loading = true;
         queryMoney(options).then(res => {
-          this.detail.specsList[index].number = res.canChangeQuantity;
-        });
+          this.loading = false;
+          // detail.specsList[num].number
+          // this.detail.specsList[num].number = res.canChangeQuantity;
+          this.canChangeQuantity = res.canChangeQuantity;
+        }).catch(() => { this.loading = false });
       }
     },
     //变换遮罩层显示与隐藏
@@ -250,6 +260,16 @@ export default {
     _genghuan() {
       this.changeFlag();
       this.changecloudFlag();
+      if(this.changeSpecsCode && this.detail) {
+        this.queryMoney(this.num);
+        this.changeSpecsCode = this.detail.specsList[this.num].code;
+        setCookie("myDetail", JSON.stringify(this.detail));
+      }
+      // if(!this.changeSpecsCode) {
+      //   this.changeSpecsCode = this.detail.specsList[0].price.specsCode;
+      //   setCookie("myDetail", JSON.stringify(this.detail));
+      // }
+      // this.queryMoney(this.num);
     },
     //选购产品数量+1
     // add() {
@@ -258,8 +278,14 @@ export default {
     // },
     //选购产品数量+1
     _add() {
+
       // this.cloudDetail.specsList[this.count].number++;
-      this.initNum++;
+      if(this.initNum >= this.cloudDetail.quantity) {
+        this.text = "已到库存上限";
+        this.$refs.mytoast.show();
+      } else {
+        this.initNum++;
+      }
     },
     // 选购产品数量-1
     // sub() {
@@ -299,17 +325,26 @@ export default {
     //确定规格
     certain(num) {
       this.genghuan();
+      this.detailIdx = num;
+      // debugger;
+      this.changeSpecsCode = this.detail.specsList[num].code;
       this.queryMoney(num);
       setCookie("myDetail", JSON.stringify(this.detail));
     },
     //确定规格
     _certain() {
       this._genghuan();
+      // this.queryMoney();
       setCookie("myDetail", JSON.stringify(this.detail));
       setCookie("cloudDetail", JSON.stringify(this.cloudDetail));
     }
   },
   mounted() {
+    let clear = this.$route.query.clear;
+    if(clear) {
+      delCookie('myDetail');
+      delCookie('cloudDetail')
+    }
     //库存商品信息
     if (JSON.parse(getCookie("myDetail")) !== null) {
       this.detail = JSON.parse(getCookie("myDetail"));
@@ -326,9 +361,15 @@ export default {
     } else {
       this.cloudDetailFlag = false;
     }
+    // debugger;
+    if (JSON.parse(getCookie("myDetail")) !== null && JSON.parse(getCookie("cloudDetail")) !== null) {
+      this.changeSpecsCode = this.detail.specsList[this.num].code;
+      this.queryMoney();
+    }
   },
   components: {
-    toast
+    toast,
+    FullLoading
   }
 };
 </script>

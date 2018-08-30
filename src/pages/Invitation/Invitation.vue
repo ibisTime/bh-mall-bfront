@@ -276,7 +276,7 @@ export default {
     }
     .erweima-middle {
       font-size: $font-size-small;
-      padding-left: 0.86rem;
+      padding: 0 0.5rem;
       p + p {
         margin-top: 0.14rem;
       }

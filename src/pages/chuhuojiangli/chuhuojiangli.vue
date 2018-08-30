@@ -1,64 +1,68 @@
 <template>
   <div class="structure">
-      <div :class="['tip',tipshow ? 'none' : '']">
-            <span>负责声明：此功能只是辅助上级管理下级的账目，与公司财务未发生任何关系，请代理们尽量严谨的审核充值金额，我公司对代理间因充值发生的纠纷概不负责</span>
-            <img src="../../assets/threshold/close.png" @click="changeTipShow">
+    <div :class="['tip',tipshow ? 'none' : '']">
+      <span>负责声明：此功能只是辅助上级管理下级的账目，与公司财务未发生任何关系，请代理们尽量严谨的审核充值金额，我公司对代理间因充值发生的纠纷概不负责</span>
+      <img src="../../assets/threshold/close.png" @click="changeTipShow">
+    </div>
+    <div class="tab">
+      <div class="header">
+        <div>
+          <span :class="[kind === 1 ? 'active' : '']" @click="chooseKind(1)">收入相关</span>
+        </div>
+        <div>
+          <span :class="[kind === 0 ? 'active' : '']" @click="chooseKind(0)">支出相关</span>
+        </div>
       </div>
-      <div class="tab">
-            <div class="header">
-                <div>
-                    <span :class="[kind === 1 ? 'active' : '']" @click="chooseKind(1)">收入相关</span>
-                </div>
-                <div>
-                    <span :class="[kind === 0 ? 'active' : '']" @click="chooseKind(0)">支出相关</span>
-                </div>
-            </div>
-            <div class="time clearfix">
-                <span>开始</span>
-                <span class="time-now">
-                <date-picker 
-                            :year="year"
-                            :month="month"
-                            :day="day"
-                            @change="updateDate"></date-picker>
-                    <img src="../../assets/imgs/xiala@2x.png" alt="">
-                </span>
-                <span>-</span>
-                <span>结束</span>
-                <span class="time-now">
-                <date-picker 
-                            :year="endyear"
-                            :month="endmonth"
-                            :day="endday"
-                            @change="updateEndDate"></date-picker>
-                    <img src="../../assets/imgs/xiala@2x.png" alt="">
-                </span>
-                <span class="confirm" @click="check">确定</span>
-            </div>
+      <div class="time clearfix">
+        <span>开始</span>
+        <span class="time-now">
+        <date-picker
+                    :year="year"
+                    :month="month"
+                    :day="day"
+                    @change="updateDate"></date-picker>
+        <img src="../../assets/imgs/xiala@2x.png" alt="">
+        </span>
+        <span>-</span>
+        <span>结束</span>
+        <span class="time-now">
+        <date-picker
+                    :year="endyear"
+                    :month="endmonth"
+                    :day="endday"
+                    @change="updateEndDate"></date-picker>
+        <img src="../../assets/imgs/xiala@2x.png" alt="">
+        </span>
+        <span class="confirm" @click="check">确定</span>
       </div>
-      <div class="tab-content">
-          <div class="item" :class="['item', list.length > 0 ? 'itemshow' : '']" v-for="item in list">
-              <div class="top">
-                  订单编号：{{item.code}}
-                  <span class="top-right">已发放</span>
-              </div>
-              <div class="bottom">
-                  <p>奖励名称：<i>{{item.bizNote}}</i></p>
-                  <p>奖励金额：<i>{{item.transAmount / 1000 }}</i></p>
-                  <p>{{item.createDatetime}}</p>
-                  <img class="more" src="../../assets/imgs/more@2x.png">
-              </div>
-          </div>
-          <div :class="['none',list.length > 0 ? 'hide' : '']">
-              <img src="../../assets/imgs/hezi.png" alt="">
-          </div>
-          <div :class="['none-text',list.length > 0 ? 'hide' : '']">近期无记录</div>
+    </div>
+    <div class="tab-content">
+      <div class="item" :class="['item', list.length > 0 ? 'itemshow' : '']" v-for="item in list">
+        <div class="top">
+          订单编号：{{item.code}}
+          <span class="top-right">已发放</span>
+        </div>
+        <div class="bottom">
+          <p>奖励名称：<i>{{item.bizNote}}</i></p>
+          <p>奖励金额：<i>{{formatAmount(item.transAmount)}}</i></p>
+          <p>{{item.createDatetime}}</p>
+          <!--<img class="more" src="../../assets/imgs/more@2x.png">-->
+        </div>
       </div>
+      <!--<div class="no">-->
+        <!--<no-result v-show="!list.length" title="暂无记录"></no-result>-->
+      <!--</div>-->
+      <div :class="['none',list.length > 0 ? 'hide' : '']">
+        <img src="../../assets/imgs/hezi.png" alt="">
+      </div>
+      <div :class="['none-text',list.length > 0 ? 'hide' : '']">近期无记录</div>
+    </div>
   </div>
 </template>
 <script>
 import DatePicker from "base/date-picker/date-picker";
-import { formatDate } from "common/js/util";
+import NoResult from 'base/no-result/no-result';
+import { formatDate, formatAmount } from "common/js/util";
 import { emptyValid } from "common/js/util";
 import { award } from "api/baohuo";
 export default {
@@ -74,15 +78,19 @@ export default {
       endmonth: "",
       endday: "",
       list: [],
-      bizType: 1,
+      bizType: 'AJ_CHJL',
       kind: 1
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     changeTipShow() {
       this.tipshow = !this.tipshow;
     },
     chooseKind(kind) {
+      // debugger;
       this.kind = kind;
       let options = {};
       options.bizType = this.bizType;
@@ -140,7 +148,8 @@ export default {
     });
   },
   components: {
-    DatePicker
+    DatePicker,
+    NoResult
   }
 };
 </script>
@@ -228,7 +237,7 @@ export default {
         }
       }
       .confirm {
-        margin-left: 0.3rem;
+        /*margin-left: 0.3rem;*/
         width: 1.5rem;
         background-color: $primary-color;
         color: #fff;
@@ -293,6 +302,9 @@ export default {
         display: none;
       }
     }
+  }
+  .no {
+    height: 80%;
   }
 }
 </style>

@@ -25,7 +25,7 @@
     <div class="middle">
       <div class="middle-top" @click="goYuncan">
         <span class="asset fl">云仓余额</span>
-        <span class="money fl">￥{{balance / 1000}}</span>
+        <span class="money fl">￥{{formatAmount(balance)}}</span>
         <i class="fr more">
           <img src="../../assets/imgs/more@2x.png" alt="">
         </i>
@@ -102,14 +102,16 @@
       </div>
     </div>
     <full-loading :title="title" v-show="loading"></full-loading>
+    <toast ref="toast" :text="toastText"></toast>
   </div>
 </template>
 <script>
+import Toast from 'base/toast/toast';
 import FullLoading from 'base/full-loading/full-loading';
 import { setCookie, getCookie, clearAllCookie } from "common/js/cookie.js";
-import { isLogin } from "common/js/util";
+import { isLogin, getUserId, formatAmount } from "common/js/util";
 import { getUser1, getUserById } from "api/user";
-import { getBill, getLevel } from "api/baohuo";
+import { getBill, getLevel, checkRed } from "api/baohuo";
 export default {
   name: "home",
   data() {
@@ -308,10 +310,14 @@ export default {
       photo: "../../assets/imgs/head@2x.png",
       balance: "",
       title: '正在加载...',
-      loading: true
+      loading: true,
+      toastText: ''
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     goYuncan() {
       this.$router.push('/yuncangzhanghu');
     },
@@ -321,24 +327,37 @@ export default {
     }
   },
   mounted() {
+    let userId;
     if (this.$route.query.userId) {
-      var userId = this.$route.query.userId;
+      userId = this.$route.query.userId;
       setCookie("userId", userId);
     } else {
-      var userId = getCookie("userId");
+      userId = getCookie("userId");
     }
-    getUser1(userId).then(res => {
-      this.userinfo = res;
-      this.balance = res.wareAmount;
-      setCookie("level", res.level);
-      getLevel(res.level).then(item => {
+    Promise.all([
+      getUser1(userId),
+      checkRed(userId)
+    ]).then(([res1, res2]) => {
+      this.userinfo = res1;
+      this.balance = res1.wareAmount;
+      setCookie("level", res1.level);
+      getLevel(res1.level).then(item => {
         this.loading = false;
-        res.level = item[0].name;
+        res1.level = item[0].name;
       });
-    });
+      setCookie('isWare', res2.isWare);
+      if(this.balance < res2.redAmount) {
+        this.toastText = '您云仓余额低于红线，请购买';
+        this.$refs.toast.show();
+        setTimeout(() => {
+          this.$router.push('/threshold');
+        }, 2000)
+      }
+    }).catch(() => { this.loading = false });
   },
   components: {
-    FullLoading
+    FullLoading,
+    Toast
   }
 };
 </script>

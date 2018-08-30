@@ -1,57 +1,56 @@
 <template>
   <div class="logout">
-      <qiniu
-        ref="qiniu"
-        style="visibility: hidden;position: absolute;"
-        :token="token"
-        :uploadUrl="uploadUrl"></qiniu>
-      <div class="header">
-        <img src="../../assets/imgs/dailixinxi@2x.png" alt="">
-        申请升级
+    <qiniu
+      ref="qiniu"
+      style="visibility: hidden;position: absolute;"
+      :token="token"
+      :uploadUrl="uploadUrl"></qiniu>
+    <div class="header">
+      <img src="../../assets/imgs/dailixinxi@2x.png" alt="">
+      申请升级
+    </div>
+    <div class="content">
+      <p>姓名：{{userInfo.realName}}</p>
+      <p>微信号：{{userInfo.wxId}}</p>
+      <p>手机号：{{userInfo.mobile}}</p>
+      <p>打款金额：<input type="text" v-model="padAmount" :placeholder="plh"></p>
+      <p>等级：{{userInfo.level}}</p>
+      <div class="area">
+        <span>升级等级</span> <button  @click="chooseLevel" :value='level'>{{level || btntext}}</button>
+        <ul :class="[panelLevelShow ? 'show' : 'hidden']" @click="selectLevel($event)">
+          <li v-for="item in levelList" v-if="item.level != 6" :level="item.level" @click="chooseLevel(item.isRealName, item.minCharge, item.reNumber)">{{item.name}}</li>
+        </ul>
       </div>
-      <div class="content">
-        <p>姓名：{{userInfo.realName}}</p>
-        <p>微信号：{{userInfo.wxId}}</p>
-        <p>手机号：{{userInfo.mobile}}</p>
-        <p v-show="!free">打款金额：<input type="text" v-model="padAmount" :placeholder="plh"></p>
-        <p>等级：{{userInfo.level}}</p>
-        <div class="area">
-            <span>升级等级</span> <button  @click="chooseLevel" :value='level'>{{level || btntext}}</button>
-            <ul :class="[panelLevelShow ? 'show' : 'hidden']" @click="selectLevel($event)">
-                <li v-for="item in levelList" v-if="item.level != 6" :level="item.level" @click="chooseLevel(item.isRealName, item.minCharge, item.reNumber)">{{item.name}}</li>
-            </ul>
+      <p v-show="isTeam">团队名称：<input type="text" v-model="myteamName"></p>
+      <p v-show="isIdentity">身份证号：<input type="text" v-model="identity"></p>
+      <div class="img" v-show="isIdentity">
+        <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
+        <p>上传手持身份证照片</p>
+        <input type="file" class="file" ref="fileInput" @change="identityFile(1,$event)" accept="image/*">
+        <div class="item" v-for="(photo,index) in identityPhotos">
+          <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
+          <img class="picture" ref="myIdentityImg" id="myIdentityImg" :src="getIdentitySrc(photo)">
         </div>
-        <p v-show="isTeam">团队名称：<input type="text" v-model="myteamName"></p>
-        <p v-show="isIdentity">身份证号：<input type="text" v-model="identity"></p>
-        <div class="img" v-show="isIdentity">
-            <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
-            <p>上传手持身份证照片</p>
-            <input type="file" class="file" ref="fileInput" @change="identityFile(1,$event)" accept="image/*">
-            <div class="item" v-for="(photo,index) in identityPhotos">
-                <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
-                <img class="picture" ref="myIdentityImg" id="myIdentityImg" :src="getIdentitySrc(photo)">
-            </div>
-        </div>
-        <div class="img">
-            <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
-            <p>上传打款图片（如有多张，请合并上传）</p>
-            <input type="file" class="file" ref="fileInput" @change="fileChange(1,$event)" accept="image/*">
-            <div class="item" v-for="(photo,index) in photos" ref="photoItem" @click="choseItem(index)">
-                <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
-                <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
-            </div>
-        </div>
-
       </div>
-      <div class="footer">
-        <span @click="upgradeApplica1">提交申请</span>
+      <div class="img">
+        <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
+        <p>上传打款图片（如有多张，请合并上传）</p>
+        <input type="file" class="file" ref="fileInput" @change="fileChange(1,$event)" accept="image/*">
+        <div class="item" v-for="(photo,index) in photos" ref="photoItem" @click="choseItem(index)">
+          <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
+          <img class="picture" ref="myImg" id="myImg" :src="getSrc(photo)">
+        </div>
       </div>
-      <toast ref="mytoast" :text="text"></toast>
+    </div>
+    <div class="footer">
+      <span @click="upgradeApplica1">提交申请</span>
+    </div>
+    <toast ref="mytoast" :text="text"></toast>
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
 import {
-  userExit,
   getLevel,
   getAccount,
   getAllLevel,
@@ -59,6 +58,7 @@ import {
 } from "api/baohuo";
 import { getUser } from "api/user";
 import toast from "base/toast/toast";
+import FullLoading from 'base/full-loading/full-loading';
 import Qiniu from "base/qiniu/qiniu";
 import Toast from "base/toast/toast";
 import Loading from "base/loading/loading";
@@ -71,6 +71,8 @@ export default {
   name: "upgrade",
   data() {
     return {
+      loading: false,
+      title: '正在加载...',
       padAmount: "",
       panelLevelShow: false,
       levelList: [],
@@ -105,7 +107,6 @@ export default {
       myRealName: -1,
       realName: false,
       reNumber: null,
-      free: false,
       plh: ''
     };
   },
@@ -145,8 +146,9 @@ export default {
       }
       this.padAmount = formatAmount(minCharge);
       if(this.reNumber >= reNumber) {
+        this.plh = '您符合半门槛要求，可免费升级';
+        this.padAmount = null;
         this.free = true;
-        this.plh = '您已符合半门槛推荐要求，可免费升级';
       } else {
         this.plh = '';
       }
@@ -175,22 +177,19 @@ export default {
       options.payPdf = this.photos[0].key;
       options.idNo = this.identity;
       this.levelList.map((item) => {
-        if(options.highLevel == item.level && options.padAmount < item.minCharge) {
+        if(options.highLevel == item.level && options.padAmount < item.minCharge && !this.free) {
           this.text =  `该等级打款不得低于${formatAmount(item.minCharge)}元`;
           this.$refs.mytoast.show();
           flag = false;
         }
       });
-      if(this.free) {
-        options.padAmount = 0;
-      } else {
-        options.padAmount = this.padAmount * 1000;
-      }
       if(this.isIdentity) {
         options.idHand = this.identityPhotos[0].key;
       }
       if(flag) {
+        this.loading = true;
         upgradeApplica(options).then(res => {
+          this.loading = false;
           if (res.isSuccess) {
             this.text = '申请成功，待上级审核';
             this.$refs.mytoast.show();
@@ -366,7 +365,6 @@ export default {
           break;
         }
       }
-      // console.log(this.photos)
     },
     upIdentityPhotos(item){
       this.identityPhotos.push(item);
@@ -414,6 +412,7 @@ export default {
     }
   },
   mounted() {
+    this.loading = true;
     Promise.all([
       getUser(),
       getLevel(),
@@ -421,6 +420,7 @@ export default {
       getAccount(),
       getQiniuToken()
     ]).then(([res1, res2, res3, res4, res5]) => {
+      this.loading = false;
       this.mylevel = res1.level;
       this.reNumber = res1.reNumber;
       res2.map((item) => {
@@ -433,13 +433,13 @@ export default {
       this.levelList = res3.list.filter(item => {
         return item.level < this.mylevel;
       });
-      if(!this.levelList.length) {
-        this.text = '您已是最高等级代理，无法升级';
-        this.$refs.mytoast.show();
-        setTimeout(() => {
-          this.$router.back();
-        }, 1000)
-      }
+      // if(!this.levelList.length) {
+      //   this.text = '您已是最高等级代理，无法升级';
+      //   this.$refs.mytoast.show();
+      //   setTimeout(() => {
+      //     this.$router.back();
+      //   }, 1000)
+      // }
       this.account = res4.amount;
       this.token = res5.uploadToken;
     })
@@ -448,7 +448,8 @@ export default {
     Qiniu,
     Toast,
     Loading,
-    PhotoEdit
+    PhotoEdit,
+    FullLoading
   },
 };
 </script>
@@ -480,9 +481,10 @@ export default {
     overflow: hidden;
     border-bottom: 1px solid #eee;
     input {
-      border: 0.01rem solid  rgb(145, 135, 135);
       padding: 0.08rem 0.15rem;
-      border-radius: 0.05rem;
+      border-radius: 0.1rem;
+      border: 1px solid #ccc;
+      width: 4rem;
     }
     .img {
       margin-top: 0.4rem;

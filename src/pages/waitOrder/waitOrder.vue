@@ -50,7 +50,7 @@
   import SendModal from 'components/send-modal/send-modal';
   import ConfirmInput from 'base/confirm-input/confirm-input';
   import { queryOrderForm1, receiveNromalOrder, fahuo, checkCancel } from "api/baohuo";
-  import { formatDate, formatImg, getUserId } from "common/js/util";
+  import { formatDate, formatImg, formatAmount, getUserId } from "common/js/util";
   import { getUser, getUserById } from "api/user";
   import { getDictList } from 'api/general';
   export default {
@@ -80,6 +80,9 @@
       };
     },
     methods: {
+      formatAmount(amount) {
+        return formatAmount(amount);
+      },
       changeHeight(index) {
         this.heightActive = this.heightActive === index ? '' : index;
       },
@@ -157,7 +160,6 @@
       },
       selectCategory(index) {
         this.index = index;
-        console.log(index);
         this.currentIndex = index;
         this.check();
       },

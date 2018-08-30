@@ -148,7 +148,6 @@ export default {
       this.levelList = res.list.filter(l => {
         return l.level != '6' && l.level >= level;
       });
-      console.log(this.levelList);
       this.options.applyLevel = this.levelList[0].level;
       this.level = this.levelList[0].name;
 

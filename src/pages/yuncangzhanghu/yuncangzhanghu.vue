@@ -3,7 +3,7 @@
     <div class="header">
       <div class="header-top">
         <p class="now-balance">当前余额 （元）</p>
-        <p class="money-balance">{{account / 1000}}</p>
+        <p class="money-balance">{{formatAmount(account)}}</p>
       </div>
       <div class="header-bottom">
         <div class="header-bottom-left fl" @click="$router.push('/woyaochuhuo')">
@@ -11,7 +11,7 @@
           <span>我要出货</span>
           <i class="line"></i>
         </div>
-        <div class="header-bottom-right fl" @click="$router.push('/woyaozhihuan')">
+        <div class="header-bottom-right fl" @click="$router.push('/woyaozhihuan?clear=1')">
           <img src="../../assets/threshold/goumaiyuncang.png" alt="">
           <span>我要置换</span>
         </div>
@@ -36,7 +36,7 @@ import {
   getCloudList,
   productDetail
 } from "api/baohuo";
-import { formatDate, formatImg } from "common/js/util";
+import { formatDate, formatImg, formatAmount } from "common/js/util";
 import { setCookie, getCookie } from "common/js/cookie.js";
 export default {
   name: "threshold",
@@ -50,6 +50,9 @@ export default {
     };
   },
   methods: {
+    formatAmount(amount) {
+      return formatAmount(amount);
+    },
     formatImg(pic) {
       return formatImg(pic);
     }

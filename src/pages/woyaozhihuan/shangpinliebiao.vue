@@ -10,8 +10,9 @@
       <img :src="item.pic">
       <div class="content">
         <p>{{item.name}}</p>
-        <i>￥{{item.specsList[0].priceList[0].price / 1000}}</i>
-        <span>1{{item.specsList[0].name}}</span>
+        <div v-for="v in item.specsList">
+          <p>￥{{v.priceList[0].changePrice / 1000}}/{{v.name}}</p>
+        </div>
       </div>
     </div>
     <div v-if="flag == 2" class="item" v-for="(item,index) in list" @click="choose(item.code,index)">
@@ -104,7 +105,7 @@ export default {
             // })
           });
           this.list = res.list;
-        })
+        }).catch(() => { this.loading = false })
       }
     },
   components: {
