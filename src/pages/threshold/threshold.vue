@@ -89,7 +89,7 @@ export default {
         });
         this.list = res.list
       })
-    })
+    }).catch(() => { this.loading = false })
   },
   computed:{
     // 判断引入收入支出图片

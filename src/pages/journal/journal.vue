@@ -34,7 +34,7 @@ export default {
     this.name = this.$route.query.name;
     let userId = this.$route.query.id;
     Promise.all([
-      getDictList(),
+      getDictList('agnecy_log_type'),
       getTrack(userId)
     ]).then(([res1, res2]) => {
       let arr = {};

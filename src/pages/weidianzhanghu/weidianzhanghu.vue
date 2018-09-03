@@ -1,40 +1,42 @@
 <template>
   <div class="threshold">
-      <div class="header">
-          <div class="header-top">
-              <p class="now-balance">当前余额 （元）</p>
-              <p class="money-balance">{{formatAmount(account)}}</p>
-          </div>
-          <div class="header-bottom">
-              <div class="header-bottom-left fl" @click="$router.push('/weidianzhanghu/quxianWeiDian?accountNumber=' + accountNumber)">
-                  <img src="../../assets/threshold/chongzhi.png" alt="">
-                  <span>取现</span>
-                  <i class="line"></i>
-              </div>
-              <div class="header-bottom-right fl" @click="$router.push('/weidianzhanghu/zrmkWeiDian?accountNumber=' + accountNumber)">
-                  <img src="../../assets/threshold/goumaiyuncang.png" alt="">
-                  <span>转入门槛</span>
-              </div>
-          </div>
+    <div class="header">
+      <div class="header-top">
+        <p class="now-balance">当前余额 （元）</p>
+        <p class="money-balance">{{formatAmount(account)}}</p>
       </div>
-      <div class="content">
-          <div class="item" v-for="item in list">
-              <div class="center">
-              <div class="item-time">
-                  <p class="day">{{item.day}}日</p>
-                  <p class="minute">{{item.hour}}:{{item.minutes}}</p>
-              </div>
-              <img :src="item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
-              <div class="detail">
-                  <p class="datail-money">{{formatAmount(item.transAmount)}}</p>
-                  <p class="detail-text">{{item.remark}}</p>
-              </div>
-              </div>
-          </div>
+      <div class="header-bottom">
+        <div class="header-bottom-left fl" @click="$router.push('/weidianzhanghu/quxianWeiDian?accountNumber=' + accountNumber)">
+          <img src="../../assets/threshold/chongzhi.png" alt="">
+          <span>取现</span>
+          <i class="line"></i>
+        </div>
+        <div class="header-bottom-right fl" @click="$router.push('/weidianzhanghu/zrmkWeiDian?accountNumber=' + accountNumber)">
+          <img src="../../assets/threshold/goumaiyuncang.png" alt="">
+          <span>转入门槛</span>
+        </div>
       </div>
+    </div>
+    <div class="content">
+      <div class="item" v-for="item in list">
+        <div class="center">
+        <div class="item-time">
+          <p class="day">{{item.day}}日</p>
+          <p class="minute">{{item.hour}}:{{item.minutes}}</p>
+        </div>
+        <img :src="item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
+        <div class="detail">
+          <p class="datail-money">{{formatAmount(item.transAmount)}}</p>
+          <p class="detail-text">{{item.remark}}</p>
+        </div>
+        </div>
+      </div>
+    </div>
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
+import FullLoading from 'base/full-loading/full-loading';
 import { queryBill, getCaccount } from "api/baohuo";
 import { setCookie, getCookie } from "common/js/cookie";
 import { formatDate, formatAmount } from "common/js/util";
@@ -42,6 +44,8 @@ export default {
   name: "yejizhanghu",
   data() {
     return {
+      loading: false,
+      title: '正在加载...',
       list: [],
       account: 0,
       accountNumber: ""
@@ -54,6 +58,7 @@ export default {
   },
   mounted() {
     //获取用户C端账户
+    this.loading = true;
     getCaccount({
       currency: 'C_CNY'
     }).then(res => {
@@ -61,6 +66,7 @@ export default {
       this.account = res[0].amount;
       //查询业绩账户流水
       queryBill(res[0].accountNumber).then(res => {
+        this.loading = false;
         res.list.map(function(item) {
           //格式化日期时间
           let date = new Date(item.createDatetime);
@@ -76,7 +82,7 @@ export default {
         });
         this.list = res.list;
       });
-    });
+    }).catch(() => { this.loading = false });
   },
   computed: {
     // 判断引入收入支出图片
@@ -87,6 +93,9 @@ export default {
           : require("../../assets/threshold/zhi.png");
       });
     }
+  },
+  components: {
+    FullLoading
   }
 };
 </script>

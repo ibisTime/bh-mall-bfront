@@ -136,7 +136,7 @@ export default {
   mounted(){
     Promise.all([
       getDictList('agent_status'),
-      getMySub()
+      getMySub(['8','12','13','14'])
     ]).then(([res1, res2]) => {
       let temp = {};
       res1.map((item) => {

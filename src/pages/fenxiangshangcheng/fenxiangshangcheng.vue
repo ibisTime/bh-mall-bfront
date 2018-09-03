@@ -3,7 +3,7 @@
         <div class="container">
             <div class="top">
                 <p class="saoyisao">扫一扫</p>
-                <p class="title">进入{{nickname}}的商城</p>
+                <p class="title">进入{{realName}}的商城</p>
             </div>
             <div class="center">
                 <div class="erweimaPic" id="qrcode"></div>
@@ -24,9 +24,9 @@ import Logo from './logo.png';
 export default {
     data() {
         return {
-            wxUrl:'http://front.bhxt.hichengdai.com/xcx/?userId=',
-            userId:'',
-            nickname:''
+          wxUrl:'http://front.bhxt.hichengdai.com/xcx/?userId=',
+          userId:'',
+          realName:''
         };
     },
     mounted(){
@@ -38,7 +38,7 @@ export default {
         this.userId = this.$route.query.userReferee || getCookie('userId');
         this.wxUrl += this.userId;
         getUserById(this.userId).then(res =>{
-            this.nickname = res.nickname;
+            this.realName = res.realName;
             this.initShare();
         });
         //用插件生成二维码
@@ -57,8 +57,8 @@ export default {
       // 初始化分享
       initShare() {
         initShare({
-          title: this.nickname + '的商城',
-          desc: '扫一扫，进入' + this.nickname + '的商城',
+          title: this.realName + '的商城',
+          desc: '扫一扫，进入' + this.realName + '的商城',
           link: location.href,
           imgUrl: Logo
         });

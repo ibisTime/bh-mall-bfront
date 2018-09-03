@@ -188,6 +188,7 @@ export default {
       }
       if(flag) {
         this.loading = true;
+        console.log('2', options.teamName);
         upgradeApplica(options).then(res => {
           this.loading = false;
           if (res.isSuccess) {
@@ -198,7 +199,7 @@ export default {
             }, 500);
           }
           res.isReset && alert(res.isReset);
-        });
+        }).catch(() => { this.loading = false });
       }
     },
     choseItem(index) {
@@ -421,6 +422,8 @@ export default {
       getQiniuToken()
     ]).then(([res1, res2, res3, res4, res5]) => {
       this.loading = false;
+      console.log('1', res1.teamName);
+      this.myteamName = res1.teamName;
       this.mylevel = res1.level;
       this.reNumber = res1.reNumber;
       res2.map((item) => {

@@ -25,6 +25,10 @@
                 <div class="inner-cont" style="padding-top: 0.1rem;">
                   <p style="line-height: 0.4rem;">规格：{{item.quantity}}{{item.specsName}}</p>
                   <div class="total">总价：¥{{formatAmount(item.amount)}}</div>
+                  <!--<div class="total yunfei" v-show="item.yunfei">运费：¥{{formatAmount(item.yunfei)}}</div>-->
+                </div>
+                <div class="inner-cont" style="padding-top: 0.1rem;">
+                  <div class="total yunfei">运费：¥{{formatAmount(item.yunfei)}}</div>
                 </div>
                 <div class="btn-wrap">
                   <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3' || item.status == '4'">查看物流</div>
@@ -221,13 +225,18 @@ export default {
         color: $primary-color;
         transform: rotateZ(90deg);
       }
+      .status {
+        float: right;
+        color: #72a52c;
+        font-size: 0.24rem;
+      }
     }
     .pic {
       display: flex;
-      padding: 0.2rem 0.3rem;
+      padding: 0.4rem 0.3rem;
+      border-bottom: 1px solid #eee;
       background-color: #fff;
       overflow: hidden;
-      border-bottom: 1px solid #eee;
       img {
         flex: 0 0 1.8rem;
         width: 1.8rem;
@@ -242,6 +251,11 @@ export default {
         padding-left: 0.2rem;
         .inner-cont {
           display: flex;
+          .yunfei {
+            float: right;
+            position: absolute;
+            right: 0;
+          }
         }
         p {
           flex: 1;

@@ -21,6 +21,9 @@
                  <div class="guige">包装：{{guige}}</div>
                 <i>￥{{formatAmount(price)}}</i>
                 <span>X{{number}}</span>
+              <div v-show="payType !== '1' && payType !== '2' && payType !== '3'" class="yunfei">
+                <span>运费：{{formatAmount(freight)}}</span>
+              </div>
             </div>
         </div>
         <div class="word">
@@ -59,7 +62,8 @@ import {
   palceOrder,
   shopBill,
   payment,
-  neigouProductDetail
+  neigouProductDetail,
+  queryYunfei
 } from "api/baohuo";
 import { setCookie, getCookie } from "common/js/cookie";
 import { queryConfig, queryAmount, thingDrtail, orderDetail, cloudPayment, outOrderDetail, payOutOrder } from "api/baohuo";
@@ -81,7 +85,8 @@ export default {
       guige: '',
       num: 0,
       price: 0,
-      payType: ''
+      payType: '',
+      freight: 0    // 运费
     };
   },
   methods: {
@@ -103,6 +108,25 @@ export default {
     },
     cancel() {
       this.loading = false;
+    },
+    queryYunfei() {
+      // debugger;
+      console.log(this.thingInfo);
+      // console.log(this.list[this.proIdx]);
+      if(!this.address) {
+        return;
+      }
+      this.loading = true;
+      queryYunfei({
+        productCode: this.thingInfo.code,
+        specsCode: this.specsCode,
+        quantity: this.number,
+        province: this.address.province,
+        kind: 1
+      }).then((res) => {
+        this.loading = false;
+        this.freight = res.yunfei;
+      }).catch(() => { this.loading = false })
     },
     buy() {
       if(this.payType === '2') {
@@ -167,9 +191,7 @@ export default {
           quantity: this.number,
           applyNote: this.applyNote
         };
-        alert(3);
         palceOrder(options).then(res => {
-          alert(2);
           let codeList = res;
           payment(codeList, this.status).then(res => {
             if (res.isSuccess && this.status === 0) {
@@ -196,50 +218,6 @@ export default {
     }
   },
   mounted() {
-    //获取用户等级
-    // let level = getCookie("level");
-
-    //获取用户订单详情
-    // this.options = JSON.parse(getCookie('options'))
-    // console.log(this.options)
-
-    //查询详情地址
-
-    // if (!this.$route.query.number && this.$route.query.code) {
-    //   this.number = getCookie("neigoushuliang");
-    //   neigouProductDetail(getCookie("shangpincode")).then(item => {
-    //     item.pic = formatImg(item.pic);
-    //     this.thingInfo = item;
-    //   });
-    //   queryDefaultAddress().then(res => {
-    //     this.address = res[0];
-    //   });
-    // } else if (this.$route.query.pay === "1") {
-    //   let code = this.$route.query.code;
-    //
-    //   thingDrtail(code).then(item => {
-    //     item.pic = formatImg(item.pic);
-    //     this.thingInfo = item;
-    //   });
-    //   queryDefaultAddress().then(res => {
-    //     this.address = res[0];
-    //   });
-    // } else {
-    //   let code = this.$route.query.code;
-    //   this.code = code;
-    //
-    //   let number = this.$route.query.number;
-    //   this.number = number;
-    //   setCookie("neigoushuliang", this.number);
-    //   setCookie("shangpincode", this.code);
-    //   neigouProductDetail(code).then(item => {
-    //     item.pic = formatImg(item.pic);
-    //     this.thingInfo = item;
-    //   });
-    //   queryDefaultAddress().then(res => {
-    //     this.address = res[0];
-    //   });
-    // }
     this.payType = this.$route.query.pay;
     if (this.payType === "1") {
       // 内购订单付款
@@ -285,10 +263,14 @@ export default {
       this.number = this.$route.query.number;
       this.num = this.$route.query.num;   // 规格索引
       neigouProductDetail(code).then(res => {
+        queryDefaultAddress().then(res => {
+          this.address = res[0];
+          this.queryYunfei();
+        });
         res.pic = formatImg(res.pic);
         this.thingInfo = res;
         this.guige = this.thingInfo.specsList[this.num].name;
-        this.price = this.thingInfo.specsList[this.num].price
+        this.price = this.thingInfo.specsList[this.num].price;
       });
 
     }
@@ -361,7 +343,7 @@ export default {
         line-height: 0.4rem;
       }
       i {
-        position: absolute;
+        /*position: absolute;*/
         top: 1.15rem;
         left: 0;
         font-size: $font-size-small;
@@ -370,7 +352,7 @@ export default {
       span {
         width: 1.2rem;
         line-height: 0.5rem;
-        position: absolute;
+        /*position: absolute;*/
         top: 1rem;
         right: 0;
         font-size: $font-size-small;
@@ -462,6 +444,12 @@ export default {
       color: #fff;
       font-size: $font-size-medium-x;
     }
+  }
+  .yunfei {
+    height: 0.3rem;
+    line-height: 0.3rem;
+    font-size: 0.28rem;
+    text-align: right;
   }
 }
 </style>

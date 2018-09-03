@@ -87,7 +87,17 @@ export default {
             this.tipshow = !this.tipshow
         },
         chooseKind(kind) {
-            this.kind = kind
+          this.kind = kind;
+          let options = {};
+          options.bizType = this.bizType;
+          options.kind = this.kind;
+          award(options).then(res => {
+            res.list.map(function(item) {
+              //格式化时间
+              item.createDatetime = formatDate(item.createDatetime);
+            });
+            this.list = res.list;
+          });
         },
         updateDate (year, month, day) {
             this.year = year;

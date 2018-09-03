@@ -81,7 +81,7 @@ export default {
       getMysub() {
         getKeywordSub({
           keyword: this.inputText,
-          status: '8'
+          statusList: ['8','12','13','14']
         }).then(res => {
           res.list.map(function(item){
             //格式化时间

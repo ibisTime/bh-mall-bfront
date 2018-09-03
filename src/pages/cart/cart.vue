@@ -84,14 +84,14 @@ export default {
     },
     // 获取购物车列表
     getPageCart() {
+      this.loading = true;
       getCartList().then((data) => {
         this.loading = false;
         this.list = data.list;
-      });
+      }).catch(() => { this.loading = false });
     },
     // 数量修改
     inputChange(quantity, code) {
-      console.log(quantity);
       quantity = Math.max(quantity, 1);
       let index = this.list.findIndex(d => d.code === code);
       let item = this.list[index];

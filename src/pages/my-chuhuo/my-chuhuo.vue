@@ -6,28 +6,44 @@
         <p class="money-balance">{{ formatAmount(allAmount) }}</p>
       </div>
     </div>
-    <div class="item clearfix" v-for="(item,index) in list">
-      <div class="top clearfix">
-        <span class="user">提交人：{{item.realName || item.nickName}}</span>
-        <span class="status">{{status[item.status]}}</span>
-      </div>
-      <div class="info" :class="{ active: heightActive === index }" ref="divInfo">
-        <div class="downward" @click="changeHeight(index)">></div>
-        <p>订单编号：{{item.code}}</p>
-        <p>订单类型：{{item.kind}}</p>
-        <p>下单时间：{{item.applyDatetime}}</p>
-        <p>收货人：{{item.signer}}（{{item.mobile}}）</p>
-        <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
-      </div>
-      <div class="pic">
-        <img :src="formatImg(item.pic)" alt="">
-        <div class="content">
-          <p>{{item.productName}}</p>
-          <p style="padding-top:0.1rem;">{{item.productSpecsName}}</p>
-          <i>￥{{formatAmount(item.price)}}</i>
-          <span>{{item.quantity}}{{item.productSpecsName}}</span><span class="status">{{item.kind == '2' ? '购买云仓' : '云仓提货'}}</span>
+    <div class="orders-content">
+      <scroll :data="list"
+              :hasMore="hasMore"
+              @pullingUp="getPageOrders">
+        <div class="item clearfix" v-for="(item,index) in list">
+          <div class="top clearfix">
+            <span class="user">提交人：{{item.realName || item.nickName}}</span>
+            <span class="status">{{status[item.status]}}</span>
+          </div>
+          <div class="info" :class="{ active: heightActive === index }" ref="divInfo">
+            <div class="downward" @click="changeHeight(index)">></div>
+            <p>订单编号：{{item.code}}</p>
+            <p>订单类型：{{type[item.kind]}}</p>
+            <p>下单时间：{{formatDate(item.applyDatetime)}}</p>
+            <p>收货人：{{item.signer}}（{{item.mobile}}）</p>
+            <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
+          </div>
+          <div class="pic">
+            <img :src="formatImg(item.pic)" alt="">
+            <div class="content">
+              <div class="inner-cont">
+                <p>{{item.productName}}</p>
+                <i>￥{{formatAmount(item.price)}}</i>
+              </div>
+              <div class="inner-cont" style="padding-top: 0.1rem;">
+                <p style="line-height: 0.4rem;">规格：{{item.quantity}}{{item.specsName}}</p>
+                <div class="total">总价：¥{{formatAmount(item.amount)}}</div>
+              </div>
+              <div class="btn-wrap">
+                <div class="quxiao" @click="cancel(item.code)" v-if="item.status == '0' || item.status == '1'">取消</div>
+                <div class="fukuan" @click="goPay(item.code)" v-if="item.status == '0'">付款</div>
+                <div class="shouhuo" @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
+                <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3' || item.status == '4'">物流信息</div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </scroll>
     </div>
     <toast ref="toast" :text="toastText"></toast>
     <full-loading :title="title" v-show="loading"></full-loading>
@@ -35,6 +51,7 @@
 </template>
 <script>
   import Toast from 'base/toast/toast';
+  import Scroll from 'base/scroll/scroll';
   import FullLoading from 'base/full-loading/full-loading';
   import { myChuHuo, receiveNromalOrder,cencelChuHuoOrder} from "api/baohuo";
   import { formatDate, formatImg, formatAmount } from "common/js/util";
@@ -45,11 +62,15 @@
       return {
         loading: false,
         title: '正在加载...',
+        start: 1,
+        limit: 10,
+        hasMore: true,
         index: "",
         list: [],
         hightShow: false,
         num: "",
         status: {},
+        type: {},
         heightActive: '',
         toastText: '',
         allAmount: 0
@@ -59,40 +80,58 @@
       formatAmount(amount) {
         return formatAmount(amount);
       },
+      formatDate(date) {
+        return formatDate(date);
+      },
       changeHeight(index) {
         this.heightActive = this.heightActive === index ? '' : index;
       },
       formatImg(img) {
         return formatImg(img);
       },
-      check() {
+      getPageOrders() {
         // 请求订单
         this.loading = true;
         Promise.all([
           myChuHuo({
+            start: this.start,
+            limit: this.limit,
             statusList: [],
             userId: this.userId
           }),
-          getDictList('out_order_status')
-        ]).then(([res1, res2]) => {
+          getDictList('out_order_status'),
+          getDictList('out_order_type')
+        ]).then(([res1, res2, res3]) => {
           this.loading = false;
+          if (res1.page.length < this.limit || res1.totalCount <= this.limit) {
+            this.hasMore = false;
+          }
           this.allAmount = res1.allAmount;
           res1.page.forEach(() => {
             res1.applyDatetime = formatDate(res1.applyDatetime);
           });
-          this.list = res1.page;
+          this.list = this.list.concat(res1.page);
+          this.start++;
           res2.map((item) => {
             this.status[item.dkey] = item.dvalue;
           });
-        });
-      }
+          res3.map((item) => {
+            this.type[item.dkey] = item.dvalue;
+          });
+          console.log(this.type);
+        }).catch(() => { this.loading = false });
+      },
+      // getPageOrders() {
+      //
+      // }
     },
     mounted() {
       this.userId = this.$route.query.userId;
-      this.check();
+      this.getPageOrders();
     },
     components: {
       Toast,
+      Scroll,
       FullLoading
     }
   };
@@ -186,43 +225,53 @@
           height: 1.8rem;
         }
         .content {
-          margin-left: 2rem;
           position: relative;
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          justify-content: space-between;
+          padding-left: 0.2rem;
+          .inner-cont {
+            display: flex;
+          }
           p {
+            flex: 1;
+            line-height: 1.2;
             font-size: $font-size-medium-s;
             color: #333;
-            line-height: 0.4rem;
           }
           i {
-            position: absolute;
-            top: 1.15rem;
-            left: 0;
             font-size: $font-size-small;
             color: $primary-color;
           }
           span {
-            width: 1.2rem;
-            line-height: 0.5rem;
-            position: absolute;
-            top: 0;
-            right: 0;
+            width: 2.2rem;
+            line-height: 0.4rem;
             font-size: $font-size-small;
             border-radius: 0.1rem;
             color: #333;
             text-align: right;
             &.status {
-              top: 0.5rem;
               color: #72a52c;
+            }
+          }
+          .btn-wrap {
+            flex: 1;
+            padding-top: 0.3rem;
+            text-align: right;
+            div {
+              float: right;
             }
           }
         }
       }
       .total {
-        padding: 0.3rem;
-        border-bottom: 1px solid #eee;
-        font-size: $font-size-medium-s;
-        color: #333;
         text-align: right;
+        line-height: 0.4rem;
+        font-size: 0.24rem;
+        border: none;
+        text-align: right;
+        color: $primary-color !important;
         p + p {
           margin-top: 0.18rem;
         }

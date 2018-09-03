@@ -53,7 +53,7 @@ export default {
           this.text = '申请失败';
           this.$refs.mytoast.show()
         }
-      }).canch(() => { this.loading = false })
+      }).catch(() => { this.loading = false })
     }
   },
   components:{

@@ -38,9 +38,11 @@
               </div>
           </div>
       </div>
+    <full-loading :title="title" v-show="loading"></full-loading>
   </div>
 </template>
 <script>
+import FullLoading from 'base/full-loading/full-loading';
 import { getTrack, getLevel, getAllLevel, getBill, getStatistics } from 'api/baohuo'
 import { setCookie, getCookie } from 'common/js/cookie';
 import { formatDate, formatAmount, getUserId } from 'common/js/util';
@@ -49,6 +51,8 @@ export default {
   name: 'subAgent',
   data() {
       return{
+        loading: false,
+        title: '正在加载...',
         levelShow : false,
         selectText:'请选择等级',
         levelArr:[],
@@ -71,41 +75,46 @@ export default {
     //选择等级
     changeSelect(event) {
         this.selectText = event.target.innerText;
-        console.dir(event.target.getAttribute('level'))
-        var level = event.target.getAttribute('level')
-        this.getMysub(level);
+        console.log(event.target.getAttribute('level'));
+        this.level = event.target.getAttribute('level');
+        this.getMysub();
     },
     //根据我的下级查询我的下级
-    getMysub(level) {
-      console.log(level);
+    getMysub() {
+      console.log(this.level);
+      this.loading = true;
       getStatistics({
         keyword: this.inputText,
         referrer: getUserId(),
-        level: level
+        level: this.level
       }).then(res => {
         this.number = res.number;
-        res.list.map(function(item){
+        res.list.map((item) => {
             //格式化时间
             item.approveDatetime = formatDate(item.approveDatetime)
             //数字等级转化文字等级
             getLevel(item.level).then(res => {
+              this.loading = false;
                 item.level = res[0].name
-            });
+            }).catch(() => { this.loading = false });
             //查询用户余额
             getBill(item.userId).then(res => {
+              this.loading = false;
                 item.amount = res[0].amount
-            });
+            }).catch(() => { this.loading = false });
         });
         this.list = res.list;
-        });
+        }).catch(() => { this.loading = false });
     }
   },
   mounted(){
+    this.loading = true;
       getUser().then(res => {
           getAllLevel(res.level).then(res => {
-              this.levelArr = res.list
-          })
-      });
+            this.loading = false;
+            this.levelArr = res.list;
+          }).catch(() => { this.loading = false })
+      }).catch(() => { this.loading = false });
       this.getMysub();
       //获取全部等级
   },
@@ -124,6 +133,9 @@ export default {
               })
           })
       },
+  },
+  components: {
+    FullLoading
   }
 }
 </script>

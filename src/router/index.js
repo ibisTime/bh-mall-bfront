@@ -21,6 +21,7 @@ import buyCloud from '@/pages/buyCloud/buyCloud'
 import buyCloudDetail from '@/pages/buyCloud/buyCloudDetail'
 import tijiaodingdan from '@/pages/buyCloud/tijiaodingdan'
 import noWare from '@/pages/buyCloud/noWare'
+import chuhuoNoWare from '@/pages/chuhuoNoWare/chuhuoNoWare'
 import noWarePay from '@/pages/buyCloud/noWarePay'
 import acceptimg from '@/pages/acceptimg/acceptimg'
 import agentTrajectory from '@/pages/agentTrajectory/agentTrajectory'
@@ -102,6 +103,8 @@ import myIntroduction from '@/pages/my-introduction/my-introduction'
 import myRecommend from '@/pages/my-recommend/my-recommend'
 import myChuhuo from '@/pages/my-chuhuo/my-chuhuo'
 import profit from '@/pages/profit/profit'
+import noWare1 from '@/pages/noWare/noWare'
+import noWarePay1 from '@/pages/noWare/noWarePay'
 
 Vue.use(Router)
 
@@ -291,6 +294,12 @@ export default new Router({
           path: '/buyCloud/noWarePay',
           name: 'noWarePay',
           component: noWarePay
+      },
+      // 出货-无云仓
+      {
+        path: '/chuhuoNoWare',
+        name: 'chuhuoNoWare',
+        component: chuhuoNoWare
       },
       //取现订单
       {
@@ -552,6 +561,18 @@ export default new Router({
         path: '/profit',
         name: 'profit',
         component: profit
+      },
+      // 差价利润
+      {
+        path: '/noWare',
+        name: 'noWare',
+        component: noWare1
+      },
+      // 差价利润
+      {
+        path: '/noWare/noWarePay',
+        name: 'noWarePay',
+        component: noWarePay1
       },
     ]
 })

@@ -147,7 +147,7 @@ export default {
   mounted() {
     this.options.userId = this.$route.query.userId;
     this.options.userId && setCookie("userId", this.options.userId);
-    // this.options.userReferee = this.$route.query.userReferee;
+    this.options.userReferee = this.$route.query.userReferee;
     Promise.all([
       getUser(),
       getAllLevel1()

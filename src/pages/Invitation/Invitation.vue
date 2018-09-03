@@ -29,7 +29,7 @@
           <div class="erweima-top">
               <img src="../../assets/imgs/touxiangfang@2x.png" alt="">
               <div class="info">
-                  <h3>{{ nickname }}</h3>
+                  <h3>{{ realName }}</h3>
                   <p>代理品牌：麦记</p>
               </div>
           </div>
@@ -48,7 +48,7 @@
 import { inquireConfig, getStatistics } from "api/baohuo";
 import { initShare } from "common/js/weixin";
 import { getCookie } from "common/js/cookie";
-import { isLogin, formatAmount } from "common/js/util";
+import { isLogin, formatAmount, getUserId } from "common/js/util";
 import { getUser } from "api/user";
 const QRCode = require("js-qrcode");
 export default {
@@ -66,7 +66,7 @@ export default {
         link: location.href.split('#')[0],
         imgUrl: "http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg"
       },
-      nickname: "",
+      realName: '',
       status:'',
       number: 0,
       refreeAward: 0
@@ -93,6 +93,7 @@ export default {
     }
   },
   mounted() {
+    this.loading = true;
     this.status = getCookie('status');
     if (isLogin()) {
       let userReferee = getCookie("userId");
@@ -112,11 +113,14 @@ export default {
       });
       qr.make(this.wxUrl);
       getUser().then(res => {
-        this.nickname = res.nickname;
+        this.realName = res.realName;
       });
 
     }
-    getStatistics({}).then((res) => {
+    getStatistics({
+      introducer: getUserId()
+    }).then((res) => {
+      this.loading = false;
       this.number = res.number;
       this.refreeAward = res.refreeAward;
     })

@@ -4,8 +4,8 @@
       <img :src="item.pic" alt="">
       <div class="content">
         <p>{{item.name}}</p>
-        <p>价格：{{formatAmount(item.specsList[0].price)}}</p>
-        <p>数量：{{item.specsList[0].number}}</p>
+        <p>价格：{{formatAmount(item.specsList ? item.specsList[0].price : 0)}}</p>
+        <p>数量：{{item.specsList ? item.specsList[0].number : 0}}</p>
         <span @click="prodectDetail(item.code)">购买</span>
       </div>
     </div>
@@ -22,7 +22,7 @@
           <p>{{detail.name}}</p>
           <span>请选择</span>
           <i @click="genghuan">X</i>
-          <p>库存：{{detail.specsList[num].number}}</p>
+          <p><span>库存：{{detail.specsList ? detail.specsList[num].number : 0}}</span></p>
         </div>
       </div>
       <div class="packaging">
@@ -48,6 +48,7 @@
       </div>
     </div>
     <full-loading :title="title" v-show="loading"></full-loading>
+    <toast ref="toast" :text="text"></toast>
   </div>
 </template>
 <script>
@@ -56,13 +57,15 @@ import {
   cloudBill,
   palceOrder,
   shopBill,
-  neigouProduct
+  neigouProduct,
+  queryYunfei
 } from "api/baohuo";
 import { getUser, getUserById } from "api/user";
 import { formatImg, formatAmount } from "common/js/util";
 import { setCookie, getCookie } from "common/js/cookie";
 import NoResult from 'base/no-result/no-result';
 import FullLoading from 'base/full-loading/full-loading';
+import Toast from 'base/toast/toast';
 
 export default {
   data() {
@@ -79,7 +82,9 @@ export default {
       i: 0,
       num: 0,
       number: 1,
-      price: 0
+      price: 0,
+      freight: 0,   // 运费,
+      text: ''
     };
   },
   methods: {
@@ -108,7 +113,13 @@ export default {
 
     //选购产品数量+1
     add() {
-      this.number++;
+      if(this.number < this.detail.specsList[this.num].number) {
+        this.number++;
+        this.queryYunfei();
+      } else {
+        this.text = '已到达库存上限';
+        this.$refs.toast.show();
+      }
     },
 
     // 选购产品数量-1
@@ -141,6 +152,8 @@ export default {
         res.pic = formatImg(res.pic);
         self.detail = res;
         this.price = this.detail.specsList[0].price;
+        // debugger;
+        this.queryYunfei();
       });
     },
     //确认商品
@@ -167,7 +180,7 @@ export default {
         item.pic = formatImg(item.pic);
       });
       this.list = res.list;
-      res.list && neigouProductDetail(res.list[0].code).then(res => {
+      res.list.length && neigouProductDetail(res.list[0].code).then(res => {
         this.loading = false;
         res.pic = formatImg(res.pic);
         this.detail = res;
@@ -177,7 +190,8 @@ export default {
   },
   components: {
     NoResult,
-    FullLoading
+    FullLoading,
+    Toast
   }
 };
 </script>

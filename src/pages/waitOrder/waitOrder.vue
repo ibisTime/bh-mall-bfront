@@ -5,7 +5,7 @@
                      @select="selectCategory"></category-scroll>
     <div class="item clearfix" v-for="(item,index) in list">
       <div class="top clearfix">
-        <span class="user">提交人：{{item.realName || item.nickName}}（{{item.mobile}}）</span>
+        <span class="user">提交人：{{item.agent.realName || item.agent.nickName}}{{levelObj[item.agent.level]}}（{{item.agent.mobile}}）</span>
         <span class="status">{{status[item.status]}}</span>
       </div>
       <div class="info" :class="{ active: heightActive === index }" ref="divInfo">
@@ -24,7 +24,7 @@
             <i>￥{{formatAmount(item.price)}}</i>
           </div>
           <div class="inner-cont" style="padding-top: 0.1rem;">
-            <p style="line-height: 0.4rem;">规格：{{item.quantity}}{{item.productSpecsName}}</p>
+            <p style="line-height: 0.4rem;">规格：{{item.quantity}}{{item.specsName}}</p>
             <div class="total">总价：¥{{formatAmount(item.amount)}}</div>
           </div>
           <div class="btn-wrap">
@@ -49,7 +49,7 @@
   import Confirm from 'base/confirm/confirm';
   import SendModal from 'components/send-modal/send-modal';
   import ConfirmInput from 'base/confirm-input/confirm-input';
-  import { queryOrderForm1, receiveNromalOrder, fahuo, checkCancel } from "api/baohuo";
+  import { queryOrderForm1, receiveNromalOrder, fahuo, checkCancel, getLevel } from "api/baohuo";
   import { formatDate, formatImg, formatAmount, getUserId } from "common/js/util";
   import { getUser, getUserById } from "api/user";
   import { getDictList } from 'api/general';
@@ -70,13 +70,14 @@
         categorys: [
           {value: '全部',key: 'all'},
           {value: '待支付', key: '0'},
-          {value: '待发货', key: '1||2'},
+          {value: '待发货', key: '2'},
           {value: '待收货', key: '3'},
           {value: '已收货', key: '4'},
           {value: '申请取消', key: '5'}],
         confirmText: '确定取消订单吗',
         userId: '',
-        content: ''
+        content: '',
+        levelObj: {}
       };
     },
     methods: {
@@ -198,6 +199,11 @@
     },
     mounted() {
       this.check();
+      getLevel().then((res) => {
+        res.map((item) => {
+          this.levelObj[item.level] = item.name;
+        })
+      })
     },
     components: {
       Toast,
@@ -338,6 +344,14 @@
               color: #72a52c;
             }
           }
+          .btn-wrap {
+            flex: 1;
+            padding-top: 0.3rem;
+            text-align: right;
+            div {
+              float: right;
+            }
+          }
           .wuliu {
             font-size: 0.3rem;
             position: absolute;
@@ -383,6 +397,9 @@
         border: none;
         text-align: right;
         color: $primary-color !important;
+        p + p {
+          margin-top: 0.18rem;
+        }
       }
     }
   }

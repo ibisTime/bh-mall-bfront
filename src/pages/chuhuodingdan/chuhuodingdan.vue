@@ -32,6 +32,10 @@
               <div class="inner-cont" style="padding-top: 0.1rem;">
                 <p style="line-height: 0.4rem;">规格：{{item.quantity}}{{item.specsName}}</p>
                 <div class="total">总价：¥{{formatAmount(item.amount)}}</div>
+                <!--<div class="total" v-show="item.yunfei">运费：¥{{formatAmount(item.yunfei)}}</div>-->
+              </div>
+              <div class="inner-cont" style="padding-top: 0.1rem;">
+                <div class="total yunfei" v-show="item.yunfei">运费：¥{{formatAmount(item.yunfei)}}</div>
               </div>
               <div class="btn-wrap">
                 <div class="quxiao" @click="cancel(item.code)" v-if="item.status == '0' || item.status == '1'">取消</div>
@@ -102,14 +106,14 @@
       },
       check() {
         let key = this.categorys[this.index].key;
-        this.index = key === 'all' ? [] : [key];
+        let index = key === 'all' ? [] : [key];
         // 请求订单
         this.loading = true;
         Promise.all([
           queryOrderForm2({
             start: this.start,
             limit: this.limit,
-            statusList: this.index
+            statusList: index
           }),
           getDictList('out_order_status'),
           getDictList('out_order_type')
@@ -137,13 +141,13 @@
       },
       getPageOrders() {
         let key = this.categorys[this.index].key;
-        this.index = key === 'all' ? [] : [key];
+        let index = key === 'all' ? [] : [key];
         // 请求订单
         this.loading = true;
         queryOrderForm2({
           start: this.start,
           limit: this.limit,
-          statusList: this.index
+          statusList: index
         }).then((data) => {
           this.loading = false;
           if (data.list.length < this.limit || data.totalCount <= this.limit) {
@@ -151,7 +155,7 @@
           }
           this.list = this.list.concat(data.list);
           this.start++;
-        });
+        }).catch(() => { this.loading = false });
       },
       shouhuo(code) {
         receiveNromalOrder(code).then(res => {
@@ -314,6 +318,11 @@
 
           .inner-cont {
             display: flex;
+            .yunfei {
+              float: right;
+              position: absolute;
+              right: 0;
+            }
           }
           p {
             flex: 1;

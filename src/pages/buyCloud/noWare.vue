@@ -47,6 +47,7 @@
             <p>产品名称：{{detail.name}}</p>
             <span>请选择</span>
             <i @click="close">X</i>
+            <p><span>运费：{{freight}}</span></p>
           </div>
         </div>
         <div class="packaging">
@@ -83,7 +84,8 @@ import {
   queryDefaultAddress,
   getCloudDetail,
   shopBill,
-  checkRed
+  checkRed,
+  queryYunfei
 } from "api/baohuo";
 import { formatImg, formatAmount, getUserId } from "common/js/util";
 import { setCookie } from "../../common/js/cookie";
@@ -117,7 +119,9 @@ export default {
       loading: true,
       start: 1,
       limit: 10,
-      hasMore: true
+      hasMore: true,
+      freight: 0,   // 运费,
+      proIdx: 0
     };
   },
   methods: {
@@ -154,6 +158,7 @@ export default {
     //选购产品数量+1
     add() {
       this.number++;
+      this.queryYunfei();
       this.prodNum[this.curIndex] = this.number;
     },
     // 选购产品数量-1
@@ -171,9 +176,11 @@ export default {
         } else if (res.result == "0") {
           this.redirectPage(`您需要再购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
         } else if (res.result == '1') {
-          this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的授权单`, '/woyaochuhuo');
+          this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的授权单`, res.isWare === '1' ? '/woyaochuhuo' : '/noWare');
+          // this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的授权单`, '/woyaochuhuo');
         } else if (res.result == '2') {
-          this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的升级单`, '/woyaochuhuo');
+          this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的升级单`, res.isWare === '1' ? '/woyaochuhuo' : '/noWare');
+          // this.redirectPage(`您需要先购买${formatAmount(res.amount)}元的升级单`, '/woyaochuhuo');
         } else if (res.result == '3') {
           this.redirectPage(`您的门槛余额已经高于${formatAmount(res.minAmount)}元，请前去购买云仓`, '/threshold');
         } else {
@@ -210,22 +217,25 @@ export default {
           //   specsName: this.specsList[this.curIndex].name,
           //   pic: this.list
           // });
-          this.text = '提货成功！';
+          this.text = '购买成功！';
           this.$refs.toast.show();
           this.$router.push('/buyCloud/noWarePay?code=' + res);
           // this.checkUser(getUserId());
         } else {
-          this.text = '提货失败！';
+          this.text = '购买失败！';
           this.$refs.toast.show();
         }
       }).catch(() => this.loading = false);
     },
     prodectDetail(code, index) {
       this.genghuan(index);
+      this.proIdx = index;
+      this.queryYunfei();
     },
     chooseSize(index) {
       this.num = index;
       this.specsList[this.curIndex] = this.detail.specsList[index];
+      this.queryYunfei();
     },
     getPageProducts() {
       this.loading = true;
@@ -258,7 +268,24 @@ export default {
         }
         this.start++;
       })
-    }
+    },
+    queryYunfei() {
+      // console.log(this.list[this.proIdx]);
+      if(!this.address) {
+        return;
+      }
+      this.loading = true;
+      queryYunfei({
+        productCode: this.list[this.proIdx].code,
+        specsCode: this.specsList[this.curIndex].code,
+        quantity: this.number,
+        province: this.address.province,
+        kind: 0
+      }).then((res) => {
+        this.loading = false;
+        this.freight = res.yunfei;
+      }).catch(() => { this.loading = false })
+    },
   },
   mounted() {
     Promise.all([

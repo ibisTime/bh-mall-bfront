@@ -161,10 +161,12 @@ export default {
           this.redirectPage(`您需要先购买${formatAmount(res.redAmount)}元的云仓`, '/threshold');
         } else if (res.result == '1') {
           this.confirmBtnText = '我要出货';
-          this.redirectPage(`购买云仓已完成，${levelInfo[0].name}授权单${formatAmount(res.amount)}元`, '/woyaochuhuo');
+          this.redirectPage(`购买云仓已完成，${levelInfo[0].name}授权单${formatAmount(res.amount)}元`, res.isWare === '1' ? '/woyaochuhuo' : '/noWare');
+          // this.redirectPage(`购买云仓已完成，${levelInfo[0].name}授权单${formatAmount(res.amount)}元`, '/woyaochuhuo');
         } else if (res.result == '2') {
           this.confirmBtnText = '我要出货';
-          this.redirectPage(`购买云仓已完成，${levelInfo[0].name}升级单${formatAmount(res.amount)}元`, '/woyaochuhuo');
+          this.redirectPage(`购买云仓已完成，${levelInfo[0].name}升级单${formatAmount(res.amount)}元`, res.isWare === '1' ? '/woyaochuhuo' : '/noWare');
+          // this.redirectPage(`购买云仓已完成，${levelInfo[0].name}升级单${formatAmount(res.amount)}元`, '/woyaochuhuo');
         } else if (res.result == '3') {
           this.redirectPage(`您的门槛余额已经高于${formatAmount(res.minAmount)}元，请前去购买云仓`, '/threshold');
         } else {

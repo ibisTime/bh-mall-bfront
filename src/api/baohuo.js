@@ -123,11 +123,12 @@ export function getStructure(userId) {
 }
 
 //我的下级
-export function getMySub() {
+export function getMySub(statusList) {
     return fetch(627320, {
         limit: '100',
         start: '0',
         userId: getUserId(),
+      statusList: statusList || []
     });
 }
 
@@ -154,7 +155,8 @@ export function getKeywordSub(info) {
       start: '0',
       userId: getUserId(),
       keyword: info.keyword,
-      status: info.status || ''
+      status: info.status || '',
+      statusList: info.statusList || []
     });
 }
 
@@ -853,7 +855,8 @@ export function getStatistics(info) {
     introducer: info.introducer || '',
     referrer: info.referrer || '',
     keyword: info.keyword || '',
-    level: info.level || ''
+    level: info.level || '',
+    userId: info.userId || ''
   });
 }
 // 分页查流水
@@ -868,8 +871,8 @@ export function liushuiList(info) {
 // 统计分析-我的出货接口
 export function myChuHuo(info) {
   return fetch(627854, {
-    start: 1,
-    limit: 100,
+    start: info.start || 1,
+    limit: info.limit || 100,
     statusList: info.statusList,
     applyUser: info.userId || getUserId()
   });
@@ -976,5 +979,16 @@ export function payOutOrder(info) {
   return fetch(627642, {
     codeList: info.codeList,
     payType: info.payType
+  });
+}
+
+// 查询运费
+export function queryYunfei(info) {
+  return fetch(627666, {
+    productCode: info.productCode,
+    specsCode: info.specsCode,
+    quantity: info.quantity,
+    province: info.province,
+    kind: info.kind
   });
 }
