@@ -27,7 +27,7 @@
         <img class="tianjia" src="../../assets/imgs/tianjia@2x.png" alt="">
         <p>上传手持身份证照片</p>
         <input type="file" class="file" ref="fileInput" @change="identityFile(1,$event)" accept="image/*">
-        <div class="item" v-for="(photo,index) in identityPhotos">
+        <div class="item" v-for="(photo,index) in identityPhotos" @click="choseItem1(index)">
           <loading v-if="!photo.ok" title="" class="photo-loading"></loading>
           <img class="picture" ref="myIdentityImg" id="myIdentityImg" :src="getIdentitySrc(photo)">
         </div>
@@ -47,6 +47,13 @@
     </div>
     <toast ref="mytoast" :text="text"></toast>
     <full-loading :title="title" v-show="loading"></full-loading>
+    <photo-edit ref="photoEdit"
+                :url="curUrl"
+                :imgKey="curKey"
+                :type="curType"
+                @beMain="beMainPhoto"
+                @updateImg="updateImg"
+                @deleteImg="deleteImg"></photo-edit>
   </div>
 </template>
 <script>
@@ -188,7 +195,6 @@ export default {
       }
       if(flag) {
         this.loading = true;
-        console.log('2', options.teamName);
         upgradeApplica(options).then(res => {
           this.loading = false;
           if (res.isSuccess) {
@@ -210,50 +216,104 @@ export default {
         return;
       }
       this.currentItem = item;
+      this.now = 'photos';
+      this.$refs.photoEdit.show();
+    },
+    choseItem1(index) {
+      console.log(1);
+      let item = this.identityPhotos[index];
+      if (!item.ok) {
+        this.text = "图片还未上传完成";
+        this.$refs.toast.show();
+        return;
+      }
+      this.currentItem = item;
+      this.now = 'identityPhotos';
       this.$refs.photoEdit.show();
     },
     /**
      * 设置为封面
      * */
     beMainPhoto(key) {
-      let index = this.photos.findIndex(photo => {
-        return photo.key === key;
-      });
-      let item = this.photos[index];
-      this.photos.splice(index, 1);
-      this.photos.unshift(item);
+      if(this.now === 'photos') {
+        let index = this.photos.findIndex(photo => {
+          return photo.key === key;
+        });
+        let item = this.photos[index];
+        this.photos.splice(index, 1);
+        this.photos.unshift(item);
+      } else {
+        let index = this.identityPhotos.findIndex(photo => {
+          return photo.key === key;
+        });
+        let item = this.identityPhotos[index];
+        this.identityPhotos.splice(index, 1);
+        this.identityPhotos.unshift(item);
+      }
+
     },
     /**
      * 更新裁剪后的图片
      * */
     updateImg(base64, key) {
-      let index = this.photos.findIndex(photo => {
-        return photo.key === key;
-      });
-      let item = this.photos[index];
-      item.ok = false;
-      item.preview = base64;
-      this.photos.splice(index, 1, item);
-      this.currentItem = item;
-      this.uploadPhoto(base64, key).then(() => {
-        // 再次获取当前图片的位置，防止在上传过程中有其它图片被删除，导致下标改变
-        index = this.photos.findIndex(photo => {
+      if(this.now = 'photos') {
+        let index = this.photos.findIndex(photo => {
           return photo.key === key;
         });
-        item = this.photos[index];
-        item.ok = true;
+        let item = this.photos[index];
+        item.ok = false;
+        item.preview = base64;
         this.photos.splice(index, 1, item);
         this.currentItem = item;
-      });
+        this.uploadPhoto(base64, key).then(() => {
+          // 再次获取当前图片的位置，防止在上传过程中有其它图片被删除，导致下标改变
+          index = this.photos.findIndex(photo => {
+            return photo.key === key;
+          });
+          item = this.photos[index];
+          item.ok = true;
+          this.photos.splice(index, 1, item);
+          this.currentItem = item;
+        });
+      } else {
+        let index = this.identityPhotos.findIndex(photo => {
+          return photo.key === key;
+        });
+        let item = this.identityPhotos[index];
+        item.ok = false;
+        item.preview = base64;
+        this.identityPhotos.splice(index, 1, item);
+        this.currentItem = item;
+        this.uploadPhoto(base64, key).then(() => {
+          // 再次获取当前图片的位置，防止在上传过程中有其它图片被删除，导致下标改变
+          index = this.identityPhotos.findIndex(photo => {
+            return photo.key === key;
+          });
+          item = this.identityPhotos[index];
+          item.ok = true;
+          this.identityPhotos.splice(index, 1, item);
+          this.currentItem = item;
+        });
+      }
+
     },
     /**
      * 在弹出的图片操作页面中删除图片
      * */
     deleteImg(key) {
-      let index = this.photos.findIndex(photo => {
-        return photo.key === key;
-      });
-      this.deletePhoto(index);
+      console.log(this.now);
+      if(this.now === 'photos') {
+        let index = this.photos.findIndex(photo => {
+          return photo.key === key;
+        });
+        this.deletePhoto(index);
+      } else {
+        let index = this.identityPhotos.findIndex(photo => {
+          return photo.key === key;
+        });
+        this.deletePhoto(index);
+      }
+
     },
     /**
      * 从相册中选择图片
@@ -371,7 +431,13 @@ export default {
       this.identityPhotos.push(item);
     },
     deletePhoto(index) {
-      this.photos.splice(index, 1);
+      console.log(this.now);
+      debugger;
+      if(this.now === 'photos') {
+        this.photos.splice(index, 1);
+      } else {
+        this.identityPhotos.splice(index, 2);
+      }
     },
     uploadPhoto(base64, key) {
       return this.$refs.qiniu.uploadByBase64(base64, key);
@@ -422,7 +488,6 @@ export default {
       getQiniuToken()
     ]).then(([res1, res2, res3, res4, res5]) => {
       this.loading = false;
-      console.log('1', res1.teamName);
       this.myteamName = res1.teamName;
       this.mylevel = res1.level;
       this.reNumber = res1.reNumber;
@@ -445,7 +510,7 @@ export default {
       // }
       this.account = res4.amount;
       this.token = res5.uploadToken;
-    })
+    }).catch(() => { this.loading = false });
   },
   components: {
     Qiniu,

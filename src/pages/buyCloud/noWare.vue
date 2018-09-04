@@ -21,15 +21,17 @@
           <div class="item" v-for="(item, index) in list">
               <img :src="item.pic" alt="">
               <div class="content">
-                  <div>
-                    <p>产品名称：{{item.name}}
-                      <p>规格：{{item.specsList[0].name}}</p>
-                      <p>数量：{{item.specsList[0].number}}</p>
-                      <p>价格：¥{{formatAmount(item.specsList ? item.specsList[0].priceList[0].price : 0)}}</p>
-                    </p>
-                  </div>
+                  <!--<div>-->
+                    <!--<p>产品名称：{{item.name}}-->
+                      <!--<p>规格：{{item.specsList[0].name}}</p>-->
+                      <!--<p>数量：{{item.specsList[0].number}}</p>-->
+                      <!--<p>价格：¥{{formatAmount(item.specsList ? item.specsList[0].priceList[0].price : 0)}}</p>-->
+                    <!--</p>-->
+                  <!--</div>-->
                   <!-- <i>规格：{{item.product.specsList[0].name}}</i> -->
-                  <span @click="prodectDetail(item.code, index)">购买</span>
+                <p>产品名称：{{item.name}} <br>单价：¥{{formatAmount(item.specsList ? item.specsList[0].priceList[0].price : 0)}}</p>
+                <i>包装：{{item.specsList[0].name}}</i>
+                <span @click="prodectDetail(item.code, index)">购买</span>
               </div>
           </div>
         </scroll>
@@ -47,7 +49,7 @@
             <p>产品名称：{{detail.name}}</p>
             <span>请选择</span>
             <i @click="close">X</i>
-            <p><span>运费：{{freight}}</span></p>
+            <p><span>库存：{{detail.specsList ? detail.specsList[num].stockNumber : 0}}</span>  <span>运费：{{freight === 0 ? '包邮' : formatAmount(freight)}}</span></p>
           </div>
         </div>
         <div class="packaging">
@@ -274,6 +276,8 @@ export default {
       if(!this.address) {
         return;
       }
+      let pCode = this.list[this.proIdx].code;
+      let spCode =this.specsList[this.curIndex].code;
       this.loading = true;
       queryYunfei({
         productCode: this.list[this.proIdx].code,

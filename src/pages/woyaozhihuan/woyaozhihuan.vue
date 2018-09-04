@@ -12,7 +12,7 @@
           <!--
           <i>￥{{cloudDetail.specsList[count].price / 1000 * cloudDetail.specsList[count].number}}</i>
           -->
-          <i>￥{{cloudDetail.specsList[count].price / 1000 * initNum}}</i>
+          <i>￥{{cloudDetail.price  * initNum / 1000}}</i>
           <div class="guige">
             <!--
             <span>{{cloudDetail.specsList[count].number}}{{cloudDetail.specsList[count].name}}</span>
@@ -116,7 +116,7 @@
           <i class="text">合计：</i>
           <i class="symbol">￥</i>
           <!--<i class="sum">{{cloudDetail.specsList[count].price.price / 1000 * cloudDetail.specsList[count].number}}</i>-->
-          <i class="sum">{{cloudDetail.specsList[count].price / 1000 * initNum}}</i>
+          <i class="sum">{{cloudDetail.price / 1000 * initNum}}</i>
         </div>
         <div class="right">
           <span class="diamonds right-item" @click="_add">+</span>

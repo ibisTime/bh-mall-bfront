@@ -118,7 +118,7 @@ export default {
 
     }
     getStatistics({
-      introducer: getUserId()
+      referrer: getUserId()
     }).then((res) => {
       this.loading = false;
       this.number = res.number;

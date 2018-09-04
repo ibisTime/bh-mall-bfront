@@ -1,9 +1,16 @@
 <template>
-  <transition name="confirm-fade">
+  <div name="confirm-fade">
     <div class="confirm-input" v-show="showFlag" @click.stop>
       <div class="confirm-wrapper">
         <div class="confirm-content">
           <p class="text">{{text}}</p>
+          <div class="input">
+            <span>{{dText}}</span>
+            <select v-model="dType">
+              <option v-for="item in deliveryType" :value="item.key">{{item.value}}</option>
+            </select>
+            <i class="right-icon"></i>
+          </div>
           <div class="input">
           	<span>{{compText}}</span>
           	<select v-model="wlCompany">
@@ -19,7 +26,7 @@
         </div>
       </div>
     </div>
-  </transition>
+  </div>
 </template>
 
 <script type="text/ecmascript-6">
@@ -41,24 +48,32 @@
       }
     },
     directives: {
-      focus: {
-        inserted: function (el) {
-          el.focus();
-        }
-      }
+      // focus: {
+      //   inserted: function (el) {
+      //     el.focus();
+      //   }
+      // }
     },
     data() {
       return {
       	companyList: [],
+        deliveryType: [
+          { key: '0', value: '自发'},
+          { key: '1', value: '云仓发' }
+        ],
         showFlag: false,
         wlCode: '',
-        wlCompany: ''
+        wlCompany: '',
+        dType: ''
       };
     },
     computed: {
     	compText() {
     		return this.wlCompany ? this.companyList.find(v => v.dkey === this.wlCompany).dvalue : '请选择物流公司';
-    	}
+    	},
+      dText() {
+        return this.dType ? this.deliveryType.find(v => v.key === this.dType).value : '请选择发货方式';
+      }
     },
     mounted() {
     	getDictList('kd_company').then(data => {
@@ -70,9 +85,9 @@
         this.wlCompany = '';
         this.wlCode = '';
         this.showFlag = true;
-        setTimeout(() => {
-          this.$refs.input.focus();
-        }, 320);
+        // setTimeout(() => {
+        //   this.$refs.input.focus();
+        // }, 320);
       },
       hide() {
         this.showFlag = false;
@@ -83,7 +98,7 @@
       },
       confirm() {
         this.hide();
-        this.$emit('confirm', this.wlCode, this.wlCompany);
+        this.$emit('confirm', this.wlCode, this.wlCompany, this.dType);
       }
     }
   };
@@ -102,15 +117,15 @@
     z-index: 998;
     background-color: $color-background-d;
 
-    &.confirm-fade-enter-active {
-      animation: confirm-fadein 0.3s;
-      .confirm-content {
-        animation: confirm-zoom 0.3s;
-      }
-    }
+    /*&.confirm-fade-enter-active {*/
+      /*animation: confirm-fadein 0.3s;*/
+      /*.confirm-content {*/
+        /*animation: confirm-zoom 0.3s;*/
+      /*}*/
+    /*}*/
 
     .confirm-wrapper {
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -198,24 +213,24 @@
       }
     }
   }
-  @keyframes confirm-fadein {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
+  /*@keyframes confirm-fadein {*/
+    /*0% {*/
+      /*opacity: 0;*/
+    /*}*/
+    /*100% {*/
+      /*opacity: 1;*/
+    /*}*/
+  /*}*/
 
-  @keyframes confirm-zoom {
-    0% {
-      transform: scale(0);
-    }
-    50% {
-      transform: scale(1.1);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
+  /*@keyframes confirm-zoom {*/
+    /*0% {*/
+      /*transform: scale(0);*/
+    /*}*/
+    /*50% {*/
+      /*transform: scale(1.1);*/
+    /*}*/
+    /*100% {*/
+      /*transform: scale(1);*/
+    /*}*/
+  /*}*/
 </style>

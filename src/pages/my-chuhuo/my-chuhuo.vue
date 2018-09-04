@@ -141,7 +141,6 @@
   @import "../../common/scss/base.scss";
   .intentionalAgent {
     background-color: #f7f7f7;
-    height: 100%;
     .fl {
       float: left;
     }
@@ -150,6 +149,10 @@
       background: url("../../assets/imgs/background@2x.png");
       text-align: center;
       color: #fff;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
       .header-top {
         height: 2.5rem;
         padding-top: 0.6rem;
@@ -162,118 +165,125 @@
         }
       }
     }
-    .item {
-      margin-top: 0.2rem;
-      background-color: #fff;
-      .top {
-        line-height: 0.8rem;
-        color: #333;
-        border-bottom: 1px solid #eee;
-        .user {
-          float: left;
-          margin-left: 0.35rem;
-          font-size: $font-size-small-s;
-        }
-        .status {
-          float: right;
-          color: $primary-color;
-          font-size: $font-size-small;
-          margin-right: 0.3rem;
-        }
-      }
-      .info {
-        padding: 0.3rem;
-        border-bottom: 1px solid #eee;
+    .orders-content {
+      position: absolute;
+      top: 2.4rem;
+      left: 0;
+      width: 100%;
+      bottom: 0;
+      .item {
+        margin-top: 0.2rem;
         background-color: #fff;
-        font-size: $font-size-small;
-        height: 0.9rem;
-        overflow: hidden;
-        position: relative;
-        &.active {
-          height: auto;
-        }
-        p + p {
-          margin-top: 0.36rem;
-        }
-        p {
-          i {
-            margin-left: 0.2rem;
+        .top {
+          line-height: 0.8rem;
+          color: #333;
+          border-bottom: 1px solid #eee;
+          .user {
+            float: left;
+            margin-left: 0.35rem;
+            font-size: $font-size-small-s;
+          }
+          .status {
+            float: right;
+            color: $primary-color;
+            font-size: $font-size-small;
+            margin-right: 0.3rem;
           }
         }
-        .downward {
-          position: absolute;
-          top: 0;
-          right: 0;
+        .info {
           padding: 0.3rem;
-          color: $primary-color;
-          transform: rotateZ(90deg);
-        }
-        .status {
-          float: right;
-          color: #72a52c;
-          font-size: 0.24rem;
-        }
-      }
-      .pic {
-        padding: 0.2rem 0.3rem;
-        background-color: #fff;
-        overflow: hidden;
-        border-bottom: 1px solid #eee;
-        img {
-          float: left;
-          width: 1.8rem;
-          height: 1.8rem;
-        }
-        .content {
+          border-bottom: 1px solid #eee;
+          background-color: #fff;
+          font-size: $font-size-small;
+          height: 0.9rem;
+          overflow: hidden;
           position: relative;
-          display: flex;
-          flex: 1;
-          flex-direction: column;
-          justify-content: space-between;
-          padding-left: 0.2rem;
-          .inner-cont {
-            display: flex;
+          &.active {
+            height: auto;
+          }
+          p + p {
+            margin-top: 0.36rem;
           }
           p {
-            flex: 1;
-            line-height: 1.2;
-            font-size: $font-size-medium-s;
-            color: #333;
-          }
-          i {
-            font-size: $font-size-small;
-            color: $primary-color;
-          }
-          span {
-            width: 2.2rem;
-            line-height: 0.4rem;
-            font-size: $font-size-small;
-            border-radius: 0.1rem;
-            color: #333;
-            text-align: right;
-            &.status {
-              color: #72a52c;
+            i {
+              margin-left: 0.2rem;
             }
           }
-          .btn-wrap {
+          .downward {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.3rem;
+            color: $primary-color;
+            transform: rotateZ(90deg);
+          }
+          .status {
+            float: right;
+            color: #72a52c;
+            font-size: 0.24rem;
+          }
+        }
+        .pic {
+          padding: 0.2rem 0.3rem;
+          background-color: #fff;
+          overflow: hidden;
+          border-bottom: 1px solid #eee;
+          img {
+            float: left;
+            width: 1.8rem;
+            height: 1.8rem;
+          }
+          .content {
+            position: relative;
+            display: flex;
             flex: 1;
-            padding-top: 0.3rem;
-            text-align: right;
-            div {
-              float: right;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-left: 0.2rem;
+            .inner-cont {
+              display: flex;
+            }
+            p {
+              flex: 1;
+              line-height: 1.2;
+              font-size: $font-size-medium-s;
+              color: #333;
+            }
+            i {
+              font-size: $font-size-small;
+              color: $primary-color;
+            }
+            span {
+              width: 2.2rem;
+              line-height: 0.4rem;
+              font-size: $font-size-small;
+              border-radius: 0.1rem;
+              color: #333;
+              text-align: right;
+              &.status {
+                color: #72a52c;
+              }
+            }
+            .btn-wrap {
+              flex: 1;
+              padding-top: 0.3rem;
+              text-align: right;
+              div {
+                float: right;
+              }
             }
           }
         }
-      }
-      .total {
-        text-align: right;
-        line-height: 0.4rem;
-        font-size: 0.24rem;
-        border: none;
-        text-align: right;
-        color: $primary-color !important;
-        p + p {
-          margin-top: 0.18rem;
+        .total {
+          text-align: right;
+          line-height: 0.4rem;
+          font-size: 0.24rem;
+          border: none;
+          text-align: right;
+          color: $primary-color !important;
+          p + p {
+            margin-top: 0.18rem;
+          }
         }
       }
     }

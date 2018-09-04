@@ -5,7 +5,8 @@
       <div class="content">
         <p>{{item.name}}</p>
         <p>价格：{{formatAmount(item.specsList ? item.specsList[0].price : 0)}}</p>
-        <p>数量：{{item.specsList ? item.specsList[0].number : 0}}</p>
+        <p>规格：{{item.specsList ? item.specsList[0].name : ''}}</p>
+        <p>数量：{{item.specsList ? item.specsList[0].stockNumber : 0}}</p>
         <span @click="prodectDetail(item.code)">购买</span>
       </div>
     </div>
@@ -22,7 +23,7 @@
           <p>{{detail.name}}</p>
           <span>请选择</span>
           <i @click="genghuan">X</i>
-          <p><span>库存：{{detail.specsList ? detail.specsList[num].number : 0}}</span></p>
+          <p><span>库存：{{detail.specsList ? detail.specsList[num].stockNumber : 0}}</span></p>
         </div>
       </div>
       <div class="packaging">
@@ -113,7 +114,7 @@ export default {
 
     //选购产品数量+1
     add() {
-      if(this.number < this.detail.specsList[this.num].number) {
+      if(this.number < this.detail.specsList[this.num].stockNumber) {
         this.number++;
         this.queryYunfei();
       } else {

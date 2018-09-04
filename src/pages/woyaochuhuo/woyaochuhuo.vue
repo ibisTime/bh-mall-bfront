@@ -38,7 +38,7 @@
               <p>产品名称：{{detail.productName}}</p>
               <span>请选择</span>
               <i @click="close">X</i>
-              <p><span>库存：{{detail.quantity}}</span><span>运费：{{formatAmount(freight)}}</span></p>
+              <p><span>库存：{{detail.quantity}}</span><span>运费：{{freight === 0 ? '包邮' : formatAmount(freight)}}</span></p>
             </div>
           </div>
           <div class="packaging">

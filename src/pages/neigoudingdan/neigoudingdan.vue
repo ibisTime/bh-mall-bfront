@@ -24,13 +24,14 @@
                 </div>
                 <div class="inner-cont" style="padding-top: 0.1rem;">
                   <p style="line-height: 0.4rem;">规格：{{item.quantity}}{{item.specsName}}</p>
-                  <div class="total">总价：¥{{formatAmount(item.amount)}}</div>
+                  <div class="total">总价：¥{{formatAmount(item.amount + item.yunfei)}}</div>
                   <!--<div class="total yunfei" v-show="item.yunfei">运费：¥{{formatAmount(item.yunfei)}}</div>-->
                 </div>
                 <div class="inner-cont" style="padding-top: 0.1rem;">
                   <div class="total yunfei">运费：¥{{formatAmount(item.yunfei)}}</div>
                 </div>
                 <div class="btn-wrap">
+                  <div class="quxiao" @click="cancel(item.code)" v-if="item.status == '0' || item.status == '1'">取消</div>
                   <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3' || item.status == '4'">查看物流</div>
                   <div class="shouhuo" @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
                   <div class="fukuan" @click="goPay(item.code)" v-if="item.status == '0'">付款</div>
@@ -43,13 +44,15 @@
     </div>
     <toast ref="toast" :text="toastText"></toast>
     <full-loading :title="title" v-show="loading"></full-loading>
+    <confirm ref="confirm" :text="confirmText" @confirm="cancelEvent"></confirm>
   </div>
 </template>
 <script>
 import Toast from 'base/toast/toast';
 import CategoryScroll from 'base/category-scroll/category-scroll';
 import FullLoading from 'base/full-loading/full-loading';
-import { queryShopForm, receiveNeigouOrder } from "api/baohuo";
+import Confirm from 'base/confirm/confirm';
+import { queryShopForm, receiveNeigouOrder, cancelInnerOrder } from "api/baohuo";
 import { formatDate, formatImg, formatAmount } from "common/js/util";
 import { getUser, getUserById } from "api/user";
 import { setCookie, getCookie } from "common/js/cookie";
@@ -71,12 +74,14 @@ export default {
       categorys: [
         {value: '全部',key: 'all'},
         {value: '待支付', key: '0'},
-        {value: '待发货', key: '1||2'},
+        {value: '待审单', key: '1'},
+        {value: '待发货', key: '2'},
         {value: '待收货', key: '3'},
         {value: '已收货', key: '4'},
         {value: '申请取消', key: '5'}
       ],
-      heightActive: ''
+      heightActive: '',
+      confirmText: '确定取消订单吗',
     };
   },
   methods: {
@@ -133,6 +138,21 @@ export default {
     wuliu(code, company) {
       this.$router.push('/wuliu?code='+code+'&company='+company);
     },
+    cancel(code){
+      this.$refs.confirm.show();
+      this.cancelCode = code;
+    },
+    cancelEvent() {
+      cancelInnerOrder(this.cancelCode).then(res => {
+        if(res.isSuccess == true){
+          this.toastText = '取消成功';
+          this.$refs.toast.show();
+          setTimeout(() => {
+            this.check();
+          }, 1000)
+        }
+      })
+    },
   },
   mounted() {
     this.check();
@@ -140,7 +160,8 @@ export default {
   components: {
     Toast,
     CategoryScroll,
-    FullLoading
+    FullLoading,
+    Confirm
   }
 };
 </script>
@@ -290,6 +311,13 @@ export default {
           div {
             float: right;
           }
+        }
+        .quxiao {
+          font-size: 0.3rem;
+          border: 1px solid #333;
+          border-radius: 0.1rem;
+          padding: 0.1rem 0.24rem;
+          margin-left: 0.3rem;
         }
         .wuliu {
           font-size: 0.3rem;

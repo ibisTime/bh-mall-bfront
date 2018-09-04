@@ -129,6 +129,7 @@
 
   .category {
     min-height: 1px;
+    overflow: hidden;
 
     .category-group {
       position: relative;

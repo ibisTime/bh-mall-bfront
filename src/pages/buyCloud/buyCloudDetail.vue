@@ -460,6 +460,7 @@ export default {
       border-bottom: 1px solid #eee;
       overflow: hidden;
       margin: 0 0.3rem;
+      overflow: scroll;
       p {
         margin-top: 0.3rem;
         margin-bottom: 0.4rem;

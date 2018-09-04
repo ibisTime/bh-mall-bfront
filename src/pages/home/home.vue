@@ -183,9 +183,9 @@ export default {
           to: "/tixianjilu"
         },
         {
-          text: "审核充值",
-          src: require("../../assets/imgs/shenhechongzhi2@2x.png"),
-          to: "/shenhechongzhi"
+          text: "微店账户",
+          src: require("../../assets/imgs/weidianzhanghu.png"),
+          to: "/weidianzhanghu"
         },
         {
           text: "推荐奖励",
@@ -203,10 +203,15 @@ export default {
           to: "/jieshaojiangli"
         },
         {
-          text: "微店账户",
-          src: require("../../assets/imgs/weidianzhanghu.png"),
-          to: "/weidianzhanghu"
-        }
+          text: "审核充值",
+          src: require("../../assets/imgs/shenhechongzhi2@2x.png"),
+          to: "/shenhechongzhi"
+        },
+        {
+          text: "审核提现",
+          src: require("../../assets/imgs/shenhechongzhi2@2x.png"),
+          to: "/shenhetixian"
+        },
       ],
 
       //云仓账户

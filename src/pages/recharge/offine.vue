@@ -24,6 +24,13 @@
       </form>
       <toast ref="toast" :text="text"></toast>
       <full-loading :title="title" v-show="loading"></full-loading>
+      <photo-edit ref="photoEdit"
+                  :url="curUrl"
+                  :imgKey="curKey"
+                  :type="curType"
+                  @beMain="beMainPhoto"
+                  @updateImg="updateImg"
+                  @deleteImg="deleteImg"></photo-edit>
       <span class="btn" @click="sendMoney">提交充值</span>
   </div>
 </template>

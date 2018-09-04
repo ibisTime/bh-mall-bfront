@@ -1,36 +1,40 @@
 <template>
   <div class="intentionalAgent">
-    <category-scroll :currentIndex="currentIndex"
-                     :categorys="categorys"
-                     @select="selectCategory"></category-scroll>
-    <div class="item clearfix" v-for="(item,index) in list">
-      <div class="top clearfix">
-        <span class="user">提交人：{{item.agent.realName || item.agent.nickName}}{{levelObj[item.agent.level]}}（{{item.agent.mobile}}）</span>
-        <span class="status">{{status[item.status]}}</span>
-      </div>
-      <div class="info" :class="{ active: heightActive === index }" ref="divInfo">
-        <div class="downward" @click="changeHeight(index)">></div>
-        <p>订单编号：{{item.code}}</p>
-        <p>订单类型：{{type[item.kind]}}</p>
-        <p>下单时间：{{formatDate(item.applyDatetime)}}</p>
-        <p>收货人：{{item.signer}}（{{item.mobile}}）</p>
-        <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
-      </div>
-      <div class="pic">
-        <img :src="formatImg(item.pic)" alt="">
-        <div class="content">
-          <div class="inner-cont">
-            <p>{{item.productName}}</p>
-            <i>￥{{formatAmount(item.price)}}</i>
-          </div>
-          <div class="inner-cont" style="padding-top: 0.1rem;">
-            <p style="line-height: 0.4rem;">规格：{{item.quantity}}{{item.specsName}}</p>
-            <div class="total">总价：¥{{formatAmount(item.amount)}}</div>
-          </div>
-          <div class="btn-wrap">
-            <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3' || item.status == '4'">物流信息</div>
-            <div class="quxiao" @click="cancel(item.code)" v-if="item.status == '5'">审核取消</div>
-            <div class="fahuo" @click="sendM(item.code)" v-if="item.status == '2'">发货</div>
+    <div class="category-wrapper">
+      <category-scroll :currentIndex="currentIndex"
+                       :categorys="categorys"
+                       @select="selectCategory"></category-scroll>
+    </div>
+    <div class="orders-content" :class="[ovfh ? 'ovfh' : 'ovfs']">
+      <div class="item clearfix" v-for="(item,index) in list">
+        <div class="top clearfix">
+          <span class="user">提交人：{{item.agent.realName || item.agent.nickName}}{{levelObj[item.agent.level]}}（{{item.agent.mobile}}）</span>
+          <span class="status">{{status[item.status]}}</span>
+        </div>
+        <div class="info" :class="{ active: heightActive === index }" ref="divInfo">
+          <div class="downward" @click="changeHeight(index)">></div>
+          <p>订单编号：{{item.code}}</p>
+          <p>订单类型：{{type[item.kind]}}</p>
+          <p>下单时间：{{formatDate(item.applyDatetime)}}</p>
+          <p>收货人：{{item.signer}}（{{item.mobile}}）</p>
+          <p>收货地址：<i>{{item.province}}</i><i>{{item.city}}</i><i>{{item.area}}</i><i>{{item.address}}</i></p>
+        </div>
+        <div class="pic">
+          <img :src="formatImg(item.pic)" alt="">
+          <div class="content">
+            <div class="inner-cont">
+              <p>{{item.productName}}</p>
+              <i>￥{{formatAmount(item.price)}}</i>
+            </div>
+            <div class="inner-cont" style="padding-top: 0.1rem;">
+              <p style="line-height: 0.4rem;">规格：{{item.quantity}}{{item.specsName}}</p>
+              <div class="total">总价：¥{{formatAmount(item.amount)}}</div>
+            </div>
+            <div class="btn-wrap">
+              <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3' || item.status == '4'">物流信息</div>
+              <div class="quxiao" @click="cancel(item.code)" v-if="item.status == '5'">审核取消</div>
+              <div class="fahuo" @click="sendM(item.code)" v-if="item.status == '2'">发货</div>
+            </div>
           </div>
         </div>
       </div>
@@ -77,7 +81,8 @@
         confirmText: '确定取消订单吗',
         userId: '',
         content: '',
-        levelObj: {}
+        levelObj: {},
+        ovfh: false
       };
     },
     methods: {
@@ -167,23 +172,29 @@
       sendM(code) {
         this.curCode = code;
         this.$refs.sendModal.show();
+        this.ovfh = true;
       },
-      handleConfirm(wlCode, wlCompany) {
-        if (!wlCompany || !wlCode) {
-          this.toastText = '物流单号和物流公司未填写完整';
+      handleConfirm(wlCode, wlCompany, dType) {
+        if(!dType) {
+          this.toastText = '您未选择发货方式';
           this.$refs.toast.show();
         } else {
-          this.fahuo(wlCode, wlCompany);
+          if (!wlCompany || !wlCode) {
+            this.toastText = '物流单号或物流公司未填写完整';
+            this.$refs.toast.show();
+          } else {
+            this.fahuo(wlCode, wlCompany, dType);
+          }
         }
       },
-      fahuo(logisticsCode, logisticsCompany) {
+      fahuo(logisticsCode, logisticsCompany, dType) {
         let params = {
           logisticsCode: logisticsCode,
           logisticsCompany: logisticsCompany,
-          code: this.curCode
+          code: this.curCode,
+          isWareSend: dType
         };
         fahuo(params).then(res => {
-          console.log(res);
           if (res.isSuccess) {
             this.toastText = '发货成功';
             this.$refs.toast.show();
@@ -218,37 +229,36 @@
 <style lang="scss" scoped>
   @import "../../common/scss/variable.scss";
   @import "../../common/scss/base.scss";
+  .ovfh {
+    overflow: hidden;
+  }
+  .ovfs {
+    overflow: scroll;
+  }
   .intentionalAgent {
     background-color: #f7f7f7;
     height: 100%;
     .fl {
       float: left;
     }
-    .header {
-      background-color: #fff;
-      > div {
-        float: left;
-        width: 20%;
-        height: 0.9rem;
-        position: relative;
-        i {
-          font-size: $font-size-medium;
-          color: #333;
-          line-height: 0.9rem;
-          position: absolute;
-          left: 43%;
-          transform: translateX(-50%);
-          &.width {
-            width: 1.2rem;
-          }
-        }
-        &.active {
-          i {
-            color: $primary-color;
-            border-bottom: 0.06rem solid $primary-color;
-          }
-        }
-      }
+    .category-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+      overflow: hidden;
+      height: 0.8rem;
+      line-height: 0.8rem;
+      background: #fff;
+      border-bottom: 1px solid $color-border;
+    }
+    .orders-content {
+      position: absolute;
+      top: 0.8rem;
+      left: 0;
+      width: 100%;
+      bottom: 0;
     }
     .item {
       margin-top: 0.2rem;

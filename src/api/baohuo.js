@@ -64,7 +64,12 @@ export function cencelChuHuoOrder(code) {
     code: code
   });
 }
-
+//申请取消内购订单
+export function cancelInnerOrder(code) {
+  return fetch(627724, {
+    code: code
+  });
+}
 //根据用户编号查询云仓
 export function getCloud(userId) {
     return fetch(627814, {
@@ -952,7 +957,8 @@ export function fahuo(info) {
     code: info.code,
     deliver: getUserId(),
     logisticsCode: info.logisticsCode,
-    logisticsCompany: info.logisticsCompany
+    logisticsCompany: info.logisticsCompany,
+    isWareSend: info.isWareSend
   });
 }
 
@@ -990,5 +996,34 @@ export function queryYunfei(info) {
     quantity: info.quantity,
     province: info.province,
     kind: info.kind
+  });
+}
+
+// 分页查询取现订单列表
+export function queryQuxian(info) {
+  return fetch(627510, {
+    start: info.start || 1,
+    limit: info.limit || 10,
+    toUserId: info.toUserId || '',
+    status: info.status || '',
+    statusList: info.statusList || ''
+  });
+}
+// 审核取现订单
+export function checkQuxian(info) {
+  return fetch(627502, {
+    approveNote: info.approveNote,
+    approveResult: info.approveResult,
+    approveUser: getUserId(),
+    codeList: info.codeList
+  });
+}
+// 支付取现订单
+export function payQuxian(info) {
+  return fetch(627503, {
+    payNote: info.payNote,
+    payResult: info.payResult,
+    payUser: getUserId(),
+    codeList: info.codeList
   });
 }

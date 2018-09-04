@@ -53,6 +53,8 @@ import tixianjilu from '@/pages/tixianjilu/tixianjilu'
 import shenhechongzhi from '@/pages/shenhechongzhi/shenhechongzhi'
 import chongzhichuli from '@/pages/shenhechongzhi/chongzhichuli'
 
+import shenhetixian from '@/pages/shenhetixian/shenhetixian'
+import tixianchuli from '@/pages/shenhetixian/tixianchuli'
 import tuijianjiangli from '@/pages/tuijianjiangli/tuijianjiangli'
 
 import chuhuojiangli from '@/pages/chuhuojiangli/chuhuojiangli'
@@ -348,6 +350,18 @@ export default new Router({
           path: '/shenhechongzhi/chongzhichuli',
           name: 'chongzhichuli',
           component: chongzhichuli
+      },
+      //审核提现
+      {
+        path: '/shenhetixian',
+        name: 'shenhetixina',
+        component: shenhetixian
+      },
+      //审核提现-提现处理
+      {
+        path: '/shenhetixian/tixianchuli',
+        name: 'tixianchuli',
+        component: tixianchuli
       },
       //推荐奖励
       {

@@ -7,13 +7,13 @@
       </div>
     </div>
       <div class="header clearfix">
-        <div class="header-select fl" @click="changeLevelShow">
-            {{selectText}}
-            <img src="../../assets/subAgent/select.png" alt="">
-            <div :class="['level',levelShow ? 'show' : '']">
-                <span @click="changeSelect($event)" v-for="(item,index) in levelArr" v-if="item.level != 6" :key="index" :level="item.level">{{item.name}}</span>
-            </div>
-        </div>
+        <!--<div class="header-select fl" @click="changeLevelShow">-->
+            <!--{{selectText}}-->
+            <!--<img src="../../assets/subAgent/select.png" alt="">-->
+            <!--<div :class="['level',levelShow ? 'show' : '']">-->
+                <!--<span @click="changeSelect($event)" v-for="(item,index) in levelArr" v-if="item.level != 6" :key="index" :level="item.level">{{item.name}}</span>-->
+            <!--</div>-->
+        <!--</div>-->
         <div class="header-search fl">
             <img src="../../assets/subAgent/search.png" alt="">
             <input v-model="inputText" type="text" placeholder="请输入代理信息">
@@ -88,6 +88,7 @@ export default {
         referrer: getUserId(),
         level: this.level
       }).then(res => {
+        this.loading = false;
         this.number = res.number;
         res.list.map((item) => {
             //格式化时间
@@ -208,7 +209,8 @@ export default {
             }
             .header-search{
                 margin-left: 0.2rem;
-                width: 4.1rem;
+                /*width: 4.1rem;*/
+                width: 75%;
                 height: 0.54rem;
                 border-radius: 0.1rem;
                 border: 1px solid #dedede;
@@ -230,7 +232,8 @@ export default {
                 }
             }
             .header-button{
-                width: 0.9rem;
+                /*width: 0.9rem;*/
+                width: 20%;
                 height: 0.54rem;
                 line-height: 0.54rem;
                 padding-left: 0.2rem;

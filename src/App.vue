@@ -11,7 +11,7 @@ import { setCookie } from "./common/js/cookie";
 export default {
   name: "App",
   mounted() {
-    // setUser({ userId: 'U201808261104285013162' });
+    setUser({ userId: 'U201809041347164363544' });
     // setCookie('isWare', 1);
     if (!isLogin()) {
       if (this.$route.path !== '/fenxiangshangcheng') {

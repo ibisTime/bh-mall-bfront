@@ -47,7 +47,7 @@
         </div>
         <div class="footer">
             <div class="f-left">
-                <span class="price">￥{{formatAmount(price) * number}}</span>
+                <span class="price">￥{{formatAmount(price * number + freight)}}</span>
                 <span class="total">总计：</span>
             </div>
             <div class="f-right" @click="buy">确认购买</div>
@@ -201,7 +201,6 @@ export default {
                 this.$router.back();
               }, 500);
             } else if (this.status === 1) {
-              alert(1);
               let wxConfig = {
                 appId: res.appId, // 公众号名称，由商户传入
                 timeStamp: res.timeStamp, // 时间戳，自1970年以来的秒数

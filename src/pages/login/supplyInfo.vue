@@ -47,6 +47,13 @@
       <full-loading :title="title" v-show="loading"></full-loading>
       <toast ref="toast" :text="text"></toast>
       <span class="btn" @click="submit">确定</span>
+    <photo-edit ref="photoEdit"
+                :url="curUrl"
+                :imgKey="curKey"
+                :type="curType"
+                @beMain="beMainPhoto"
+                @updateImg="updateImg"
+                @deleteImg="deleteImg"></photo-edit>
   </div>
 </template>
 <script>
@@ -282,7 +289,8 @@ export default {
          * 选中要操作的图片
          * */
         choseItem(index) {
-            let item = this.photos[index];
+          console.log(1);
+          let item = this.photos3[index];
             if (!item.ok) {
             this.text = '图片还未上传完成';
             this.$refs.toast.show();
@@ -306,22 +314,22 @@ export default {
          * 更新裁剪后的图片
          * */
         updateImg(base64, key) {
-            let index = this.photos.findIndex((photo) => {
+            let index = this.photos3.findIndex((photo) => {
                 return photo.key === key;
             });
-            let item = this.photos[index];
+            let item = this.photos3[index];
             item.ok = false;
             item.preview = base64;
-            this.photos.splice(index, 1, item);
+            this.photos3.splice(index, 1, item);
             this.currentItem = item;
             this.uploadPhoto(base64, key).then(() => {
                 // 再次获取当前图片的位置，防止在上传过程中有其它图片被删除，导致下标改变
-                index = this.photos.findIndex((photo) => {
+                index = this.photos3.findIndex((photo) => {
                     return photo.key === key;
                 });
-                item = this.photos[index];
+                item = this.photos3[index];
                 item.ok = true;
-                this.photos.splice(index, 1, item);
+                this.photos3.splice(index, 1, item);
                 this.currentItem = item;
             });
         },
@@ -329,7 +337,7 @@ export default {
          * 在弹出的图片操作页面中删除图片
          * */
         deleteImg(key) {
-            let index = this.photos.findIndex((photo) => {
+            let index = this.photos3.findIndex((photo) => {
                 return photo.key === key;
             });
             this.deletePhoto(index);
@@ -387,7 +395,7 @@ export default {
           }
         },
         deletePhoto(index) {
-            this.photos.splice(index, 1);
+            this.photos3.splice(index, 1);
         },
         uploadPhoto(base64, key) {
             return this.$refs.qiniu.uploadByBase64(base64, key);
