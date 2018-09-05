@@ -84,7 +84,6 @@ export default {
       num: 0,
       number: 1,
       price: 0,
-      freight: 0,   // 运费,
       text: ''
     };
   },

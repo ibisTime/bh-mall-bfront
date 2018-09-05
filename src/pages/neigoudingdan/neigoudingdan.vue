@@ -122,6 +122,7 @@ export default {
         if(res.isSuccess) {
           this.toastText = '收货成功';
           this.$refs.toast.show();
+          this.check();
           this.list.map(item => {
             if(item.code == code) {
               item.status = '3'

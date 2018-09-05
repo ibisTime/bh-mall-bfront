@@ -49,7 +49,7 @@
             <p>产品名称：{{detail.name}}</p>
             <span>请选择</span>
             <i @click="close">X</i>
-            <p><span>库存：{{detail.specsList ? detail.specsList[num].stockNumber : 0}}</span>  <span>运费：{{freight === 0 ? '包邮' : formatAmount(freight)}}</span></p>
+            <p><span>库存：{{detail.specsList ? detail.specsList[num].stockNumber : 0}}</span></p>
           </div>
         </div>
         <div class="packaging">
@@ -62,7 +62,7 @@
           <div class="left">
             <i class="text">合计：</i>
             <i class="symbol">￥</i>
-            <i class="sum">{{formatAmount(specsList[curIndex] ? specsList[curIndex].priceList[0].price * number : 0)}}</i>
+            <i class="sum">{{formatAmount(specsList[curIndex] ? specsList[curIndex].priceList[0].price * number: 0)}}</i>
           </div>
           <div class="right">
             <span class="diamonds right-item" @click="add">+</span>
@@ -87,7 +87,7 @@ import {
   getCloudDetail,
   shopBill,
   checkRed,
-  queryYunfei
+  // queryYunfei
 } from "api/baohuo";
 import { formatImg, formatAmount, getUserId } from "common/js/util";
 import { setCookie } from "../../common/js/cookie";
@@ -122,7 +122,7 @@ export default {
       start: 1,
       limit: 10,
       hasMore: true,
-      freight: 0,   // 运费,
+      // freight: 0,   // 运费,
       proIdx: 0
     };
   },
@@ -160,7 +160,7 @@ export default {
     //选购产品数量+1
     add() {
       this.number++;
-      this.queryYunfei();
+      // this.queryYunfei();
       this.prodNum[this.curIndex] = this.number;
     },
     // 选购产品数量-1
@@ -232,12 +232,12 @@ export default {
     prodectDetail(code, index) {
       this.genghuan(index);
       this.proIdx = index;
-      this.queryYunfei();
+      // this.queryYunfei();
     },
     chooseSize(index) {
       this.num = index;
       this.specsList[this.curIndex] = this.detail.specsList[index];
-      this.queryYunfei();
+      // this.queryYunfei();
     },
     getPageProducts() {
       this.loading = true;
@@ -271,23 +271,23 @@ export default {
         this.start++;
       })
     },
-    queryYunfei() {
-      // console.log(this.list[this.proIdx]);
-      if(!this.address) {
-        return;
-      }
-      this.loading = true;
-      queryYunfei({
-        productCode: this.list[this.proIdx].code,
-        specsCode: this.specsList[this.curIndex].code,
-        quantity: this.number,
-        province: this.address.province,
-        kind: 0
-      }).then((res) => {
-        this.loading = false;
-        this.freight = res.yunfei;
-      }).catch(() => { this.loading = false })
-    },
+    // queryYunfei() {
+    //   // console.log(this.list[this.proIdx]);
+    //   if(!this.address) {
+    //     return;
+    //   }
+    //   this.loading = true;
+    //   queryYunfei({
+    //     productCode: this.list[this.proIdx].code,
+    //     specsCode: this.specsList[this.curIndex].code,
+    //     quantity: this.number,
+    //     province: this.address.province,
+    //     kind: 0
+    //   }).then((res) => {
+    //     this.loading = false;
+    //     this.freight = res.yunfei;
+    //   }).catch(() => { this.loading = false })
+    // },
   },
   mounted() {
     Promise.all([

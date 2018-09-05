@@ -51,7 +51,7 @@
             <div class="left">
               <i class="text">合计：</i>
               <i class="symbol">￥</i>
-              <i class="sum">{{formatAmount(detail.price * number)}}</i>
+              <i class="sum">{{formatAmount(detail.price * number + freight)}}</i>
             </div>
             <div class="right">
               <span class="diamonds right-item" @click="add">+</span>
