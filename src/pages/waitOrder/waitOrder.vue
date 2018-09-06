@@ -8,7 +8,7 @@
     <div class="orders-content" :class="[ovfh ? 'ovfh' : 'ovfs']">
       <div class="item clearfix" v-for="(item,index) in list">
         <div class="top clearfix">
-          <span class="user">提交人：{{item.agent.realName || item.agent.nickName}}{{levelObj[item.agent.level]}}（{{item.agent.mobile}}）</span>
+          <span class="user">提交人：{{item.realName || item.nickName}}{{item.agent ? levelObj[item.agent.level] : ''}}（{{item.agent ? item.agent.mobile : ''}}）</span>
           <span class="status">{{status[item.status]}}</span>
         </div>
         <div class="info" :class="{ active: heightActive === index }" ref="divInfo">

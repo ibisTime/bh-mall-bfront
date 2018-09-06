@@ -5,7 +5,7 @@
               <div>
                   <span>成功邀请（人）</span>
                   <i>{{number}}</i>
-                  <button @click="share">分享链接</button>
+                  <button @click="showMask">分享链接</button>
               </div>
               <div>
                   <span>提成收益（元）</span>
@@ -41,6 +41,7 @@
               <div class="erweimaPic" id="qrcode"></div>
           </div>
       </div>
+    <share-mask ref="shareMask"></share-mask>
   </div>
 </template>
 <script>
@@ -51,6 +52,7 @@ import { getCookie } from "common/js/cookie";
 import { isLogin, formatAmount, getUserId } from "common/js/util";
 import { getUser } from "api/user";
 const QRCode = require("js-qrcode");
+import ShareMask from 'components/share-mask/share-mask';
 export default {
   name: "Invitation",
   data() {
@@ -59,13 +61,13 @@ export default {
       // 177
      // wxUrl: "http://mj.bfront.zjqiyu.com?userReferee=",
       // 183
-       wxUrl: "http://front.bhxt.hichengdai.com?userReferee=",
-      info: {
-        title: "麦记新零售邀请链接",
-        desc: "邀请链接",
-        link: location.href.split('#')[0],
-        imgUrl: "http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg"
-      },
+       wxUrl: "http://front.bhxt.hichengdai.com/#/?userReferee=",
+      // info: {
+      //   title: "麦记新零售邀请链接",
+      //   desc: "邀请链接",
+      //   link: location.origin.split('#')[0] + '?userReferee=' + this.userReferee,
+      //   imgUrl: "http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg"
+      // },
       realName: '',
       status:'',
       number: 0,
@@ -79,26 +81,35 @@ export default {
     changeFlag() {
       this.flag = !this.flag;
     },
-    share() {
-      initShare(this.info, this.success);
+    initShare() {
+      initShare({
+        title: "麦记新零售邀请链接",
+        desc: "邀请链接",
+        link: location.href.split('#')[0] + '/#/?userReferee=' + getUserId(),
+        imgUrl: "http://otoieuivb.bkt.clouddn.com/下载_1522114909652.jpg"
+      });
     },
     success() {
-      alert("点击右上角，进行分享");
+      // alert("点击右上角，进行分享");
+      this.showMask();
     },
     error(e) {
       alert(e);
     },
     cancel() {
       alert("cancel");
+    },
+    showMask() {
+      this.$refs.shareMask.show();
     }
   },
   mounted() {
     this.loading = true;
     this.status = getCookie('status');
     if (isLogin()) {
-      let userReferee = getCookie("userId");
+      this.userReferee = getCookie("userId");
 
-      this.wxUrl += userReferee;
+      this.wxUrl += this.userReferee;
       //用插件生成二维码
       const container = document.getElementById("qrcode");
 
@@ -114,6 +125,7 @@ export default {
       qr.make(this.wxUrl);
       getUser().then(res => {
         this.realName = res.realName;
+        this.initShare();
       });
 
     }
@@ -124,6 +136,9 @@ export default {
       this.number = res.number;
       this.refreeAward = res.refreeAward;
     })
+  },
+  components: {
+    ShareMask
   }
 };
 </script>

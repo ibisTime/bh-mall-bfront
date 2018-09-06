@@ -42,12 +42,15 @@ export default {
     if (!isLogin()) {
       if (this.$route.path === '/fenxiangshangcheng') {
         return;
-      } else if (/userReferee=([^&]+)&code=([^&]+)&state=/.exec(location.href)) {
-        this.userReferee = RegExp.$1;
-        this.code = RegExp.$2;
-        this.toOther();
+      // } else if (/userReferee=([^&]+)&code=([^&]+)&state=/.exec(location.href)) {
+      //   this.userReferee = RegExp.$1;
+      //   this.code = RegExp.$2;
+      //   this.toOther();
       } else if (/code=([^&]+)&state=/.exec(location.href)) {
         this.code = RegExp.$1;
+        if (/userReferee=([^&$]+)/.exec(location.href)) {
+          this.userReferee = RegExp.$1;
+        }
         this.toOther();
       } else if (/userReferee=([^&$]+)/.exec(location.href)) {
         this.userReferee = RegExp.$1;
@@ -74,9 +77,9 @@ export default {
       //获取用户appid
       getAppId("wx_h5_access_key").then(res => {
         var appId = res.cvalue;
-        let redirect_uri = `${location.origin}?${location.hash}`;
-        if (this.userReferee) {
-          redirect_uri += `&userReferee=${this.userReferee}`;
+        let redirect_uri = `${location.origin}/${location.hash}`;
+        if (this.userReferee && !/userReferee=([^&$]+)/.exec(location.href)) {
+          redirect_uri += `?userReferee=${this.userReferee}`;
         }
         // 获取当前地址
         let redirectUri = encodeURIComponent(redirect_uri);
@@ -102,7 +105,7 @@ export default {
           let status = info.status;
           setUser(info);
           this.goLogin(userId, status);
-        });
+        }).catch(() => { alert('网络异常'); });
       } else {
         usergo1(this.code).then(info => {
           this.info = info;
@@ -110,7 +113,7 @@ export default {
           let userId = info.userId;
           let status = info.status;
           this.goLogin(userId, status);
-        });
+        }).catch(() => { alert('网络异常'); });
       }
     },
     checkUser(userId) {
@@ -132,7 +135,8 @@ export default {
         } else if (res.result == '6') {
           this.loading = false;
         } else {
-          this.$router.push('/home');
+          // this.$router.push('/home');
+          location.href = '/#/home';
         }
       });
     },

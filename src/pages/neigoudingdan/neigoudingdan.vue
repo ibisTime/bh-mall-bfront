@@ -308,6 +308,7 @@ export default {
         .btn-wrap {
           flex: 1;
           padding-top: 0.3rem;
+          margin-top: 0.2rem;
           text-align: right;
           div {
             float: right;

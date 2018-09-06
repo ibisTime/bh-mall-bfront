@@ -46,7 +46,7 @@
       <div class="title">
         <span>代理管理</span>
       </div>
-      <div v-for="(item,key) in dailiManage" :key="key" class="item" @click="$router.push(item.to);">
+      <div v-for="(item,key) in dailiManage" :key="key" class="item" @click="dlClick(item.to)">
         <img v-bind:src="item.src"><br>
         <span>{{item.text}}</span>
       </div>
@@ -329,6 +329,13 @@ export default {
     tuichu() {
       clearAllCookie();
       this.$router.push("/home");
+    },
+    dlClick(to) {
+      if (to === '/Invitation') {
+        location.href = location.origin + '/#/Invitation?userReferee=' + getUserId();
+      } else {
+        this.$router.push(to);
+      }
     }
   },
   mounted() {

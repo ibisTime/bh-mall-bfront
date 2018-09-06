@@ -19,7 +19,7 @@
         <div class="area">
             <i v-show="errors.has('area')" class="error-tip">{{errors.first('area')}}</i>
             <span>省份、市、区</span>
-            <city-picker class="item-input pl2rem"
+            <city-picker class="item-input pl2rem db"
                         :province="options.province"
                         :city="options.city"
                         :district="options.district"
@@ -445,6 +445,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "../../common/scss/variable.scss";
+.db {
+  display: block;
+}
 .login {
   padding: 0 0.2rem;
   width: 100%;

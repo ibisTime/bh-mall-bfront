@@ -35,7 +35,7 @@ export default {
     methods: {
       // 生成二维码
       makeCode() {
-        this.userId = this.$route.query.userReferee || getCookie('userId');
+        this.userId = this.$route.query.userId || getCookie('userId');
         this.wxUrl += this.userId;
         getUserById(this.userId).then(res =>{
             this.realName = res.realName;
@@ -59,7 +59,7 @@ export default {
         initShare({
           title: this.realName + '的商城',
           desc: '扫一扫，进入' + this.realName + '的商城',
-          link: location.href,
+          link: location.href.split('#')[0] + '/#/fenxiangshangcheng?userId=' + this.userId,
           imgUrl: Logo
         });
       },

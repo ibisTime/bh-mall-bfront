@@ -29,8 +29,6 @@ export function initShare(config, suc, err, isInitImage) {
       } else {
         config.link = config.link;
       }
-    } else {
-      config.link.replace(/((?:\?|&)userReferee=)[^&$]+/, '$1' + getUserId());
     }
     _initShare(data, config, isInitImage);
   }).catch((e) => {

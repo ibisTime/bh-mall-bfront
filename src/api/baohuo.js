@@ -400,16 +400,20 @@ export function queryProduct(info) {
       limit: info.limit || 100,
       name: info.name || '',
       start: info.start || 1,
-      status: info.status || ''
+      status: info.status || '',
+      orderColumn: 'order_No',
+      orderDir: 'asc'
     });
 }
 
 //获取内购商品列表
 export function neigouProduct(status) {
     return fetch(627710, {
-        start: 1,
-        limit: 100,
-        status: status || ''
+      start: 1,
+      limit: 100,
+      status: status || '',
+      orderColumn: 'order_No',
+      orderDir: 'asc'
     })
 }
 
@@ -706,10 +710,10 @@ export function queryYunOrder(info) {
 //分页查询内购商城理订单
 export function queryShopForm(statusList) {
     return fetch(627731, {
-        start: 1,
-        limit: 100,
-        // toUserId: getUserId(),
-        statusList: statusList,
+      start: 1,
+      limit: 100,
+      applyUser: getUserId(),
+      statusList: statusList,
     });
 }
 // 详情查内购订单
@@ -787,9 +791,11 @@ export function queryDefaultAddress() {
 //素材查询
 export function queryFodder(type) {
     return fetch(627430, {
-        start: 0,
-        limit: 100,
-        type: type,
+      start: 0,
+      limit: 100,
+      type: type,
+      orderColumn: 'order_No',
+      orderDir: 'asc'
     });
 }
 // 详情查素材

@@ -11,11 +11,15 @@ import { setCookie } from "./common/js/cookie";
 export default {
   name: "App",
   mounted() {
-    setUser({ userId: 'U201809041347164363544' });
+    // setUser({ userId: 'U201809051256207458747' });
     // setCookie('isWare', 1);
     if (!isLogin()) {
       if (this.$route.path !== '/fenxiangshangcheng') {
-        this.$router.push('/?userReferee=' + this.$route.query.userReferee || '');
+        // alert('app' + location.href);
+        // alert(JSON.stringify(this.$route));
+        if (this.$route.query.userReferee) {
+          this.$router.push('/?userReferee=' + this.$route.query.userReferee);
+        }
       }
     }
     this.resetFontSize();

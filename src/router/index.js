@@ -111,7 +111,7 @@ import noWarePay1 from '@/pages/noWare/noWarePay'
 Vue.use(Router)
 
 export default new Router({
-    mode: 'history',
+    // mode: 'history',
     routes: [
       //ceshi
       {
