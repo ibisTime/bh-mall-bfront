@@ -29,9 +29,9 @@
           <p class="day">{{item.day}}日</p>
           <p class="minute">{{item.hour}}:{{item.minutes}}</p>
         </div>
-        <img :src="item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
+        <img :src="item.inAmount !== '0' ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
         <div class="detail">
-          <p class="datail-money" :style="!item.bizNote.includes('充值') && 'color: #a5ca64'">{{item.bizNote}}   {{formatAmount(item.transAmount)}}</p>
+          <p class="datail-money" :style="item.outAmount !== '0' && 'color: #a5ca64'">{{item.bizNote}}   {{formatAmount(item.transAmount)}}</p>
           <p class="detail-text">{{item.remark}}</p>
         </div>
         </div>

@@ -24,9 +24,9 @@
           <p class="day">{{item.day}}日</p>
           <p class="minute">{{item.hour}}:{{item.minutes}}</p>
         </div>
-        <img :src="item.bizNote.includes('充值') ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
+        <img :src="item.inAmount !== '0' ? require('../../assets/threshold/shou.png') : require('../../assets/threshold/zhi.png') " alt="">
         <div class="detail">
-          <p class="datail-money">{{formatAmount(item.transAmount)}}</p>
+          <p class="datail-money" :style="item.outAmount !== '0' && 'color: #a5ca64'">{{item.bizNote}}  {{formatAmount(item.transAmount)}}</p>
           <p class="detail-text">{{item.remark}}</p>
         </div>
         </div>
@@ -144,18 +144,25 @@ export default {
     }
   }
   .item {
-    height: 1.4rem;
-    border-bottom: 1px solid #eee;
+    /*height: 1.4rem;*/
+    /*border-bottom: 1px solid #eee;*/
+    /*position: relative;*/
     position: relative;
+    padding: 0.2rem 0.3rem;
+    border-bottom: 1px solid #eee;
     .center {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
+      /*<!--position: absolute;-->*/
+      /*<!--top: 50%;-->*/
+      /*<!--transform: translateY(-50%);-->*/
+      display: flex;
+      width: 100%;
+      align-items: center;
       .item-time {
-        display: inline-block;
-        width: 1.23rem;
-        margin-left: 0.3rem;
-        text-align: center;
+        /*display: inline-block;*/
+        /*width: 1.23rem;*/
+        /*margin-left: 0.3rem;*/
+        /*text-align: center;*/
+        flex: 0 0 0.84rem;
         .day {
           font-size: $font-size-medium-xx;
           color: #333;
@@ -170,13 +177,20 @@ export default {
         width: 0.72rem;
       }
       .detail {
-        display: inline-block;
+        /*display: inline-block;*/
+        padding-left: 0.2rem;
         .datail-money {
+          /*<!--font-size: $font-size-large-s;-->*/
+          /*<!--color: #fe8472;-->*/
+          line-height: 1.1;
           font-size: $font-size-large-s;
           color: #fe8472;
         }
         .detail-text {
-          margin-top: 0.22rem;
+          /*<!--margin-top: 0.22rem;-->*/
+          /*<!--font-size: $font-size-small;-->*/
+          /*<!--color: #333;-->*/
+          margin-top: 0.1rem;
           font-size: $font-size-small;
           color: #333;
         }

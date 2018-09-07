@@ -73,7 +73,7 @@ export default {
           this.toastText = '提交失败';
           this.$refs.toast.show();
         }
-      });
+      }).catch(() => { this.loading = false; });
     },
     backRecord(index) {
       this.codeList = this.code.split(',');
@@ -95,7 +95,7 @@ export default {
           this.toastText = '提交失败';
           this.$refs.toast.show();
         }
-      });
+      }).catch(() => { this.loading = false; });
     }
   },
   mounted() {
@@ -109,7 +109,7 @@ export default {
       this.approveNote = res.approveNote;
       this.payNote = res.payNote;
       this.info = res;
-    });
+    }).catch(() => { this.loading = false; });
   },
   components: {
     Toast,

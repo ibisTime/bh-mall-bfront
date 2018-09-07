@@ -102,9 +102,9 @@ export default {
     this.options.accountNumber = this.$route.query.accountNumber;
     Promise.all([
       queryAmount(this.options.accountNumber),
-      getPercent("BUSERQXFL"),
+      getPercent("WDQXFL"),
       queryBankCard(),
-      getConfig({ type: 'AT_QX' })
+      getConfig({ type: 'WD_QX' })
     ]).then(([res1, res2, res3, res4]) => {
       this.account = res1.amount;
       this.percent = res2.cvalue;
