@@ -14,7 +14,7 @@
           <div class="input">
           	<span>{{compText}}</span>
           	<select v-model="wlCompany">
-          		<option v-for="item in companyList" :value="item.dkey">{{item.dvalue}}</option>
+          		<option v-for="item in companyList" :value="item.dvalue">{{item.dvalue}}</option>
           	</select>
           	<i class="right-icon"></i>
           </div>

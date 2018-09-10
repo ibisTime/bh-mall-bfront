@@ -24,7 +24,8 @@ import Logo from './logo.png';
 export default {
     data() {
         return {
-          wxUrl:'http://front.bhxt.hichengdai.com/xcx/?userId=',
+          // wxUrl:'http://front.bhxt.hichengdai.com/xcx/?userId=',
+          wxUrl:'http://mj.bfront.zjqiyu.com/xcx/?userId=',
           userId:'',
           realName:''
         };

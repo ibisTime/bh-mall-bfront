@@ -971,8 +971,8 @@ export function fahuo(info) {
 // 分页查意向代理
 export function getYixiang(info) {
   return fetch(627265, {
-    start: 1,
-    limit: 100,
+    start: info.start || 1,
+    limit: info.limit || 100,
     toUserId: info.toUserId || '',
     approver: info.approver || '',
     status: info.status || ''

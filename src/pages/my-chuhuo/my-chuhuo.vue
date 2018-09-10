@@ -34,12 +34,6 @@
                 <p style="line-height: 0.4rem;">规格：{{item.quantity}}{{item.specsName}}</p>
                 <div class="total">总价：¥{{formatAmount(item.amount)}}</div>
               </div>
-              <div class="btn-wrap">
-                <div class="quxiao" @click="cancel(item.code)" v-if="item.status == '0' || item.status == '1'">取消</div>
-                <div class="fukuan" @click="goPay(item.code)" v-if="item.status == '0'">付款</div>
-                <div class="shouhuo" @click="shouhuo(item.code)" v-if="item.status == '3'">收货</div>
-                <div class="wuliu" @click="wuliu(item.logisticsCode, item.logisticsCompany)" v-if="item.status == '3' || item.status == '4'">物流信息</div>
-              </div>
             </div>
           </div>
         </div>
@@ -118,12 +112,9 @@
           res3.map((item) => {
             this.type[item.dkey] = item.dvalue;
           });
-          console.log(this.type);
+          this.type[5] = '云仓订单';
         }).catch(() => { this.loading = false });
       },
-      // getPageOrders() {
-      //
-      // }
     },
     mounted() {
       this.userId = this.$route.query.userId;
