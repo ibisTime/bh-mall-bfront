@@ -6,11 +6,11 @@
         <p class="money-balance">{{formatAmount(account)}}</p>
       </div>
       <div class="header-bottom">
-        <div class="header-bottom-left fl" @click="$router.push('/recharge?type=TX_CNY&accountNumber=' + accountNumber)">
-          <img src="../../assets/threshold/chongzhi.png" alt="">
-          <span>充值</span>
-          <i class="line"></i>
-        </div>
+        <!--<div class="header-bottom-left fl" @click="$router.push('/recharge?type=TX_CNY&accountNumber=' + accountNumber)">-->
+          <!--<img src="../../assets/threshold/chongzhi.png" alt="">-->
+          <!--<span>充值</span>-->
+          <!--<i class="line"></i>-->
+        <!--</div>-->
         <div class="header-bottom-left fl" @click="$router.push('/yejizhanghu/quxian?accountNumber=' + accountNumber)">
           <img src="../../assets/threshold/chongzhi.png" alt="">
           <span>取现</span>
@@ -129,7 +129,7 @@ export default {
       background-color: rgba(0, 0, 0, 0.04);
       font-size: $font-size-medium-x;
       > div {
-        width: 33.33%;
+        width: 50%;
         line-height: 0.9rem;
         img {
           width: 0.3rem;

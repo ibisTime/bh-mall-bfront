@@ -108,16 +108,18 @@ export default {
     ]).then(([res1, res2, res3, res4]) => {
       this.account = res1.amount;
       this.percent = res2.cvalue;
-      this.options.payCardInfo = res3[0].bankName;
-      this.options.payCardNo = res3[0].bankcardNumber;
-      this.cardList = res3;
+      if(res3.length) {
+        this.options.payCardInfo = res3[0].bankName;
+        this.options.payCardNo = res3[0].bankcardNumber;
+        this.cardList = res3;
+      }
       this.rules = res4.list;
       if(!this.cardList.length) {
         this.text = "您暂无银行卡，请添加";
         this.$refs.mytoast.show();
         setTimeout(() => {
           this.$router.push('/yejizhanghu/addBankCard');
-        }, 300)
+        }, 500)
       }
     });
   },
